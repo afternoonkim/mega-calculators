@@ -1,0 +1,51 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { calculatorsByCategory } from "@/lib/calculators/data";
+import AdSlot from "@/components/ads/AdSlot";
+
+export const metadata: Metadata = {
+  title: "All Calculators",
+  description: "Browse 100 free online calculators and converters across finance, health, time, math, unit conversion, and life topics.",
+  alternates: { canonical: "/calculators" },
+};
+
+export default function AllCalculatorsPage() {
+  return (
+    <div className="space-y-8">
+      <section>
+        <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">All calculators</div>
+        <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">Browse all 100 free online calculators</h1>
+        <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">
+          Explore calculators by category to quickly find finance tools, health tools, time calculators, math calculators, unit converters, and everyday life utilities.
+        </p>
+      </section>
+
+      <AdSlot slotKey="calculatorsIndexMid" label="All calculators page ad" minHeightClass="min-h-[140px]" />
+
+      {calculatorsByCategory.map((category) => (
+        <section key={category.slug} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-950">{category.name}</h2>
+              <p className="mt-2 text-sm text-slate-600">{category.items.length} calculators in this category.</p>
+            </div>
+            <Link href={`/calculators/${category.slug}`} className="text-sm font-semibold text-blue-700">Category page →</Link>
+          </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {category.items.map((item) => (
+              <Link
+                key={item.slug}
+                href={`/calculators/${item.category}/${item.slug}`}
+                className="rounded-2xl border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50"
+              >
+                <div className="text-base font-semibold text-slate-900">{item.name}</div>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{item.description}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}

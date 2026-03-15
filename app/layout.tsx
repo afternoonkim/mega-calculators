@@ -36,6 +36,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  verification: {
+    google: "utGZoboUYhCKflQygCPsZ_K8CdJiQaOfYBeunri0AcE",
+    // other: {
+    //   "naver-site-verification": "1dae33c8d0ab9be494b117f91e4d8a6ad911b520",
+    //   "msvalidate.01": "A0623C2A4E78687DE6334EBC6E9BBE67"
+    // }
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

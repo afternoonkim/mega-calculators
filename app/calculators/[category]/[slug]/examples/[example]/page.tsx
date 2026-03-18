@@ -36,6 +36,7 @@ export default async function CalculatorExamplePage({ params }: { params: Promis
   const { category, slug, example } = await params;
   const calculator = getCalculator(category, slug);
   if (!calculator) notFound();
+
   const exampleData = getCalculatorExamples(calculator).find((item) => item.slug === example);
   if (!exampleData) notFound();
 
@@ -92,7 +93,7 @@ export default async function CalculatorExamplePage({ params }: { params: Promis
           {result.secondary?.length ? (
             <div className="mt-6 space-y-3">
               {result.secondary.map((item) => (
-                <div key={item.label} className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                <div key={`${item.label}-${item.value}`} className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
                   <span className="text-sm text-slate-300">{item.label}</span>
                   <span className="text-sm font-semibold text-white">{item.value}</span>
                 </div>

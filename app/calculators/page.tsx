@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { calculatorsByCategory } from "@/lib/calculators/data";
-import AdSlot from "@/components/ads/AdSlot";
+import AdPlaceholder from "@/components/ads/AdPlaceholder";
+import { calculatorCategories, calculators } from "@/lib/calculators/data";
+
+const categorySections = calculatorCategories.map((category) => ({
+  ...category,
+  items: calculators.filter((item) => item.category === category.slug),
+}));
+
+const total = calculators.length;
 
 export const metadata: Metadata = {
   title: "All Calculators",
-  description: "Browse 100 free online calculators and converters across finance, health, time, math, unit conversion, and life topics.",
+  description: `Browse ${total} free online calculators and converters across finance, health, time, math, unit conversion, and life topics.`,
   alternates: { canonical: "/calculators" },
 };
 
@@ -14,15 +21,15 @@ export default function AllCalculatorsPage() {
     <div className="space-y-8">
       <section>
         <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">All calculators</div>
-        <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">Browse all 100 free online calculators</h1>
+        <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">Browse all {total} free online calculators</h1>
         <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">
           Explore calculators by category to quickly find finance tools, health tools, time calculators, math calculators, unit converters, and everyday life utilities.
         </p>
       </section>
 
-      <AdSlot slotKey="calculatorsIndexMid" label="All calculators page ad" minHeightClass="min-h-[140px]" />
+      <AdPlaceholder label="All calculators ad" />
 
-      {calculatorsByCategory.map((category) => (
+      {categorySections.map((category) => (
         <section key={category.slug} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -35,7 +42,7 @@ export default function AllCalculatorsPage() {
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {category.items.map((item) => (
               <Link
-                key={item.slug}
+                key={`${item.category}-${item.slug}`}
                 href={`/calculators/${item.category}/${item.slug}`}
                 className="rounded-2xl border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50"
               >

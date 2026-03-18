@@ -8,12 +8,12 @@ export default function SiteFooter() {
           <div>
             <div className="text-lg font-bold text-slate-950">Mega Calculators</div>
             <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">
-              Mega Calculators is a free online calculator and converter library built for US and global English-speaking users.
-              Every tool page is designed to be fast, mobile-friendly, and easy to understand.
+              Mega Calculators is a free online calculator and converter library built to answer practical questions clearly and quickly.
+              Use it for money decisions, health estimates, date math, percentages, and everyday conversions.
             </p>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-              We focus on practical tools for finance, health, time, math, unit conversion, and everyday life.
-              Our goal is to provide clear formulas, realistic examples, step-by-step guides, and simple explanations alongside each calculator.
+              Results are intended for planning and education. When taxes, lending, legal matters, payroll, or medical decisions are involved,
+              verify the numbers with an official source or qualified professional.
             </p>
           </div>
 

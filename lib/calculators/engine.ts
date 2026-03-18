@@ -40,6 +40,30 @@ function parseList(input: string | undefined) {
     .filter((item) => Number.isFinite(item));
 }
 
+
+function parseDateSafe(dateString: string | undefined) {
+  const date = new Date(String(dateString || ""));
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function diffYMD(start: Date, end: Date) {
+  let years = end.getUTCFullYear() - start.getUTCFullYear();
+  let months = end.getUTCMonth() - start.getUTCMonth();
+  let days = end.getUTCDate() - start.getUTCDate();
+
+  if (days < 0) {
+    const prevMonth = new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), 0));
+    days += prevMonth.getUTCDate();
+    months -= 1;
+  }
+
+  if (months < 0) {
+    months += 12;
+    years -= 1;
+  }
+
+  return { years: Math.max(years, 0), months: Math.max(months, 0), days: Math.max(days, 0) };
+}
 function monthsToText(months: number) {
   const years = Math.floor(months / 12);
   const remainingMonths = Math.round(months % 12);
@@ -105,6 +129,199 @@ export function getDefaultValues(definition: CalculatorDefinition) {
 
 export function computeCalculator(definition: CalculatorDefinition, values: Values): CalculatorResult {
   switch (definition.kind) {
+    case "bloodPressure": {
+      const systolic = num(values.systolic);
+      const diastolic = num(values.diastolic);
+      const pulsePressure = systolic - diastolic;
+      const map = diastolic + (pulsePressure / 3);
+      return {
+        primary: { label: "Mean arterial pressure", value: `${formatNumber(map)} mmHg` },
+        secondary: [
+          { label: "Pulse pressure", value: `${formatNumber(pulsePressure)} mmHg` },
+          { label: "Blood pressure", value: `${formatNumber(systolic, 0)}/${formatNumber(diastolic, 0)} mmHg` },
+        ],
+      };
+    }
+    case "concreteVolume": {
+      const lengthFt = num(values.lengthFt);
+      const widthFt = num(values.widthFt);
+      const depthFt = num(values.depthIn) / 12;
+      const cubicFeet = lengthFt * widthFt * depthFt;
+      const cubicYards = cubicFeet / 27;
+      const bags80 = cubicYards / 0.022;
+      return {
+        primary: { label: "Concrete needed", value: `${formatNumber(cubicYards)} yd³` },
+        secondary: [
+          { label: "Volume", value: `${formatNumber(cubicFeet)} ft³` },
+          { label: "Approx. 80 lb bags", value: formatNumber(bags80, 0) },
+        ],
+      };
+    }
+    case "tileCoverage": {
+      const roomAreaIn2 = num(values.roomLengthFt) * 12 * num(values.roomWidthFt) * 12;
+      const tileAreaIn2 = Math.max(num(values.tileLengthIn) * num(values.tileWidthIn), 0.0001);
+      const tiles = roomAreaIn2 / tileAreaIn2;
+      const withWaste = tiles * (1 + num(values.wastePct) / 100);
+      return {
+        primary: { label: "Estimated tiles needed", value: formatNumber(Math.ceil(withWaste), 0) },
+        secondary: [
+          { label: "Surface area", value: `${formatNumber(roomAreaIn2 / 144)} sq ft` },
+          { label: "Tiles before waste", value: formatNumber(Math.ceil(tiles), 0) },
+          { label: "Waste included", value: `${formatNumber(num(values.wastePct))}%` },
+        ],
+      };
+    }
+    case "gravelVolume": {
+      const lengthFt = num(values.lengthFt);
+      const widthFt = num(values.widthFt);
+      const depthFt = num(values.depthIn) / 12;
+      const cubicFeet = lengthFt * widthFt * depthFt;
+      const cubicYards = cubicFeet / 27;
+      const tons = cubicYards * 1.5;
+      return {
+        primary: { label: "Gravel needed", value: `${formatNumber(cubicYards)} yd³` },
+        secondary: [
+          { label: "Volume", value: `${formatNumber(cubicFeet)} ft³` },
+          { label: "Approx. weight", value: `${formatNumber(tons)} tons` },
+        ],
+      };
+    }
+    case "acceleration": {
+      const a = (num(values.finalVelocity) - num(values.initialVelocity)) / Math.max(num(values.timeSeconds), 0.0001);
+      return {
+        primary: { label: "Acceleration", value: `${formatNumber(a)} m/s²` },
+        secondary: [
+          { label: "Change in velocity", value: `${formatNumber(num(values.finalVelocity) - num(values.initialVelocity))} m/s` },
+          { label: "Time", value: `${formatNumber(num(values.timeSeconds))} s` },
+        ],
+      };
+    }
+    case "kineticEnergy": {
+      const energy = 0.5 * num(values.massKg) * Math.pow(num(values.velocity), 2);
+      return {
+        primary: { label: "Kinetic energy", value: `${formatNumber(energy)} J` },
+        secondary: [
+          { label: "Mass", value: `${formatNumber(num(values.massKg))} kg` },
+          { label: "Velocity", value: `${formatNumber(num(values.velocity))} m/s` },
+        ],
+      };
+    }
+    case "baseConverter": {
+      const raw = String(values.value || '').trim();
+      const base = Number(values.fromBase || '10');
+      const parsed = Number.parseInt(raw, base);
+      if (!raw || Number.isNaN(parsed)) {
+        return { primary: { label: 'Converted value', value: 'Invalid input' }, note: 'Enter a value that matches the base you selected.' };
+      }
+      return {
+        primary: { label: 'Decimal', value: parsed.toString(10) },
+        secondary: [
+          { label: 'Binary', value: parsed.toString(2) },
+          { label: 'Octal', value: parsed.toString(8) },
+          { label: 'Hexadecimal', value: parsed.toString(16).toUpperCase() },
+        ],
+      };
+    }
+    case "ageDifference": {
+      const d1 = parseDateSafe(values.dateOne);
+      const d2 = parseDateSafe(values.dateTwo);
+      if (!d1 || !d2) return { primary: { label: 'Age difference', value: 'Invalid date' } };
+      const [start, end] = d1 <= d2 ? [d1, d2] : [d2, d1];
+      const totalDays = daysBetween(start, end);
+      const diff = diffYMD(start, end);
+      return {
+        primary: { label: 'Age difference', value: `${diff.years} years ${diff.months} months ${diff.days} days` },
+        secondary: [
+          { label: 'Total days', value: formatNumber(totalDays, 0) },
+          { label: 'Earlier date', value: formatDate(start) },
+          { label: 'Later date', value: formatDate(end) },
+        ],
+      };
+    }
+    case "anniversary": {
+      const start = parseDateSafe(values.startDate);
+      if (!start) return { primary: { label: 'Next anniversary', value: 'Invalid date' } };
+      const today = new Date();
+      let next = new Date(Date.UTC(today.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate()));
+      if (next < new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()))) {
+        next = new Date(Date.UTC(today.getUTCFullYear() + 1, start.getUTCMonth(), start.getUTCDate()));
+      }
+      const upcomingYear = next.getUTCFullYear() - start.getUTCFullYear();
+      const remainingDays = daysBetween(new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())), next);
+      return {
+        primary: { label: 'Next anniversary', value: formatDate(next) },
+        secondary: [
+          { label: 'Upcoming anniversary', value: `${upcomingYear}${upcomingYear === 1 ? 'st' : upcomingYear === 2 ? 'nd' : upcomingYear === 3 ? 'rd' : 'th'}` },
+          { label: 'Days remaining', value: formatNumber(remainingDays, 0) },
+        ],
+      };
+    }
+    case "median": {
+      const list = parseList(values.numbers).sort((a,b)=>a-b);
+      if (!list.length) return { primary: { label: 'Median', value: '0' } };
+      const mid = Math.floor(list.length/2);
+      const median = list.length % 2 ? list[mid] : (list[mid-1]+list[mid])/2;
+      return {
+        primary: { label: 'Median', value: formatNumber(median) },
+        secondary: [
+          { label: 'Values', value: formatNumber(list.length,0) },
+          { label: 'Lowest', value: formatNumber(list[0]) },
+          { label: 'Highest', value: formatNumber(list[list.length-1]) },
+        ],
+      };
+    }
+    case "mode": {
+      const list = parseList(values.numbers);
+      if (!list.length) return { primary: { label: 'Mode', value: 'No data' } };
+      const counts = new Map<number, number>();
+      for (const n of list) counts.set(n, (counts.get(n)||0)+1);
+      const maxCount = Math.max(...counts.values());
+      const modes = [...counts.entries()].filter(([,c])=>c===maxCount).map(([n])=>n);
+      const noMode = modes.length === counts.size;
+      return {
+        primary: { label: 'Mode', value: noMode ? 'No mode' : modes.map((n)=>formatNumber(n)).join(', ') },
+        secondary: [
+          { label: 'Highest frequency', value: formatNumber(maxCount,0) },
+          { label: 'Unique values', value: formatNumber(counts.size,0) },
+        ],
+      };
+    }
+    case "halfLife": {
+      const initial = num(values.initialAmount);
+      const halfLife = Math.max(num(values.halfLife), 0.0001);
+      const elapsed = Math.max(num(values.elapsedTime), 0);
+      const remaining = initial * Math.pow(0.5, elapsed / halfLife);
+      return {
+        primary: { label: 'Remaining amount', value: formatNumber(remaining) },
+        secondary: [
+          { label: 'Initial amount', value: formatNumber(initial) },
+          { label: 'Elapsed half-lives', value: formatNumber(elapsed / halfLife) },
+        ],
+      };
+    }
+    case "gramsToMoles": {
+      const grams = num(values.grams);
+      const molarMass = Math.max(num(values.molarMass), 0.0001);
+      const moles = grams / molarMass;
+      return {
+        primary: { label: 'Moles', value: formatNumber(moles) },
+        secondary: [
+          { label: 'Mass', value: `${formatNumber(grams)} g` },
+          { label: 'Molar mass', value: `${formatNumber(molarMass)} g/mol` },
+        ],
+      };
+    }
+    case "ph": {
+      const h = Math.max(num(values.hConcentration), 1e-16);
+      const ph = -Math.log10(h);
+      return {
+        primary: { label: 'pH', value: formatNumber(ph) },
+        secondary: [
+          { label: 'Hydrogen ion concentration', value: `${h} mol/L` },
+          { label: 'Classification', value: ph < 7 ? 'Acidic' : ph > 7 ? 'Basic' : 'Neutral' },
+        ],
+      };
+    }
     case "expression": {
       const result = safeEvalExpression(definition.expr || "0", values);
 

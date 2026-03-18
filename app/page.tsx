@@ -1,74 +1,71 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { calculatorsByCategory } from "@/lib/calculators/data";
-import AdSlot from "@/components/ads/AdSlot";
+import AdPlaceholder from "@/components/ads/AdPlaceholder";
+import { calculatorCategories, calculators } from "@/lib/calculators/data";
 
 export const metadata: Metadata = {
   title: "Free Online Calculators and Converters",
   description:
-    "Mega Calculators offers free online calculators and converters for finance, health, time, math, unit conversion, and everyday life. Browse calculator pages, formula pages, how-to guides, use-case hubs, and example scenarios built for SEO and mobile users.",
+    "Mega Calculators offers free online calculators and converters for finance, health, time, math, unit conversion, and everyday life.",
   alternates: { canonical: "/" },
 };
 
 const featuredCalculators = [
   { href: "/calculators/finance/compound-interest-calculator", name: "Compound Interest Calculator", tag: "Investing" },
-  { href: "/calculators/finance/mortgage-calculator", name: "Mortgage Calculator", tag: "Home buying" },
-  { href: "/calculators/finance/loan-calculator", name: "Loan Calculator", tag: "Borrowing" },
+  { href: "/calculators/finance/mortgage-calculator", name: "Mortgage Calculator", tag: "Home" },
   { href: "/calculators/health/bmi-calculator", name: "BMI Calculator", tag: "Health" },
+  { href: "/calculators/life/concrete-calculator", name: "Concrete Calculator", tag: "Projects" },
   { href: "/calculators/time/age-calculator", name: "Age Calculator", tag: "Time" },
-  { href: "/calculators/math/percentage-calculator", name: "Percentage Calculator", tag: "Math" },
-  { href: "/calculators/life/tip-calculator", name: "Tip Calculator", tag: "Everyday life" },
-  { href: "/calculators/life/gpa-calculator", name: "GPA Calculator", tag: "Education" },
+  { href: "/calculators/math/kinetic-energy-calculator", name: "Kinetic Energy Calculator", tag: "Science" },
+  { href: "/calculators/unit-converters/base-converter", name: "Base Converter", tag: "Conversion" },
+  { href: "/calculators/unit-converters/cups-to-tablespoons-converter", name: "Cups to Tablespoons Converter", tag: "Kitchen" },
 ];
 
-const seoPoints = [
+const highlights = [
   {
-    title: "Clear formulas and examples",
-    description:
-      "Each calculator page includes an explanation, usage steps, and practical examples so visitors can understand the result instead of seeing a number only.",
+    title: "Fast answers",
+    description: "Open a calculator, enter your numbers, and get a clear result without digging through cluttered screens.",
   },
   {
-    title: "Built for mobile and desktop",
-    description:
-      "Mega Calculators is designed for fast loading, simple inputs, and clean navigation across phones, tablets, and desktop screens.",
+    title: "Useful explanations",
+    description: "Each tool includes a short explanation, simple usage steps, and an example so the result is easier to understand.",
   },
   {
-    title: "Useful internal linking",
-    description:
-      "Related calculator links and category hubs help users discover more tools while improving crawlability and site structure.",
+    title: "Everyday coverage",
+    description: "Use Mega Calculators for money, health, dates, home projects, cooking, schoolwork, and common conversion tasks.",
   },
 ];
+
+const categoryCards = calculatorCategories.map((category) => ({
+  ...category,
+  items: calculators.filter((item) => item.category === category.slug),
+}));
 
 export default function HomePage() {
-  const totalCalculators = calculatorsByCategory.reduce((sum, category) => sum + category.items.length, 0);
+  const totalCalculators = calculators.length;
 
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Mega Calculators",
     url: "https://mega-calculators.com",
-    potentialAction: {
-      "@type": "SearchAction",
-      target: "https://mega-calculators.com/calculators",
-      "query-input": "required name=search_term_string",
-    },
   };
 
   return (
     <div className="space-y-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
 
-      <section className="overflow-hidden rounded-[2rem] bg-slate-950 px-6 py-12 text-white shadow-sm md:px-10 md:py-16">
+      <section className="rounded-[2rem] bg-slate-950 px-6 py-12 text-white shadow-sm md:px-10 md:py-16">
         <div className="max-w-5xl">
-          <div className="inline-flex rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-200">
-            Free online calculators and converters
+          <div className="inline-flex rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-200">
+            Free online tools
           </div>
           <h1 className="mt-5 text-4xl font-black tracking-tight md:text-6xl">
-            Free online calculators for finance, health, time, math, units, and everyday life
+            Free calculators for money, health, dates, conversions, and daily tasks
           </h1>
           <p className="mt-5 max-w-4xl text-base leading-8 text-slate-300 md:text-lg">
-            Mega Calculators helps you solve common problems faster with free online calculators built for US and global English-speaking users.
-            Browse calculators for compound interest, loans, mortgages, BMI, age, percentages, tips, GPA, conversions, and dozens of other daily tasks.
+            Mega Calculators helps you solve common questions faster with clean, easy-to-use online calculators. Browse tools for loans,
+            mortgages, BMI, age, concrete, tile, cooking conversions, statistics, and much more.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/calculators" className="rounded-2xl bg-blue-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-400">
@@ -81,21 +78,13 @@ export default function HomePage() {
         </div>
 
         <div className="mt-10 grid gap-4 md:grid-cols-3">
-          <StatCard label="Core calculators" value={`${totalCalculators}`} />
-          <StatCard label="SEO support pages" value={`${totalCalculators * 9}+`} />
-          <StatCard label="Primary audience" value="US + English" />
+          <StatCard label="Total calculators" value={`${totalCalculators}`} />
+          <StatCard label="Main categories" value={`${categoryCards.length}`} />
+          <StatCard label="Popular uses" value="Finance, health, projects" />
         </div>
       </section>
 
-      <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-        <div className="max-w-4xl">
-          <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">SEO content network</div>
-          <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Every calculator now connects to formula, guide, use-case, and example pages</h2>
-          <p className="mt-4 text-base leading-8 text-slate-600">
-            Instead of publishing only one page per calculator, Mega Calculators now creates a full search cluster around each tool. That means more long-tail landing pages, stronger internal linking, and better chances to rank for intent-rich searches such as examples, formulas, and how-to queries.
-          </p>
-        </div>
-      </section>
+      <AdPlaceholder label="Homepage banner ad" />
 
       <section>
         <div className="flex items-end justify-between gap-4">
@@ -104,7 +93,7 @@ export default function HomePage() {
             <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Start with the calculators people use most</h2>
           </div>
           <Link href="/calculators" className="text-sm font-semibold text-blue-700">
-            View all 100 calculators →
+            View all calculators →
           </Link>
         </div>
 
@@ -119,8 +108,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <AdSlot slotKey="homeMid" label="Homepage ad" minHeightClass="min-h-[140px]" />
-
       <section>
         <div className="flex items-end justify-between gap-4">
           <div>
@@ -133,7 +120,7 @@ export default function HomePage() {
         </div>
 
         <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {calculatorsByCategory.map((category) => (
+          {categoryCards.map((category) => (
             <Link
               key={category.slug}
               href={`/calculators/${category.slug}`}
@@ -142,7 +129,7 @@ export default function HomePage() {
               <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">{category.items.length} tools</div>
               <h3 className="mt-3 text-2xl font-bold text-slate-950">{category.name}</h3>
               <p className="mt-3 text-sm leading-7 text-slate-600">
-                Explore free online tools in the {category.name.toLowerCase()} category with formulas, examples, FAQs, and related calculator links.
+                Find calculators in {category.name.toLowerCase()} for quick answers, simple comparisons, and everyday planning.
               </p>
             </Link>
           ))}
@@ -151,15 +138,15 @@ export default function HomePage() {
 
       <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
         <div className="max-w-4xl">
-          <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">Why Mega Calculators</div>
-          <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">A calculator site designed for usefulness first</h2>
+          <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">Why people use Mega Calculators</div>
+          <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">A calculator site built to be practical</h2>
           <p className="mt-4 text-base leading-8 text-slate-600">
-            Many calculator websites only show a basic form and a result. Mega Calculators is built differently.
-            We pair each tool with plain-English explanations, short how-to sections, realistic examples, and FAQs so the page is useful to both searchers and returning visitors.
+            Some calculator sites feel crowded or confusing. Mega Calculators keeps things simple with clear forms, readable results,
+            and short explanations that help you use the answer right away.
           </p>
         </div>
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
-          {seoPoints.map((item) => (
+          {highlights.map((item) => (
             <InfoCard key={item.title} title={item.title} description={item.description} />
           ))}
         </div>

@@ -2,22 +2,22 @@ import type { Metadata } from "next";
 
 const posts = [
   {
-    title: "How calculator pages rank for long-tail search",
-    description: "A practical look at why formulas, examples, FAQs, and related links help calculator pages capture intent-rich search traffic.",
+    title: "How to compare loan and mortgage estimates",
+    description: "A quick guide to reading monthly payment, total repayment, and interest results before you borrow.",
   },
   {
-    title: "What makes a high-performing calculator landing page",
-    description: "Fast inputs, instant results, clear copy, and strong internal linking usually outperform flashy but thin tool pages.",
+    title: "How to choose the right health calculator",
+    description: "When to use BMI, calorie, heart rate, and body-composition tools, and when to ask a professional instead.",
   },
   {
-    title: "How to scale from 100 calculators to 1,000",
-    description: "A data-driven content system makes it easier to expand your tool library without breaking information architecture.",
+    title: "Simple ways to use percentage and time calculators",
+    description: "Practical examples for discounts, date math, work hours, and everyday calculations.",
   },
 ];
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "Read blog content about calculator SEO, tool UX, and scalable content architecture.",
+  description: "Helpful articles about using calculators for money, health, time, and everyday decisions.",
 };
 
 export default function BlogPage() {
@@ -25,9 +25,9 @@ export default function BlogPage() {
     <div className="space-y-8">
       <section>
         <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">Blog</div>
-        <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">Calculator SEO, tool UX, and content growth</h1>
+        <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">Helpful articles for everyday calculations</h1>
         <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">
-          This section can support the calculator library with informational content that targets broader search intent and strengthens internal linking.
+          Browse short articles that explain how to use common calculators, compare real-world scenarios, and understand the numbers before you make a decision.
         </p>
       </section>
 

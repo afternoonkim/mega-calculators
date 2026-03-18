@@ -1,9 +1,10 @@
+import { additionalCalculators } from "@/lib/calculators/additional";
 export type SelectOption = { label: string; value: string }
 
 export type CalculatorInput = {
   name: string;
   label: string;
-  type: "number" | "select" | "date" | "time" | "textarea";
+  type: "number" | "select" | "date" | "time" | "textarea" | "text";
   defaultValue?: string;
   min?: string;
   max?: string;
@@ -42,7 +43,7 @@ export const calculatorCategories = [
   { slug: "life", name: "Life Calculators" },
 ] as const;
 
-export const calculators: CalculatorDefinition[] = [
+const baseCalculators: CalculatorDefinition[] = [
   {
     "category": "finance",
     "categoryName": "Finance Calculators",
@@ -6826,6 +6827,14 @@ export const calculators: CalculatorDefinition[] = [
 
 
 
+
+const calculatorMap = new Map<string, CalculatorDefinition>();
+for (const calculator of [...baseCalculators, ...additionalCalculators]) {
+  calculatorMap.set(`${calculator.category}::${calculator.slug}`, calculator);
+}
+
+export const calculators: CalculatorDefinition[] = Array.from(calculatorMap.values());
+
 const calculatorContentOverrides: Record<string, Partial<CalculatorDefinition>> = {
   "roi-calculator": {
     description: "Free ROI calculator to estimate return on investment, net profit, and ending value from your cost and gain.",
@@ -6982,23 +6991,23 @@ const calculatorContentOverrides: Record<string, Partial<CalculatorDefinition>> 
   },
 };
 
-for (const calculator of calculators) {
+const enrichedCalculators = calculators.map((calculator) => {
   const override = calculatorContentOverrides[calculator.slug];
-  if (override) Object.assign(calculator, override);
-}
+  return override ? { ...calculator, ...override } : calculator;
+});
 
 export const calculatorsByCategory = calculatorCategories.map((category) => ({
   ...category,
-  items: calculators.filter((item) => item.category === category.slug),
+  items: enrichedCalculators.filter((item) => item.category === category.slug),
 }));
 
 export function getCalculator(category: string, slug: string) {
-  return calculators.find((item) => item.category === category && item.slug === slug);
+  return enrichedCalculators.find((item) => item.category === category && item.slug === slug);
 }
 
 export function getRelatedCalculators(slugs: string[] | undefined) {
   if (!slugs) return [];
   return slugs
-    .map((slug) => calculators.find((item) => item.slug === slug))
+    .map((slug) => enrichedCalculators.find((item) => item.slug === slug))
     .filter((item): item is CalculatorDefinition => Boolean(item));
 }

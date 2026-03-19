@@ -1,0 +1,12 @@
+Apply these sitemap changes:
+
+1. ADD this file:
+   app/sitemap.xml/route.ts
+
+2. DELETE this file from your project:
+   app/sitemap.ts
+
+Reason:
+- app/sitemap.ts is currently rendering as plain text in your environment.
+- app/sitemap.xml/route.ts forces a real XML response with Content-Type: application/xml.
+- Keeping both files can cause route conflicts for /sitemap.xml.

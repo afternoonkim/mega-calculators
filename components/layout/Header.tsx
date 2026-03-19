@@ -1,20 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { calculatorCategories } from "@/lib/calculators/data";
 import CalculatorSearch from "@/components/search/CalculatorSearch";
+import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
+import { localizeCategoryName } from "@/lib/calculators/localization";
+import { withLocale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 
-const primaryLinks = [
-  { href: "/calculators", label: "All calculators" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-];
-
-export default function Header() {
+export default function Header({ locale }: { locale: Locale }) {
   const [open, setOpen] = useState(false);
+
+  const primaryLinks = useMemo(
+    () => locale === "ko"
+      ? [
+          { href: withLocale(locale, "/calculators"), label: "전체 계산기" },
+          { href: withLocale(locale, "/faq"), label: "FAQ" },
+          { href: withLocale(locale, "/about"), label: "소개" },
+          { href: withLocale(locale, "/contact"), label: "문의" },
+        ]
+      : [
+          { href: withLocale(locale, "/calculators"), label: "All calculators" },
+          { href: withLocale(locale, "/faq"), label: "FAQ" },
+          { href: withLocale(locale, "/about"), label: "About" },
+          { href: withLocale(locale, "/contact"), label: "Contact" },
+        ],
+    [locale]
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -26,12 +40,12 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-4 md:px-6 lg:px-8">
-        <Link href="/" className="shrink-0 text-xl font-black tracking-tight text-slate-950">
+        <Link href={withLocale(locale, "/")} className="shrink-0 text-xl font-black tracking-tight text-slate-950">
           Mega Calculators
         </Link>
 
         <div className="hidden lg:block lg:flex-1">
-          <CalculatorSearch />
+          <CalculatorSearch locale={locale} />
         </div>
 
         <nav className="hidden items-center gap-5 text-sm font-medium text-slate-600 xl:flex">
@@ -41,15 +55,19 @@ export default function Header() {
             </Link>
           ))}
           {calculatorCategories.map((category) => (
-            <Link key={category.slug} href={`/calculators/${category.slug}`} className="transition hover:text-slate-950">
-              {category.name.replace(" Calculators", "")}
+            <Link key={category.slug} href={withLocale(locale, `/calculators/${category.slug}`)} className="transition hover:text-slate-950">
+              {localizeCategoryName(category.slug, locale).replace(locale === "ko" ? " 계산기" : " Calculators", "")}
             </Link>
           ))}
         </nav>
 
+        <div className="hidden lg:block">
+          <LanguageSwitcher locale={locale} />
+        </div>
+
         <button
           type="button"
-          aria-label={open ? "Close menu" : "Open menu"}
+          aria-label={open ? (locale === "ko" ? "메뉴 닫기" : "Close menu") : (locale === "ko" ? "메뉴 열기" : "Open menu")}
           aria-expanded={open}
           onClick={() => setOpen((current) => !current)}
           className="ml-auto inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 text-slate-900 transition hover:bg-slate-50 lg:hidden"
@@ -61,31 +79,21 @@ export default function Header() {
       {open ? (
         <div className="border-t border-slate-200 bg-white lg:hidden">
           <div className="mx-auto max-w-7xl space-y-6 px-4 py-5 md:px-6">
-            <CalculatorSearch compact onNavigate={() => setOpen(false)} />
-
+            <CalculatorSearch locale={locale} compact onNavigate={() => setOpen(false)} />
+            <LanguageSwitcher locale={locale} />
             <div className="grid gap-2">
               {primaryLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="rounded-2xl px-4 py-3 text-base font-semibold text-slate-900 transition hover:bg-slate-50"
-                >
+                <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className="rounded-2xl px-4 py-3 text-base font-semibold text-slate-900 transition hover:bg-slate-50">
                   {link.label}
                 </Link>
               ))}
             </div>
             <div>
-              <div className="px-4 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Calculator categories</div>
+              <div className="px-4 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{locale === "ko" ? "계산기 카테고리" : "Calculator categories"}</div>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 {calculatorCategories.map((category) => (
-                  <Link
-                    key={category.slug}
-                    href={`/calculators/${category.slug}`}
-                    onClick={() => setOpen(false)}
-                    className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-                  >
-                    {category.name}
+                  <Link key={category.slug} href={withLocale(locale, `/calculators/${category.slug}`)} onClick={() => setOpen(false)} className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                    {localizeCategoryName(category.slug, locale)}
                   </Link>
                 ))}
               </div>

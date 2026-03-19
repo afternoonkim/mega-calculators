@@ -1,4 +1,5 @@
 import { CalculatorDefinition } from "@/lib/calculators/data";
+import { localizeResultText } from "@/lib/calculators/localization";
 
 export type CalculatorResult = {
   primary: { label: string; value: string };
@@ -8,25 +9,50 @@ export type CalculatorResult = {
 
 type Values = Record<string, string>;
 
+
+function getLocalizedText(value: string | { en?: string; ko?: string } | undefined, locale: "en" | "ko") {
+  if (typeof value === "string") return value;
+  if (!value) return "";
+  return value[locale] ?? value.en ?? value.ko ?? "";
+}
+
+function finalizeResult(result: CalculatorResult, locale: "en" | "ko"): CalculatorResult {
+  if (locale === "en") return result;
+  return {
+    primary: {
+      label: localizeResultText(result.primary.label, locale),
+      value: localizeResultText(result.primary.value, locale),
+    },
+    secondary: result.secondary?.map((item) => ({
+      label: localizeResultText(item.label, locale),
+      value: localizeResultText(item.value, locale),
+    })),
+    note: result.note ? localizeResultText(result.note, locale) : undefined,
+  };
+}
+
 function num(value: string | undefined) {
   const n = Number(value ?? 0);
   return Number.isFinite(n) ? n : 0;
 }
 
-function currency(value: number) {
+function currency(value: number, locale: "en" | "ko" = "en") {
+  if (locale === "ko") {
+    return new Intl.NumberFormat("ko-KR", { style: "currency", currency: "KRW", maximumFractionDigits: 0 }).format(value);
+  }
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(value);
 }
 
-function formatNumber(value: number, digits = 2) {
-  return new Intl.NumberFormat("en-US", { maximumFractionDigits: digits }).format(value);
+function formatNumber(value: number, digits = 2, locale: "en" | "ko" = "en") {
+  return new Intl.NumberFormat(locale === "ko" ? "ko-KR" : "en-US", { maximumFractionDigits: digits }).format(value);
 }
 
-function percent(value: number, digits = 2) {
-  return `${formatNumber(value, digits)}%`;
+function percent(value: number, digits = 2, locale: "en" | "ko" = "en") {
+  return `${formatNumber(value, digits, locale)}%`;
 }
 
-function percentOrZero(value: number, digits = 2) {
-  return Number.isFinite(value) ? percent(value, digits) : percent(0, digits);
+function percentOrZero(value: number, digits = 2, locale: "en" | "ko" = "en") {
+  return Number.isFinite(value) ? percent(value, digits, locale) : percent(0, digits, locale);
 }
 
 function positiveMonths(years: number) {
@@ -64,9 +90,13 @@ function diffYMD(start: Date, end: Date) {
 
   return { years: Math.max(years, 0), months: Math.max(months, 0), days: Math.max(days, 0) };
 }
-function monthsToText(months: number) {
+function monthsToText(months: number, locale: "en" | "ko" = "en") {
   const years = Math.floor(months / 12);
   const remainingMonths = Math.round(months % 12);
+  if (locale === "ko") {
+    if (years <= 0) return `${remainingMonths}개월`;
+    return `${years}년 ${remainingMonths}개월`;
+  }
   if (years <= 0) return `${remainingMonths} months`;
   return `${years} years ${remainingMonths} months`;
 }
@@ -81,8 +111,8 @@ function daysBetween(start: Date, end: Date) {
   return Math.round((end.getTime() - start.getTime()) / 86400000);
 }
 
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }).format(date);
+function formatDate(date: Date, locale: "en" | "ko" = "en") {
+  return new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }).format(date);
 }
 
 function isoWeekNumber(dateString: string) {
@@ -127,7 +157,7 @@ export function getDefaultValues(definition: CalculatorDefinition) {
   );
 }
 
-export function computeCalculator(definition: CalculatorDefinition, values: Values): CalculatorResult {
+function computeCalculatorRaw(definition: CalculatorDefinition, values: Values, locale: "en" | "ko" = "en"): CalculatorResult {
   switch (definition.kind) {
     case "bloodPressure": {
       const systolic = num(values.systolic);
@@ -330,10 +360,10 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
         const sharePrice = Math.max(num(values.sharePrice), 0.000001);
         const yieldPct = (annualDividend / sharePrice) * 100;
         return {
-          primary: { label: "Dividend yield", value: percentOrZero(yieldPct) },
+          primary: { label: "Dividend yield", value: percentOrZero(yieldPct, 2, locale) },
           secondary: [
-            { label: "Annual income per 100 shares", value: currency(annualDividend * 100) },
-            { label: "Dividend per month equivalent", value: currency(annualDividend / 12) },
+            { label: "Annual income per 100 shares", value: currency(annualDividend * 100, locale) },
+            { label: "Dividend per month equivalent", value: currency(annualDividend / 12, locale) },
           ],
         };
       }
@@ -344,10 +374,10 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
         const timeYears = Math.max(num(values.timeYears), 1 / 12);
         const annualizedRate = (interest / (principal * timeYears)) * 100;
         return {
-          primary: { label: "Estimated annual rate", value: percentOrZero(annualizedRate) },
+          primary: { label: "Estimated annual rate", value: percentOrZero(annualizedRate, 2, locale) },
           secondary: [
-            { label: "Principal", value: currency(principal) },
-            { label: "Interest paid", value: currency(interest) },
+            { label: "Principal", value: currency(principal, locale) },
+            { label: "Interest paid", value: currency(interest, locale) },
           ],
         };
       }
@@ -357,10 +387,10 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
         const cost = Math.max(num(values.cost), 0.000001);
         const totalValue = cost + gain;
         return {
-          primary: { label: "Return on investment", value: percentOrZero((gain / cost) * 100) },
+          primary: { label: "Return on investment", value: percentOrZero((gain / cost) * 100, 2, locale) },
           secondary: [
-            { label: "Net profit", value: currency(gain) },
-            { label: "Ending value", value: currency(totalValue) },
+            { label: "Net profit", value: currency(gain, locale) },
+            { label: "Ending value", value: currency(totalValue, locale) },
           ],
         };
       }
@@ -370,10 +400,10 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
         const liabilities = num(values.liabilities);
         const netWorth = assets - liabilities;
         return {
-          primary: { label: "Net worth", value: currency(netWorth) },
+          primary: { label: "Net worth", value: currency(netWorth, locale) },
           secondary: [
-            { label: "Assets", value: currency(assets) },
-            { label: "Liabilities", value: currency(liabilities) },
+            { label: "Assets", value: currency(assets, locale) },
+            { label: "Liabilities", value: currency(liabilities, locale) },
           ],
         };
       }
@@ -383,10 +413,10 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
         const expenses = num(values.expenses);
         const savings = income - expenses;
         return {
-          primary: { label: "Monthly budget balance", value: currency(savings) },
+          primary: { label: "Monthly budget balance", value: currency(savings, locale) },
           secondary: [
-            { label: "Monthly income", value: currency(income) },
-            { label: "Monthly expenses", value: currency(expenses) },
+            { label: "Monthly income", value: currency(income, locale) },
+            { label: "Monthly expenses", value: currency(expenses, locale) },
           ],
           note: savings < 0 ? "Your expenses are higher than your income in this estimate." : "A positive balance means you have room to save, invest, or pay down debt.",
         };
@@ -397,10 +427,10 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
         const principal = Math.max(num(values.principal), 0.000001);
         const apr = (totalCost / principal) * 100;
         return {
-          primary: { label: "Estimated APR", value: percentOrZero(apr) },
+          primary: { label: "Estimated APR", value: percentOrZero(apr, 2, locale) },
           secondary: [
-            { label: "Loan amount", value: currency(principal) },
-            { label: "Total interest and fees", value: currency(totalCost) },
+            { label: "Loan amount", value: currency(principal, locale) },
+            { label: "Total interest and fees", value: currency(totalCost, locale) },
           ],
         };
       }
@@ -411,16 +441,19 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
         const years = Math.max(num(values.years), 1);
         const presentValue = futureValue / Math.pow(1 + annualRate, years);
         return {
-          primary: { label: "Present value", value: currency(presentValue) },
+          primary: { label: "Present value", value: currency(presentValue, locale) },
           secondary: [
-            { label: "Future value target", value: currency(futureValue) },
-            { label: "Discount rate", value: percentOrZero(annualRate * 100) },
+            { label: "Future value target", value: currency(futureValue, locale) },
+            { label: "Discount rate", value: percentOrZero(annualRate * 100, 2, locale) },
           ],
         };
       }
 
-      const output = `${definition.prefix ?? ""}${formatNumber(result)}${definition.suffix ?? ""}`;
-      return { primary: { label: definition.primary ?? "Result", value: output } };
+      const prefixText = getLocalizedText(definition.prefix, locale);
+      const suffixText = getLocalizedText(definition.suffix, locale);
+      const primaryLabel = getLocalizedText(definition.primary, locale) || (locale === "ko" ? "결과" : "Result");
+      const output = prefixText === "$" || prefixText === "₩" ? currency(result, locale) : `${prefixText ?? ""}${formatNumber(result, 2, locale)}${suffixText ?? ""}`;
+      return finalizeResult({ primary: { label: primaryLabel, value: output } }, locale);
     }
     case "compoundInterest": {
       const principal = num(values.principal);
@@ -436,10 +469,10 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
       const total = futurePrincipal + futureContrib;
       const invested = principal + (monthlyContribution * months);
       return {
-        primary: { label: "Future value", value: currency(total) },
+        primary: { label: "Future value", value: currency(total, locale) },
         secondary: [
-          { label: "Total contributed", value: currency(invested) },
-          { label: "Estimated growth", value: currency(total - invested) },
+          { label: "Total contributed", value: currency(invested, locale) },
+          { label: "Estimated growth", value: currency(total - invested, locale) },
           { label: "Time horizon", value: `${formatNumber(years, 0)} years` },
         ],
       };
@@ -456,11 +489,11 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
         : monthlyContribution * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate));
       const invested = startingAmount + (monthlyContribution * months);
       return {
-        primary: { label: definition.slug === "savings-calculator" ? "Projected savings balance" : "Projected value", value: currency(futureValue) },
+        primary: { label: definition.slug === "savings-calculator" ? "Projected savings balance" : "Projected value", value: currency(futureValue, locale) },
         secondary: [
-          { label: "Total contributed", value: currency(invested) },
-          { label: "Estimated growth", value: currency(futureValue - invested) },
-          { label: "Average monthly addition", value: currency(monthlyContribution) },
+          { label: "Total contributed", value: currency(invested, locale) },
+          { label: "Estimated growth", value: currency(futureValue - invested, locale) },
+          { label: "Average monthly addition", value: currency(monthlyContribution, locale) },
         ],
       };
     }
@@ -472,11 +505,11 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
       const monthlyPayment = monthlyRate === 0 ? amount / months : (amount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
       const totalPaid = monthlyPayment * months;
       return {
-        primary: { label: definition.slug === "amortization-calculator" ? "Monthly payment" : "Monthly payment", value: currency(monthlyPayment) },
+        primary: { label: definition.slug === "amortization-calculator" ? "Monthly payment" : "Monthly payment", value: currency(monthlyPayment, locale) },
         secondary: [
-          { label: "Loan amount", value: currency(amount) },
-          { label: "Total paid", value: currency(totalPaid) },
-          { label: "Total interest", value: currency(totalPaid - amount) },
+          { label: "Loan amount", value: currency(amount, locale) },
+          { label: "Total paid", value: currency(totalPaid, locale) },
+          { label: "Total interest", value: currency(totalPaid - amount, locale) },
         ],
         note: definition.slug === "amortization-calculator" ? "This estimate shows the payment for a standard fixed-rate amortizing loan. Taxes, insurance, and fees are not included." : undefined,
       };
@@ -491,11 +524,11 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
       const monthlyPayment = monthlyRate === 0 ? amount / months : (amount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
       const totalPaid = monthlyPayment * months;
       return {
-        primary: { label: "Estimated monthly mortgage", value: currency(monthlyPayment) },
+        primary: { label: "Estimated monthly mortgage", value: currency(monthlyPayment, locale) },
         secondary: [
-          { label: "Loan amount", value: currency(amount) },
-          { label: "Down payment", value: percentOrZero(homePrice > 0 ? (downPayment / homePrice) * 100 : 0) },
-          { label: "Total interest", value: currency(totalPaid - amount) },
+          { label: "Loan amount", value: currency(amount, locale) },
+          { label: "Down payment", value: percentOrZero(homePrice > 0 ? (downPayment / homePrice) * 100 : 0, 2, locale) },
+          { label: "Total interest", value: currency(totalPaid - amount, locale) },
         ],
         note: "This estimate includes principal and interest only. Property taxes, homeowners insurance, HOA fees, and PMI can increase the real payment.",
       };
@@ -514,11 +547,11 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
         : monthlyContribution * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate));
       const invested = currentSavings + monthlyContribution * months;
       return {
-        primary: { label: "Estimated retirement savings", value: currency(futureValue) },
+        primary: { label: "Estimated retirement savings", value: currency(futureValue, locale) },
         secondary: [
           { label: "Years until retirement", value: formatNumber(years, 0) },
-          { label: "Total contributed", value: currency(invested) },
-          { label: "Estimated investment growth", value: currency(futureValue - invested) },
+          { label: "Total contributed", value: currency(invested, locale) },
+          { label: "Estimated investment growth", value: currency(futureValue - invested, locale) },
         ],
       };
     }
@@ -534,10 +567,10 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
       }
       const months = monthlyRate === 0 ? balance / Math.max(monthlyPayment, 1) : -Math.log(1 - (balance * monthlyRate) / monthlyPayment) / Math.log(1 + monthlyRate);
       return {
-        primary: { label: "Estimated payoff time", value: monthsToText(months) },
+        primary: { label: "Estimated payoff time", value: monthsToText(months, locale) },
         secondary: [
-          { label: "Monthly payment", value: currency(monthlyPayment) },
-          { label: "Estimated total paid", value: currency(monthlyPayment * Math.ceil(months)) },
+          { label: "Monthly payment", value: currency(monthlyPayment, locale) },
+          { label: "Estimated total paid", value: currency(monthlyPayment * Math.ceil(months), locale) },
         ],
       };
     }
@@ -547,10 +580,10 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
       const years = Math.max(num(values.years), 0);
       const futureCost = amount * Math.pow(1 + inflationRate, years);
       return {
-        primary: { label: "Future cost", value: currency(futureCost) },
+        primary: { label: "Future cost", value: currency(futureCost, locale) },
         secondary: [
-          { label: "Purchasing power loss", value: currency(futureCost - amount) },
-          { label: "Value of today's amount in future dollars", value: currency(futureCost) },
+          { label: "Purchasing power loss", value: currency(futureCost - amount, locale) },
+          { label: "Value of today's amount in future dollars", value: currency(futureCost, locale) },
         ],
       };
     }
@@ -563,11 +596,11 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
       const totalInvested = (shares1 * price1) + (shares2 * price2);
       const avgCost = totalShares === 0 ? 0 : totalInvested / totalShares;
       return {
-        primary: { label: "Average cost basis", value: currency(avgCost) },
+        primary: { label: "Average cost basis", value: currency(avgCost, locale) },
         secondary: [
           { label: "Total shares", value: formatNumber(totalShares, 4) },
-          { label: "Total invested", value: currency(totalInvested) },
-          { label: "Break-even share price", value: currency(avgCost) },
+          { label: "Total invested", value: currency(totalInvested, locale) },
+          { label: "Break-even share price", value: currency(avgCost, locale) },
         ],
       };
     }
@@ -583,10 +616,10 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
       }
       const months = monthlyRate === 0 ? balance / Math.max(monthlyPayment, 1) : -Math.log(1 - (balance * monthlyRate) / monthlyPayment) / Math.log(1 + monthlyRate);
       return {
-        primary: { label: "Estimated payoff time", value: monthsToText(months) },
+        primary: { label: "Estimated payoff time", value: monthsToText(months, locale) },
         secondary: [
-          { label: "Monthly payment", value: currency(monthlyPayment) },
-          { label: "Estimated total paid", value: currency(monthlyPayment * Math.ceil(months)) },
+          { label: "Monthly payment", value: currency(monthlyPayment, locale) },
+          { label: "Estimated total paid", value: currency(monthlyPayment * Math.ceil(months), locale) },
         ],
       };
     }
@@ -603,9 +636,9 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
       return {
         primary: { label: "Simple comparison", value: cheaper },
         secondary: [
-          { label: `${formatNumber(years, 0)}-year rent cost`, value: currency(rentCost) },
-          { label: `${formatNumber(years, 0)}-year buy cash outflow`, value: currency(buyCost) },
-          { label: "Estimated monthly mortgage", value: currency(mortgage) },
+          { label: `${formatNumber(years, 0)}-year rent cost`, value: currency(rentCost, locale) },
+          { label: `${formatNumber(years, 0)}-year buy cash outflow`, value: currency(buyCost, locale) },
+          { label: "Estimated monthly mortgage", value: currency(mortgage, locale) },
         ],
         note: "This comparison is intentionally simplified. It does not include home appreciation, maintenance, taxes, insurance, or investment returns on cash.",
       };
@@ -638,7 +671,7 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
       const result = sex === "male"
         ? 86.01 * Math.log10(Math.max(waist - neck, 1)) - 70.041 * Math.log10(height) + 36.76
         : 163.205 * Math.log10(Math.max(waist + hip - neck, 1)) - 97.684 * Math.log10(height) - 78.387;
-      return { primary: { label: "Estimated body fat", value: percent(result) } };
+      return { primary: { label: "Estimated body fat", value: percent(result, 2, locale) } };
     }
     case "calorie":
     case "tdee": {
@@ -766,12 +799,12 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
     }
     case "percentage": {
       const result = (num(values.part) / num(values.whole)) * 100;
-      return { primary: { label: "Percentage", value: percent(result) } };
+      return { primary: { label: "Percentage", value: percent(result, 2, locale) } };
     }
     case "percentChange": {
       const oldValue = num(values.oldValue);
       const result = ((num(values.newValue) - oldValue) / oldValue) * 100;
-      return { primary: { label: "Percent change", value: percent(result) } };
+      return { primary: { label: "Percent change", value: percent(result, 2, locale) } };
     }
     case "fraction": {
       const n1 = num(values.numerator1);
@@ -859,10 +892,10 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
       const total = bill + tipAmount;
       const people = Math.max(num(values.people), 1);
       return {
-        primary: { label: "Tip amount", value: currency(tipAmount) },
+        primary: { label: "Tip amount", value: currency(tipAmount, locale) },
         secondary: [
-          { label: "Total bill", value: currency(total) },
-          { label: "Per person", value: currency(total / people) },
+          { label: "Total bill", value: currency(total, locale) },
+          { label: "Per person", value: currency(total / people, locale) },
         ],
       };
     }
@@ -870,8 +903,8 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
       const originalPrice = num(values.originalPrice);
       const finalPrice = originalPrice * (1 - num(values.discountPercent) / 100);
       return {
-        primary: { label: "Final price", value: currency(finalPrice) },
-        secondary: [{ label: "You save", value: currency(originalPrice - finalPrice) }],
+        primary: { label: "Final price", value: currency(finalPrice, locale) },
+        secondary: [{ label: "You save", value: currency(originalPrice - finalPrice, locale) }],
       };
     }
     case "gpa": {
@@ -885,40 +918,40 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
       const total = bill + tipAmount;
       const perPerson = total / Math.max(num(values.people), 1);
       return {
-        primary: { label: "Per person", value: currency(perPerson) },
-        secondary: [{ label: "Total with tip", value: currency(total) }],
+        primary: { label: "Per person", value: currency(perPerson, locale) },
+        secondary: [{ label: "Total with tip", value: currency(total, locale) }],
       };
     }
     case "salesTax": {
       const price = num(values.price);
       const tax = price * num(values.taxRate) / 100;
       return {
-        primary: { label: "Final price", value: currency(price + tax) },
-        secondary: [{ label: "Sales tax", value: currency(tax) }],
+        primary: { label: "Final price", value: currency(price + tax, locale) },
+        secondary: [{ label: "Sales tax", value: currency(tax, locale) }],
       };
     }
     case "commission": {
       const commission = num(values.sales) * num(values.commissionRate) / 100;
-      return { primary: { label: "Commission", value: currency(commission) } };
+      return { primary: { label: "Commission", value: currency(commission, locale) } };
     }
     case "markup": {
       const cost = num(values.cost);
       const sellingPrice = cost * (1 + num(values.markupPercent) / 100);
-      return { primary: { label: "Selling price", value: currency(sellingPrice) } };
+      return { primary: { label: "Selling price", value: currency(sellingPrice, locale) } };
     }
     case "markdown": {
       const originalPrice = num(values.originalPrice);
       const salePrice = originalPrice * (1 - num(values.markdownPercent) / 100);
-      return { primary: { label: "Sale price", value: currency(salePrice) } };
+      return { primary: { label: "Sale price", value: currency(salePrice, locale) } };
     }
     case "fuelCost": {
       const gallons = num(values.distance) / Math.max(num(values.mpg), 1);
       const total = gallons * num(values.gasPrice);
-      return { primary: { label: "Estimated fuel cost", value: currency(total) } };
+      return { primary: { label: "Estimated fuel cost", value: currency(total, locale) } };
     }
     case "rentSplit": {
       const perPerson = num(values.rent) / Math.max(num(values.roommates), 1);
-      return { primary: { label: "Rent per person", value: currency(perPerson) } };
+      return { primary: { label: "Rent per person", value: currency(perPerson, locale) } };
     }
     case "breakEven": {
       const contribution = num(values.pricePerUnit) - num(values.variableCost);
@@ -929,7 +962,7 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
       return { primary: { label: "Years to double", value: formatNumber(72 / Math.max(num(values.annualRate), 0.0001), 1) } };
     }
     case "unitPrice": {
-      return { primary: { label: "Unit price", value: currency(num(values.price) / Math.max(num(values.quantity), 1)) } };
+      return { primary: { label: "Unit price", value: currency(num(values.price) / Math.max(num(values.quantity), 1), locale) } };
     }
     case "sleep": {
       const wakeMinutes = timeToMinutes(values.wakeTime);
@@ -953,21 +986,26 @@ export function computeCalculator(definition: CalculatorDefinition, values: Valu
     }
     case "overtimePay": {
       const overtimePay = num(values.hourlyRate) * num(values.overtimeHours) * num(values.multiplier);
-      return { primary: { label: "Overtime pay", value: currency(overtimePay) } };
+      return { primary: { label: "Overtime pay", value: currency(overtimePay, locale) } };
     }
     case "hourlyToSalary": {
       const annual = num(values.hourlyRate) * num(values.hoursPerWeek) * num(values.weeksPerYear);
-      return { primary: { label: "Estimated annual salary", value: currency(annual) } };
+      return { primary: { label: "Estimated annual salary", value: currency(annual, locale) } };
     }
     case "salaryToHourly": {
       const hourly = num(values.annualSalary) / Math.max(num(values.hoursPerWeek) * num(values.weeksPerYear), 1);
-      return { primary: { label: "Estimated hourly rate", value: currency(hourly) } };
+      return { primary: { label: "Estimated hourly rate", value: currency(hourly, locale) } };
     }
     case "travelBudget": {
       const total = num(values.days) * num(values.dailyBudget) + num(values.transportation) + num(values.lodging);
-      return { primary: { label: "Estimated trip budget", value: currency(total) } };
+      return { primary: { label: "Estimated trip budget", value: currency(total, locale) } };
     }
     default:
       return { primary: { label: "Result", value: "Not available" } };
   }
+}
+
+
+export function computeCalculator(definition: CalculatorDefinition, values: Values, locale: "en" | "ko" = "en"): CalculatorResult {
+  return finalizeResult(computeCalculatorRaw(definition, values, locale), locale);
 }

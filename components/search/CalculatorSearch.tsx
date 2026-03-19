@@ -4,8 +4,10 @@ import Link from "next/link";
 import { Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { calculators } from "@/lib/calculators/data";
+import { localizeCalculatorDefinition } from "@/lib/calculators/localization";
+import { withLocale, type Locale } from "@/lib/i18n";
 
-export default function CalculatorSearch({ compact = false, onNavigate }: { compact?: boolean; onNavigate?: () => void }) {
+export default function CalculatorSearch({ locale, compact = false, onNavigate }: { locale: Locale; compact?: boolean; onNavigate?: () => void }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -20,16 +22,21 @@ export default function CalculatorSearch({ compact = false, onNavigate }: { comp
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const localized = useMemo(() => calculators.map((item) => localizeCalculatorDefinition(item, locale)), [locale]);
+
   const results = useMemo(() => {
     const keyword = query.trim().toLowerCase();
     if (!keyword) return [];
-    return calculators
+    return localized
       .filter((item) => {
         const haystack = `${item.name} ${item.slug} ${item.description} ${item.categoryName}`.toLowerCase();
         return haystack.includes(keyword);
       })
       .slice(0, 8);
-  }, [query]);
+  }, [localized, query]);
+
+  const placeholder = locale === "ko" ? "계산기 검색" : "Search calculators";
+  const noResults = locale === "ko" ? "검색 결과가 없습니다. 대출, BMI, 퍼센트, 나이, 변환기 같은 단어로 다시 검색해보세요." : "No matching calculators found. Try words like mortgage, calorie, GPA, discount, or converter.";
 
   return (
     <div ref={wrapperRef} className={`relative ${compact ? "w-full" : "w-full max-w-md"}`}>
@@ -43,13 +50,13 @@ export default function CalculatorSearch({ compact = false, onNavigate }: { comp
           }}
           onFocus={() => setOpen(true)}
           type="search"
-          placeholder="Search calculators"
+          placeholder={placeholder}
           className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-11 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white"
         />
         {query ? (
           <button
             type="button"
-            aria-label="Clear search"
+            aria-label={locale === "ko" ? "검색 지우기" : "Clear search"}
             onClick={() => {
               setQuery("");
               setOpen(false);
@@ -68,7 +75,7 @@ export default function CalculatorSearch({ compact = false, onNavigate }: { comp
               {results.map((item) => (
                 <Link
                   key={`${item.category}-${item.slug}`}
-                  href={`/calculators/${item.category}/${item.slug}`}
+                  href={withLocale(locale, `/calculators/${item.category}/${item.slug}`)}
                   onClick={() => {
                     setOpen(false);
                     setQuery("");
@@ -83,7 +90,7 @@ export default function CalculatorSearch({ compact = false, onNavigate }: { comp
               ))}
             </div>
           ) : (
-            <div className="px-4 py-5 text-sm text-slate-600">No matching calculators found. Try words like mortgage, calorie, GPA, discount, or converter.</div>
+            <div className="px-4 py-5 text-sm text-slate-600">{noResults}</div>
           )}
         </div>
       ) : null}

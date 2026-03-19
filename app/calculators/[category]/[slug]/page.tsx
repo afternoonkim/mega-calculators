@@ -6,10 +6,17 @@ import { calculators, getCalculator, getRelatedCalculators } from "@/lib/calcula
 import { getProgrammaticHubLinks } from "@/lib/calculators/programmatic";
 
 export function generateStaticParams() {
-  return calculators.map((calculator) => ({ category: calculator.category, slug: calculator.slug }));
+  return calculators.map((calculator) => ({
+    category: calculator.category,
+    slug: calculator.slug,
+  }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ category: string; slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ category: string; slug: string }>;
+}): Promise<Metadata> {
   const { category, slug } = await params;
   const calculator = getCalculator(category, slug);
   if (!calculator) return {};
@@ -17,8 +24,15 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
   return {
     title: `${calculator.name} - Free Online Calculator`,
     description: calculator.description,
-    keywords: [calculator.name, `${calculator.name} online`, `${calculator.name} free`, `${calculator.categoryName.toLowerCase()}`],
-    alternates: { canonical: `/calculators/${calculator.category}/${calculator.slug}` },
+    keywords: [
+      calculator.name,
+      `${calculator.name} online`,
+      `${calculator.name} free`,
+      `${calculator.categoryName.toLowerCase()}`,
+    ],
+    alternates: {
+      canonical: `/calculators/${calculator.category}/${calculator.slug}`,
+    },
     openGraph: {
       title: `${calculator.name} - Mega Calculators`,
       description: calculator.description,
@@ -29,16 +43,22 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
   };
 }
 
-export default async function CalculatorPage({ params }: { params: Promise<{ category: string; slug: string }> }) {
+export default async function CalculatorPage({
+  params,
+}: {
+  params: Promise<{ category: string; slug: string }>;
+}) {
   const { category, slug } = await params;
   const calculator = getCalculator(category, slug);
   if (!calculator) notFound();
-  const calculatorData = calculator!;
+
+  const calculatorData = calculator;
 
   const related = getRelatedCalculators(calculatorData.relatedSlugs).map((item) => ({
     name: item.name,
     href: `/calculators/${item.category}/${item.slug}`,
   }));
+
   const hubLinks = getProgrammaticHubLinks(calculatorData);
 
   const faqSchema = {
@@ -102,19 +122,35 @@ export default async function CalculatorPage({ params }: { params: Promise<{ cat
 
   return (
     <div className="space-y-8">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(appSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(appSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
 
       <nav className="text-sm text-slate-500">
         <Link href="/">Home</Link>
         <span className="mx-2">/</span>
         <Link href="/calculators">Calculators</Link>
         <span className="mx-2">/</span>
-        <Link href={`/calculators/${calculatorData.category}`}>{calculatorData.categoryName}</Link>
+        <Link href={`/calculators/${calculatorData.category}`}>
+          {calculatorData.categoryName}
+        </Link>
       </nav>
 
-      <CalculatorEngine definition={calculatorData} relatedLinks={related} hubLinks={hubLinks} />
+      <CalculatorEngine
+        locale="en"
+        definition={calculatorData}
+        relatedLinks={related}
+        hubLinks={hubLinks}
+      />
     </div>
   );
 }

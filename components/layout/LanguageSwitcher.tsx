@@ -8,7 +8,7 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
   const pathname = usePathname();
 
   return (
-    <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 p-1">
+    <div className="inline-flex w-fit items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1">
       {(["en", "ko"] as const).map((target) => {
         const active = target === locale;
         return (
@@ -16,7 +16,7 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
             key={target}
             href={switchLocaleInPathname(pathname || `/${locale}`, target)}
             hrefLang={target}
-            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${active ? "bg-white text-slate-950 shadow-sm" : "text-slate-500 hover:text-slate-900"}`}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold leading-none transition ${active ? "bg-white text-slate-950 shadow-sm" : "text-slate-500 hover:bg-white hover:text-slate-900"}`}
           >
             {localeLabels[target]}
           </Link>

@@ -8,10 +8,13 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
         explore: "바로가기",
         popular: "인기 계산기",
         all: "전체 계산기",
+        blog: "블로그",
+        guides: "가이드",
         faq: "FAQ",
         about: "소개",
         contact: "문의",
         privacy: "개인정보처리방침",
+        terms: "이용약관",
         description: "Mega Calculators는 실생활에서 자주 찾는 계산을 빠르게 처리할 수 있도록 만든 무료 온라인 계산기 사이트입니다. 금융, 건강, 날짜, 퍼센트, 단위 변환 같은 주제를 간편하게 계산할 수 있습니다.",
         note: "결과는 일반적인 참고용입니다. 세금, 대출, 법률, 의료처럼 중요한 판단은 공식 기관이나 전문가와 함께 확인하세요.",
         copyright: "계산 결과는 교육 및 일반 참고용으로 제공됩니다.",
@@ -20,10 +23,13 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
         explore: "Explore",
         popular: "Popular calculators",
         all: "All calculators",
+        blog: "Blog",
+        guides: "Guides",
         faq: "FAQ",
         about: "About",
         contact: "Contact",
         privacy: "Privacy Policy",
+        terms: "Terms of Use",
         description: "Mega Calculators is a free online calculator and converter library built to answer practical questions clearly and quickly. Use it for money decisions, health estimates, date math, percentages, and everyday conversions.",
         note: "Results are intended for planning and education. When taxes, lending, legal matters, payroll, or medical decisions are involved, verify the numbers with an official source or qualified professional.",
         copyright: "Calculator outputs are provided for educational and general planning purposes only.",
@@ -44,10 +50,13 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
               <div className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">{t.explore}</div>
               <div className="mt-3 flex flex-col gap-3 text-sm text-slate-600">
                 <Link href={withLocale(locale, "/calculators")}>{t.all}</Link>
+                <Link href={withLocale(locale, "/blog")}>{t.blog}</Link>
+                <Link href={withLocale(locale, "/guides")}>{t.guides}</Link>
                 <Link href={withLocale(locale, "/faq")}>{t.faq}</Link>
                 <Link href={withLocale(locale, "/about")}>{t.about}</Link>
                 <Link href={withLocale(locale, "/contact")}>{t.contact}</Link>
                 <Link href={withLocale(locale, "/privacy")}>{t.privacy}</Link>
+                <Link href={withLocale(locale, "/terms")}>{t.terms}</Link>
               </div>
             </div>
             <div>

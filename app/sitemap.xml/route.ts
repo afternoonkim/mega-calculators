@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { calculatorCategories, calculators } from "@/lib/calculators/data";
 import { getCalculatorExamples } from "@/lib/calculators/programmatic";
+import { getBlogPosts, getGuides } from "@/lib/editorial";
 
 const baseUrl = "https://mega-calculators.com";
 const locales = ["en", "ko"] as const;
-const staticRoutes = ["", "/about", "/blog", "/calculators", "/contact", "/faq", "/guides", "/privacy"];
+const staticRoutes = ["", "/about", "/blog", "/calculators", "/contact", "/faq", "/guides", "/privacy", "/terms"];
 
 function escapeXml(value: string): string {
   return value
@@ -40,6 +41,14 @@ export async function GET() {
         route === "" ? "daily" : "weekly",
         route === "" ? "1.0" : "0.8"
       );
+    }
+
+    for (const post of getBlogPosts(locale)) {
+      addUrl(xmlParts, `${baseUrl}/${locale}/blog/${post.slug}`, post.updatedAt, "monthly", "0.8");
+    }
+
+    for (const guide of getGuides(locale)) {
+      addUrl(xmlParts, `${baseUrl}/${locale}/guides/${guide.slug}`, guide.updatedAt, "monthly", "0.8");
     }
 
     for (const category of calculatorCategories) {

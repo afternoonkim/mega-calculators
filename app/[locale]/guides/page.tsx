@@ -1,14 +1,49 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import AdPlaceholder from "@/components/ads/AdPlaceholder";
-import AdSlot from "@/components/ads/AdSlot";
-import CalculatorEngine from "@/components/calculators/CalculatorEngine";
-import { calculatorCategories, calculators, calculatorsByCategory, getCalculator, getRelatedCalculators } from "@/lib/calculators/data";
-import { computeCalculator, getDefaultValues } from "@/lib/calculators/engine";
-import { getCalculatorExamples, getFormulaSeo, getGuideSeo, getProgrammaticHubLinks, getUseCases } from "@/lib/calculators/programmatic";
+import { getGuides } from "@/lib/editorial";
 import { normalizeLocale, withLocale } from "@/lib/i18n";
-import { calculatorKeywordLine, localizeCalculatorDefinition, localizeCalculatorName, localizeCategoryName, localizeDescription, localizeUiText } from "@/lib/calculators/localization";
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> { const locale = normalizeLocale((await params).locale); return { title: locale === "ko" ? "가이드" : "Guides", description: locale === "ko" ? "계산기 사용법을 단계별로 정리한 가이드 모음입니다." : "Simple guides that help you use calculators with more confidence.", alternates: { canonical: `/${locale}/guides`, languages: { en: "/en/guides", ko: "/ko/guides" } } }; }
-export default async function GuidesPage({ params }: { params: Promise<{ locale: string }> }) { const locale = normalizeLocale((await params).locale); const guides = locale === "ko" ? ["주담대 계산기 사용 전 꼭 확인할 5가지", "칼로리 계산 결과를 해석하는 방법", "날짜 차이 계산기로 일정 계산하기", "단위 변환기를 헷갈리지 않고 쓰는 법", "퍼센트, 비율, 총액 계산 결과 읽는 법"] : ["How to use a mortgage calculator before house hunting", "How to estimate calorie needs and compare fitness goals", "How to use date and hours calculators for work schedules", "How to compare unit conversions without manual math", "How to read common results like percentages, rates, and totals"]; return <div className="space-y-8"><section className="rounded-[2rem] bg-white p-8 shadow-sm"><div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">{locale === "ko" ? "가이드" : "Guides"}</div><h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">{locale === "ko" ? "계산기를 더 쉽게 이해하는 방법" : "Simple guides for common calculator questions"}</h1><p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">{locale === "ko" ? "인기 계산기 사용법과 결과 해석 포인트를 짧고 쉽게 정리한 가이드입니다." : "These guides explain how to use popular calculators, what the results mean, and when a quick estimate is enough versus when you should confirm the numbers elsewhere."}</p></section><div className="grid gap-4 md:grid-cols-2">{guides.map((guide) => <div key={guide} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"><h2 className="text-xl font-bold text-slate-950">{guide}</h2><p className="mt-3 text-sm leading-7 text-slate-600">{locale === "ko" ? "실전에서 바로 활용할 수 있도록 계산 흐름과 체크 포인트를 간단하게 설명합니다." : "Use this space for straightforward help content that makes the calculators easier to understand and easier to apply in everyday situations."}</p></div>)}</div></div>; }
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const locale = normalizeLocale((await params).locale);
+  return {
+    title: locale === "ko" ? "가이드" : "Guides",
+    description: locale === "ko" ? "계산기 사용법을 단계별로 정리한 가이드 모음입니다." : "Simple guides that help you use calculators with more confidence.",
+    alternates: {
+      canonical: `/${locale}/guides`,
+      languages: { en: "/en/guides", ko: "/ko/guides" },
+    },
+  };
+}
+
+export default async function GuidesPage({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = normalizeLocale((await params).locale);
+  const isKo = locale === "ko";
+  const guides = getGuides(locale);
+
+  return (
+    <div className="space-y-8">
+      <section className="rounded-[2rem] bg-white p-8 shadow-sm">
+        <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">{isKo ? "가이드" : "Guides"}</div>
+        <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">{isKo ? "계산기를 더 쉽게 이해하는 방법" : "Simple guides for common calculator questions"}</h1>
+        <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">
+          {isKo ? "인기 계산기 사용법과 결과 해석 포인트를 단계별로 정리한 가이드입니다." : "These guides explain how to use popular calculators, what the results mean, and when a quick estimate is enough versus when you should confirm the numbers elsewhere."}
+        </p>
+      </section>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        {guides.map((guide) => (
+          <article key={guide.slug} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">{guide.updatedAt}</div>
+            <h2 className="mt-3 text-xl font-bold text-slate-950">{guide.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-slate-600">{guide.description}</p>
+            <div className="mt-5">
+              <Link href={withLocale(locale, `/guides/${guide.slug}`)} className="text-sm font-semibold text-blue-700">
+                {isKo ? "가이드 보기 →" : "Open guide →"}
+              </Link>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}

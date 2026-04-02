@@ -1,14 +1,56 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import AdPlaceholder from "@/components/ads/AdPlaceholder";
-import AdSlot from "@/components/ads/AdSlot";
-import CalculatorEngine from "@/components/calculators/CalculatorEngine";
-import { calculatorCategories, calculators, calculatorsByCategory, getCalculator, getRelatedCalculators } from "@/lib/calculators/data";
-import { computeCalculator, getDefaultValues } from "@/lib/calculators/engine";
-import { getCalculatorExamples, getFormulaSeo, getGuideSeo, getProgrammaticHubLinks, getUseCases } from "@/lib/calculators/programmatic";
+import { getBlogPosts } from "@/lib/editorial";
 import { normalizeLocale, withLocale } from "@/lib/i18n";
-import { calculatorKeywordLine, localizeCalculatorDefinition, localizeCalculatorName, localizeCategoryName, localizeDescription, localizeUiText } from "@/lib/calculators/localization";
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> { const locale = normalizeLocale((await params).locale); return { title: locale === "ko" ? "블로그" : "Blog", description: locale === "ko" ? "계산기 활용법과 실생활 계산 팁을 정리한 글 모음입니다." : "Helpful articles about using calculators for money, health, time, and everyday decisions.", alternates: { canonical: `/${locale}/blog`, languages: { en: "/en/blog", ko: "/ko/blog" } } }; }
-export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) { const locale = normalizeLocale((await params).locale); const posts = locale === "ko" ? [{ title: "대출 계산기와 주담대 계산기 차이 쉽게 이해하기", description: "월 상환액, 총 이자, 상환 기간을 비교할 때 어떤 계산기를 봐야 하는지 정리합니다." }, { title: "BMI 계산기는 언제 참고하면 좋을까", description: "BMI 수치의 의미와 참고 범위를 간단히 정리하고, 건강 판단에서 어디까지 활용할 수 있는지 설명합니다." }, { title: "퍼센트와 날짜 계산기를 일상에서 쓰는 방법", description: "할인율 계산, 날짜 차이, 근무 시간 계산처럼 자주 찾는 예시를 모았습니다." }] : [{ title: "How to compare loan and mortgage estimates", description: "A quick guide to reading monthly payment, total repayment, and interest results before you borrow." }, { title: "How to choose the right health calculator", description: "When to use BMI, calorie, heart rate, and body-composition tools, and when to ask a professional instead." }, { title: "Simple ways to use percentage and time calculators", description: "Practical examples for discounts, date math, work hours, and everyday calculations." }]; return <div className="space-y-8"><section><div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">{locale === "ko" ? "블로그" : "Blog"}</div><h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">{locale === "ko" ? "계산기를 더 잘 쓰기 위한 짧고 실용적인 글" : "Helpful articles for everyday calculations"}</h1><p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">{locale === "ko" ? "실생활에서 많이 찾는 계산기 사용법, 비교 포인트, 숫자 해석 방법을 짧고 쉽게 정리합니다." : "Browse short articles that explain how to use common calculators, compare real-world scenarios, and understand the numbers before you make a decision."}</p></section><div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{posts.map((post) => <article key={post.title} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"><h2 className="text-xl font-bold text-slate-950">{post.title}</h2><p className="mt-3 text-sm leading-7 text-slate-600">{post.description}</p></article>)}</div></div>; }
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const locale = normalizeLocale((await params).locale);
+  return {
+    title: locale === "ko" ? "블로그" : "Blog",
+    description:
+      locale === "ko"
+        ? "계산기 활용법과 실생활 계산 팁을 정리한 글 모음입니다."
+        : "Helpful articles about using calculators for money, health, time, and everyday decisions.",
+    alternates: {
+      canonical: `/${locale}/blog`,
+      languages: { en: "/en/blog", ko: "/ko/blog" },
+    },
+  };
+}
+
+export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = normalizeLocale((await params).locale);
+  const isKo = locale === "ko";
+  const posts = getBlogPosts(locale);
+
+  return (
+    <div className="space-y-8">
+      <section className="rounded-[2rem] bg-white p-8 shadow-sm">
+        <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">{isKo ? "블로그" : "Blog"}</div>
+        <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">
+          {isKo ? "계산기를 더 잘 쓰기 위한 실용적인 글" : "Helpful articles for everyday calculations"}
+        </h1>
+        <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">
+          {isKo
+            ? "실생활에서 많이 찾는 계산기 사용법, 비교 포인트, 숫자 해석 방법을 짧고 이해하기 쉽게 정리했습니다."
+            : "Browse practical articles that explain how to use common calculators, compare real-world scenarios, and understand the numbers before you decide."}
+        </p>
+      </section>
+
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {posts.map((post) => (
+          <article key={post.slug} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">{post.updatedAt}</div>
+            <h2 className="mt-3 text-xl font-bold text-slate-950">{post.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-slate-600">{post.description}</p>
+            <div className="mt-5">
+              <Link href={withLocale(locale, `/blog/${post.slug}`)} className="text-sm font-semibold text-blue-700">
+                {isKo ? "자세히 보기 →" : "Read article →"}
+              </Link>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CalculatorDefinition } from "@/lib/calculators/data";
 import { computeCalculator, getDefaultValues } from "@/lib/calculators/engine";
 import AdPlaceholder from "@/components/ads/AdPlaceholder";
+import CalculatorSeoContent from "@/components/calculators/CalculatorSeoContent";
 import { localizeUiText, localizeInputLabel, localizeResultText } from "@/lib/calculators/localization";
 import type { Locale } from "@/lib/i18n";
 
@@ -153,6 +154,8 @@ export default function CalculatorEngine({ definition, relatedLinks, hubLinks, l
         <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"><h2 className="text-2xl font-bold text-slate-900">{t("How to use it")}</h2><ol className="mt-4 space-y-3 text-sm leading-7 text-slate-600 md:text-base">{definition.howToUse.map((item) => <li key={item} className="rounded-2xl bg-slate-50 px-4 py-3">{item}</li>)}</ol></article>
       </section>
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"><h2 className="text-2xl font-bold text-slate-900">{t("Example")}</h2><p className="mt-4 text-sm leading-7 text-slate-600 md:text-base">{definition.example}</p></section>
+      <CalculatorSeoContent definition={definition} locale={locale} relatedLinks={relatedLinks} />
+
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"><h2 className="text-2xl font-bold text-slate-900">{locale === "ko" ? "자주 묻는 질문" : "Frequently asked questions"}</h2><div className="mt-5 space-y-4">{definition.faq.map((item) => <article key={item.q} className="rounded-2xl border border-slate-200 p-5"><h3 className="text-base font-semibold text-slate-900">{item.q}</h3><p className="mt-3 text-sm leading-7 text-slate-600 md:text-base">{item.a}</p></article>)}</div></section>
       {relatedLinks?.length ? <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"><h2 className="text-2xl font-bold text-slate-900">{t("Related calculators")}</h2><div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">{relatedLinks.map((item) => <Link key={item.href} href={item.href} className="rounded-2xl border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50"><div className="text-sm font-semibold text-slate-900">{item.name}</div><div className="mt-2 text-sm text-blue-700">{locale === "ko" ? "바로가기 →" : "Open calculator →"}</div></Link>)}</div></section> : null}
     </div>

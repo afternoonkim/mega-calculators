@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import AdPlaceholder from "@/components/ads/AdPlaceholder";
-import AdSlot from "@/components/ads/AdSlot";
-import CalculatorEngine from "@/components/calculators/CalculatorEngine";
-import { calculatorCategories, calculators, calculatorsByCategory, getCalculator, getRelatedCalculators } from "@/lib/calculators/data";
-import { computeCalculator, getDefaultValues } from "@/lib/calculators/engine";
-import { getCalculatorExamples, getFormulaSeo, getGuideSeo, getProgrammaticHubLinks, getUseCases } from "@/lib/calculators/programmatic";
+import { calculatorCategories, calculators, getCalculator } from "@/lib/calculators/data";
 import { normalizeLocale, withLocale } from "@/lib/i18n";
-import { calculatorKeywordLine, localizeCalculatorDefinition, localizeCalculatorName, localizeCategoryName, localizeDescription, localizeUiText } from "@/lib/calculators/localization";
+import { localizeCalculatorDefinition, localizeCategoryName } from "@/lib/calculators/localization";
+import { getBlogPosts, getGuides } from "@/lib/editorial";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const locale = normalizeLocale((await params).locale);
@@ -45,6 +40,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     name: localizeCategoryName(category.slug, locale),
     items: calculators.filter((item) => item.category === category.slug),
   }));
+  const blogPosts = getBlogPosts(locale).slice(0, 3);
+  const guides = getGuides(locale).slice(0, 3);
 
   const websiteSchema = {
     "@context": "https://schema.org",
@@ -57,11 +54,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   return (
     <div className="space-y-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
+
       <section className="rounded-[2rem] bg-slate-950 px-6 py-12 text-white shadow-sm md:px-10 md:py-16">
         <div className="max-w-5xl">
           <div className="inline-flex rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-200">{isKo ? "무료 온라인 도구" : "Free online tools"}</div>
           <h1 className="mt-5 text-4xl font-black tracking-tight md:text-6xl">{isKo ? "대출, 복리, BMI, 날짜, 퍼센트, 단위 변환까지 한 번에 계산하세요" : "Free calculators for money, health, dates, conversions, and daily tasks"}</h1>
-          <p className="mt-5 max-w-4xl text-base leading-8 text-slate-300 md:text-lg">{isKo ? "Mega Calculators는 금융, 건강, 시간, 수학, 단위 변환, 생활 계산을 빠르게 처리할 수 있는 무료 온라인 계산기 사이트입니다. 한국어 버전은 네이버 검색에 맞춰 자연스럽게 읽히는 설명과 함께 구성했습니다." : "Mega Calculators helps you solve common questions faster with clean, easy-to-use online calculators. Browse tools for loans, mortgages, BMI, age, concrete, tile, cooking conversions, statistics, and much more."}</p>
+          <p className="mt-5 max-w-4xl text-base leading-8 text-slate-300 md:text-lg">{isKo ? "Mega Calculators는 금융, 건강, 시간, 수학, 단위 변환, 생활 계산을 빠르게 처리할 수 있는 무료 온라인 계산기 사이트입니다. 필요한 계산기를 먼저 찾고, 설명 글과 가이드로 결과 해석까지 이어서 확인할 수 있습니다." : "Mega Calculators helps you solve common questions faster with clean, easy-to-use online calculators. Find the tool you need first, then use practical articles and guides when you want more context."}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href={withLocale(locale, "/calculators")} className="rounded-2xl bg-blue-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-400">{isKo ? "전체 계산기 보기" : "Browse all calculators"}</Link>
             <Link href={withLocale(locale, "/faq")} className="rounded-2xl border border-white/20 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/5">{isKo ? "자주 묻는 질문" : "Read site FAQ"}</Link>
@@ -70,11 +68,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           <StatCard label={isKo ? "전체 계산기" : "Total calculators"} value={`${totalCalculators}`} />
           <StatCard label={isKo ? "주요 카테고리" : "Main categories"} value={`${categoryCards.length}`} />
-          <StatCard label={isKo ? "대표 분야" : "Popular uses"} value={isKo ? "금융, 건강, 생활" : "Finance, health, projects"} />
+          <StatCard label={isKo ? "자주 쓰는 분야" : "Popular uses"} value={isKo ? "금융, 건강, 생활" : "Finance, health, projects"} />
         </div>
       </section>
-
-      <AdPlaceholder label="Homepage banner ad" />
 
       <section>
         <div className="flex items-end justify-between gap-4">
@@ -119,11 +115,55 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </div>
       </section>
 
+      <section>
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">{isKo ? "블로그" : "Blog"}</div>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">{isKo ? "계산기와 함께 읽으면 좋은 글" : "Articles that make calculators easier to use"}</h2>
+          </div>
+          <Link href={withLocale(locale, "/blog")} className="text-sm font-semibold text-blue-700">{isKo ? "블로그 전체 보기 →" : "View all blog posts →"}</Link>
+        </div>
+        <div className="mt-6 grid gap-5 md:grid-cols-3">
+          {blogPosts.map((post) => (
+            <article key={post.slug} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">{post.updatedAt}</div>
+              <h3 className="mt-3 text-xl font-bold text-slate-950">{post.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-600">{post.description}</p>
+              <div className="mt-5">
+                <Link href={withLocale(locale, `/blog/${post.slug}`)} className="text-sm font-semibold text-blue-700">{isKo ? "자세히 보기 →" : "Read article →"}</Link>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">{isKo ? "가이드" : "Guides"}</div>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">{isKo ? "결과를 읽는 법까지 정리한 가이드" : "Step-by-step guides for common calculator questions"}</h2>
+          </div>
+          <Link href={withLocale(locale, "/guides")} className="text-sm font-semibold text-blue-700">{isKo ? "가이드 전체 보기 →" : "View all guides →"}</Link>
+        </div>
+        <div className="mt-6 grid gap-5 md:grid-cols-3">
+          {guides.map((guide) => (
+            <article key={guide.slug} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">{guide.updatedAt}</div>
+              <h3 className="mt-3 text-xl font-bold text-slate-950">{guide.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-600">{guide.description}</p>
+              <div className="mt-5">
+                <Link href={withLocale(locale, `/guides/${guide.slug}`)} className="text-sm font-semibold text-blue-700">{isKo ? "가이드 보기 →" : "Open guide →"}</Link>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
         <div className="max-w-4xl">
           <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">{isKo ? "왜 Mega Calculators인가" : "Why people use Mega Calculators"}</div>
           <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">{isKo ? "복잡하지 않게, 필요한 계산만 빠르게" : "A calculator site built to be practical"}</h2>
-          <p className="mt-4 text-base leading-8 text-slate-600">{isKo ? "불필요하게 복잡한 화면 대신 입력과 결과가 명확하게 보이도록 구성했습니다. 한국어 버전은 네이버 검색 사용자가 원하는 자연스러운 문장과 설명 중심으로 정리했습니다." : "Some calculator sites feel crowded or confusing. Mega Calculators keeps things simple with clear forms, readable results, and short explanations that help you use the answer right away."}</p>
+          <p className="mt-4 text-base leading-8 text-slate-600">{isKo ? "불필요하게 복잡한 화면 대신 입력과 결과가 명확하게 보이도록 구성했습니다. 계산기뿐 아니라 설명 글과 가이드를 함께 제공해 숫자를 실제 판단에 연결하기 쉽게 만들었습니다." : "Some calculator sites feel crowded or confusing. Mega Calculators keeps things simple with clear forms, readable results, and short explanations that help you use the answer right away."}</p>
         </div>
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
           <InfoCard title={isKo ? "바로 계산" : "Fast answers"} description={isKo ? "숫자만 입력하면 핵심 결과와 보조 수치를 즉시 확인할 수 있습니다." : "Open a calculator, enter your numbers, and get a clear result without digging through cluttered screens."} />

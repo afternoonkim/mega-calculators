@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { headers } from "next/headers";
 import "./globals.css";
-// import AdSenseScript from "@/components/ads/AdSenseScript";
+import AdSenseScript from "@/components/ads/AdSenseScript";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mega-calculators.com"),
@@ -14,9 +14,9 @@ export const metadata: Metadata = {
       "naver-site-verification": "c7b8ff2a84274ce6403736a44777d0e08942cee8"
     }
   },
-  // other: {
-  //   "google-adsense-account": "ca-pub-5407950462485150",
-  // },
+  other: {
+    "google-adsense-account": "ca-pub-5407950462485150",
+  },
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
@@ -27,7 +27,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang={locale}>
       <body>
         {children}
-        {/* <AdSenseScript /> */}
+        <AdSenseScript />
         <Analytics />
       </body>
     </html>

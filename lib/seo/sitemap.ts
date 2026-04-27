@@ -25,16 +25,31 @@ export const sitemapIndexItems = [
   { loc: `${SITEMAP_BASE_URL}/sitemap-examples.xml`, lastmod: BUILD_LASTMOD },
 ] as const;
 
+// Use `application/xml` (not `text/xml`) — some CDN/proxy layers re-write
+// `text/xml` to `text/html` for legacy compatibility, which makes browsers
+// (and crawlers) render the body as HTML and silently strip unknown tags
+// like <urlset>, <url>, <xhtml:link>. That's the symptom we hit:
+// /sitemap.xml renders as a tree view, but the larger child sitemaps come
+// through as plain text. Switching to application/xml is the standard
+// modern MIME type for XML and is not subject to that legacy rewrite.
+//
+// Cache-Control: serve from edge cache for 1 hour, allow stale-while-
+// revalidate for a day. Sitemap content barely changes between requests
+// and the function is expensive (the examples sitemap iterates ~1100 paths
+// across two locales). `force-dynamic` was making every crawl hit the
+// serverless function from scratch, which can time out on large responses.
 export const sitemapResponseHeaders: HeadersInit = {
-  "Content-Type": "text/xml; charset=utf-8",
-  "Cache-Control": "no-store, max-age=0",
-  "X-Content-Type-Options": "nosniff",
+  "Content-Type": "application/xml; charset=utf-8",
+  "Cache-Control": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400",
 };
 
 export function createXmlResponse(xml: string): Response {
+  // Build a fresh Headers instance per response so the shared object
+  // reference can never be mutated mid-request by an upstream layer.
+  const headers = new Headers(sitemapResponseHeaders);
   return new Response(xml, {
     status: 200,
-    headers: sitemapResponseHeaders,
+    headers,
   });
 }
 

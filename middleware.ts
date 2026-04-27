@@ -13,6 +13,10 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/apple-touch-icon") ||
     pathname === "/robots.txt" ||
     pathname === "/sitemap.xml" ||
+    pathname === "/sitemap-static.xml" ||
+    pathname === "/sitemap-calculators.xml" ||
+    pathname === "/sitemap-examples.xml" ||
+    pathname.endsWith(".xml") ||
     pathname === "/ads.txt"
   ) {
     return NextResponse.next();

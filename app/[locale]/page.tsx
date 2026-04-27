@@ -4,6 +4,7 @@ import { calculatorCategories, calculators, getCalculator } from "@/lib/calculat
 import { normalizeLocale, withLocale } from "@/lib/i18n";
 import { localizeCalculatorDefinition, localizeCategoryName } from "@/lib/calculators/localization";
 import { getBlogPosts, getGuides } from "@/lib/editorial";
+import { RecentCalculatorsList } from "@/components/calculators/RecentCalculators";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const locale = normalizeLocale((await params).locale);
@@ -11,8 +12,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: isKo ? "무료 온라인 계산기 모음" : "Free Online Calculators and Converters",
     description: isKo
-      ? "대출, 복리, BMI, 나이, 퍼센트, 단위 변환까지 한국어로 바로 계산할 수 있는 무료 온라인 계산기 모음입니다."
-      : "Mega Calculators offers free online calculators and converters for finance, health, time, math, unit conversion, and everyday life.",
+      ? "대출, 복리, BMI, 나이, 퍼센트, 단위 변환까지 한국어로 바로 계산하실 수 있는 무료 온라인 계산기 모음입니다."
+      : "Find free online calculators for finance, health, time, math, unit conversion, and everyday life — all in one place.",
     alternates: {
       canonical: `/${locale}`,
       languages: { en: "/en", ko: "/ko" },
@@ -59,7 +60,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="max-w-5xl">
           <div className="inline-flex rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-200">{isKo ? "무료 온라인 도구" : "Free online tools"}</div>
           <h1 className="mt-5 text-4xl font-black tracking-tight md:text-6xl">{isKo ? "대출, 복리, BMI, 날짜, 퍼센트, 단위 변환까지 한 번에 계산하세요" : "Free calculators for money, health, dates, conversions, and daily tasks"}</h1>
-          <p className="mt-5 max-w-4xl text-base leading-8 text-slate-300 md:text-lg">{isKo ? "Mega Calculators는 금융, 건강, 시간, 수학, 단위 변환, 생활 계산을 빠르게 처리할 수 있는 무료 온라인 계산기 사이트입니다. 필요한 계산기를 먼저 찾고, 설명 글과 가이드로 결과 해석까지 이어서 확인할 수 있습니다." : "Mega Calculators helps you solve common questions faster with clean, easy-to-use online calculators. Find the tool you need first, then use practical articles and guides when you want more context."}</p>
+          <p className="mt-5 max-w-4xl text-base leading-8 text-slate-300 md:text-lg">{isKo ? "금융, 건강, 시간, 수학, 단위 변환, 생활 계산까지 자주 마주치는 질문에 몇 초 만에 답을 얻으실 수 있어요. 원하시는 계산기를 먼저 찾으시고, 결과 해석이 필요하시면 바로 옆의 설명 글과 가이드를 함께 확인해보세요." : "Get quick answers to everyday questions with simple, easy-to-use online calculators. Open the tool you need, see the result right away, and use the practical articles and guides whenever you want more context."}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href={withLocale(locale, "/calculators")} className="rounded-2xl bg-blue-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-400">{isKo ? "전체 계산기 보기" : "Browse all calculators"}</Link>
             <Link href={withLocale(locale, "/faq")} className="rounded-2xl border border-white/20 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/5">{isKo ? "자주 묻는 질문" : "Read site FAQ"}</Link>
@@ -71,6 +72,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <StatCard label={isKo ? "자주 쓰는 분야" : "Popular uses"} value={isKo ? "금융, 건강, 생활" : "Finance, health, projects"} />
         </div>
       </section>
+
+      <RecentCalculatorsList locale={locale} />
 
       <section>
         <div className="flex items-end justify-between gap-4">
@@ -109,7 +112,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <Link key={category.slug} href={withLocale(locale, `/calculators/${category.slug}`)} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200">
               <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">{category.items.length} {isKo ? "개 도구" : "tools"}</div>
               <h3 className="mt-3 text-2xl font-bold text-slate-950">{category.name}</h3>
-              <p className="mt-3 text-sm leading-7 text-slate-600">{isKo ? `${category.name} 관련 계산기를 한 곳에서 빠르게 찾아볼 수 있습니다. 한국어 설명과 함께 바로 계산을 시작해보세요.` : `Find calculators in ${category.name.toLowerCase()} for quick answers, simple comparisons, and everyday planning.`}</p>
+              <p className="mt-3 text-sm leading-7 text-slate-600">{isKo ? `${category.name} 관련 계산기를 한 곳에서 빠르게 찾아보시고, 한국어 설명과 함께 바로 계산을 시작해보실 수 있어요.` : `Browse calculators in ${category.name.toLowerCase()} for quick answers, easy comparisons, and everyday planning.`}</p>
             </Link>
           ))}
         </div>
@@ -126,7 +129,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="mt-6 grid gap-5 md:grid-cols-3">
           {blogPosts.map((post) => (
             <article key={post.slug} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">{post.updatedAt}</div>
+              {/* <div className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">{post.updatedAt}</div> */}
               <h3 className="mt-3 text-xl font-bold text-slate-950">{post.title}</h3>
               <p className="mt-3 text-sm leading-7 text-slate-600">{post.description}</p>
               <div className="mt-5">
@@ -148,7 +151,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="mt-6 grid gap-5 md:grid-cols-3">
           {guides.map((guide) => (
             <article key={guide.slug} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">{guide.updatedAt}</div>
+              {/* <div className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">{guide.updatedAt}</div> */}
               <h3 className="mt-3 text-xl font-bold text-slate-950">{guide.title}</h3>
               <p className="mt-3 text-sm leading-7 text-slate-600">{guide.description}</p>
               <div className="mt-5">
@@ -163,12 +166,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="max-w-4xl">
           <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">{isKo ? "왜 Mega Calculators인가" : "Why people use Mega Calculators"}</div>
           <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">{isKo ? "복잡하지 않게, 필요한 계산만 빠르게" : "A calculator site built to be practical"}</h2>
-          <p className="mt-4 text-base leading-8 text-slate-600">{isKo ? "불필요하게 복잡한 화면 대신 입력과 결과가 명확하게 보이도록 구성했습니다. 계산기뿐 아니라 설명 글과 가이드를 함께 제공해 숫자를 실제 판단에 연결하기 쉽게 만들었습니다." : "Some calculator sites feel crowded or confusing. Mega Calculators keeps things simple with clear forms, readable results, and short explanations that help you use the answer right away."}</p>
+          <p className="mt-4 text-base leading-8 text-slate-600">{isKo ? "복잡한 화면에 시간을 빼앗기지 않으셔도 됩니다. 입력과 결과가 한눈에 보이고, 결과 옆에 짧은 설명과 가이드가 함께 있어 숫자를 어떻게 활용하시면 좋을지 바로 이어가실 수 있어요." : "You won't waste time hunting through a cluttered screen. Forms are short, results are easy to read, and short explanations sit right next to each result so you can put the answer to use right away."}</p>
         </div>
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
-          <InfoCard title={isKo ? "바로 계산" : "Fast answers"} description={isKo ? "숫자만 입력하면 핵심 결과와 보조 수치를 즉시 확인할 수 있습니다." : "Open a calculator, enter your numbers, and get a clear result without digging through cluttered screens."} />
-          <InfoCard title={isKo ? "읽기 쉬운 설명" : "Useful explanations"} description={isKo ? "한국어 안내 문구와 활용 예시로 계산 결과를 이해하기 쉽도록 만들었습니다." : "Each tool includes a short explanation, simple usage steps, and an example so the result is easier to understand."} />
-          <InfoCard title={isKo ? "넓은 주제 범위" : "Everyday coverage"} description={isKo ? "금융, 건강, 날짜, 수학, 단위 변환, 생활 계산 등 자주 찾는 주제를 폭넓게 다룹니다." : "Use Mega Calculators for money, health, dates, home projects, cooking, schoolwork, and common conversion tasks."} />
+          <InfoCard title={isKo ? "바로 계산" : "Fast answers"} description={isKo ? "숫자만 입력하시면 핵심 결과와 보조 수치를 곧바로 확인하실 수 있어요." : "Open a calculator, type in your numbers, and see a clear result — no digging required."} />
+          <InfoCard title={isKo ? "읽기 쉬운 설명" : "Useful explanations"} description={isKo ? "한국어 안내와 활용 예시를 함께 제공해, 결과의 의미를 쉽게 이해하실 수 있도록 도와드려요." : "Read a short explanation, follow simple usage steps, and check an example so you understand exactly what the number means."} />
+          <InfoCard title={isKo ? "넓은 주제 범위" : "Everyday coverage"} description={isKo ? "금융, 건강, 날짜, 수학, 단위 변환, 생활 계산 등 자주 찾으시는 주제를 폭넓게 다룹니다." : "Use these calculators for money, health, dates, home projects, cooking, schoolwork, and the conversions you do most often."} />
         </div>
       </section>
     </div>

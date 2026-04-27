@@ -6,6 +6,16 @@ export type ProgrammaticExample = {
   description: string;
   intro: string;
   overrides: Record<string, string>;
+  /**
+   * Optional pre-translated Korean copy. When provided, the locale layer
+   * uses these directly instead of running pattern-based translation on
+   * the English title. This is essential for programmatic SEO at scale —
+   * it gives us native, search-friendly Korean phrasing without needing
+   * to teach the pattern matcher every variant we generate.
+   */
+  koTitle?: string;
+  koDescription?: string;
+  koIntro?: string;
 };
 
 const TOP_PRIORITY_SLUGS = new Set([
@@ -138,11 +148,186 @@ const specificExamples: Record<string, ProgrammaticExample[]> = {
   ],
 };
 
+// ─────────────────────────────────────────────────────────────────────────
+// Programmatic SEO scenario generators.
+//
+// For our top-traffic calculators we generate ~100 example pages each by
+// expanding realistic search-query patterns into a static URL grid. Each
+// scenario page targets a long-tail query (e.g., "BMI for 175 cm 70 kg"
+// or "$300,000 mortgage at 6.5% for 30 years") that the main calculator
+// page would not rank for on its own.
+//
+// All generators emit BOTH English and Korean copy at build time so each
+// locale's URL gets natural, indexable text — not template fallback.
+// ─────────────────────────────────────────────────────────────────────────
+
+const enUsd = (n: number) => `$${n.toLocaleString("en-US")}`;
+const koKrwApprox = (usd: number) => {
+  // Approximate display-only USD→KRW for readability in KO titles.
+  // Calculator results still use the engine's locale-aware formatting.
+  const krw = Math.round(usd * 1300 / 1000) * 1000;
+  return `${krw.toLocaleString("ko-KR")}원`;
+};
+
+function buildBmiExamples(): ProgrammaticExample[] {
+  // 10 heights × 10 weights = 100 scenarios.
+  // Range covers most adult body sizes that users search for.
+  const heightsCm = [150, 155, 160, 165, 170, 175, 180, 185, 190, 195];
+  const weightsKg = [45, 50, 55, 60, 65, 70, 75, 80, 85, 90];
+  const result: ProgrammaticExample[] = [];
+  for (const h of heightsCm) {
+    for (const w of weightsKg) {
+      const lbs = Math.round(w * 2.20462);
+      const inches = Math.round(h / 2.54);
+      const ft = Math.floor(inches / 12);
+      const inchRem = inches - ft * 12;
+      result.push({
+        slug: `${h}cm-${w}kg`,
+        title: `BMI for ${h} cm and ${w} kg (${ft}'${inchRem}" / ${lbs} lb)`,
+        description: `See the BMI value and category for an adult who is ${h} cm tall and weighs ${w} kg, with the equivalent ${ft}'${inchRem}" / ${lbs} lb conversion.`,
+        intro: `This example calculates BMI for someone ${h} cm (${ft}'${inchRem}") tall weighing ${w} kg (${lbs} lb), and shows where it falls on the standard WHO/CDC BMI category scale.`,
+        overrides: { heightCm: String(h), weightKg: String(w) },
+        koTitle: `키 ${h}cm 몸무게 ${w}kg BMI 결과`,
+        koDescription: `키 ${h}cm 몸무게 ${w}kg일 때 BMI 값과 한국 비만 분류(대한비만학회 기준)를 한눈에 확인하실 수 있어요.`,
+        koIntro: `키 ${h}cm 몸무게 ${w}kg일 때 BMI가 어느 범위에 들어가는지, 그리고 한국 기준(저체중·정상·과체중·비만)에서 어떻게 해석하면 좋을지 함께 정리해드려요.`,
+      });
+    }
+  }
+  return result;
+}
+
+function buildLoanExamples(): ProgrammaticExample[] {
+  // 10 amounts × 10 terms = 100 scenarios. Rate held at 7% (typical
+  // 2025–2026 personal-loan rate) so the variation comes from amount × term.
+  const amounts = [1000, 2500, 5000, 7500, 10000, 15000, 20000, 25000, 30000, 50000];
+  const terms = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const rate = 7;
+  const result: ProgrammaticExample[] = [];
+  for (const amount of amounts) {
+    for (const term of terms) {
+      result.push({
+        slug: `${amount}-loan-${term}-years`,
+        title: `${enUsd(amount)} Loan Over ${term} Year${term === 1 ? "" : "s"} at ${rate}%`,
+        description: `Estimate the monthly payment and total interest on a ${enUsd(amount)} fixed-rate loan repaid over ${term} year${term === 1 ? "" : "s"} at ${rate}% APR.`,
+        intro: `This example models a ${enUsd(amount)} loan at ${rate}% APR repaid over ${term} year${term === 1 ? "" : "s"}. You'll see the monthly payment, total interest, and total repayment so you can compare it against your lender quote.`,
+        overrides: { loanAmount: String(amount), annualRate: String(rate), years: String(term) },
+        koTitle: `${koKrwApprox(amount)} 대출 ${term}년 ${rate}% 예시`,
+        koDescription: `${koKrwApprox(amount)} 원리금균등 대출을 ${term}년 ${rate}% 금리로 받았을 때 월 상환금과 총이자를 한국어로 확인하실 수 있어요.`,
+        koIntro: `대출 원금 ${koKrwApprox(amount)}, 상환 기간 ${term}년, 연 ${rate}% 금리 시나리오로 월 상환금과 총이자를 미리 가늠해보실 수 있도록 정리한 예시입니다.`,
+      });
+    }
+  }
+  return result;
+}
+
+function buildMortgageExamples(): ProgrammaticExample[] {
+  // 10 home prices × 5 rates × 2 terms = 100 scenarios.
+  // Down payment is held at 20% (LTV 80%) — the conventional benchmark.
+  const homePrices = [150000, 200000, 250000, 300000, 350000, 400000, 500000, 600000, 750000, 1000000];
+  const rates = [5.5, 6.0, 6.5, 7.0, 7.5];
+  const terms = [15, 30];
+  const result: ProgrammaticExample[] = [];
+  for (const price of homePrices) {
+    for (const rate of rates) {
+      for (const term of terms) {
+        const down = Math.round(price * 0.2);
+        result.push({
+          slug: `${price}-home-${rate.toString().replace(".", "_")}-${term}yr`,
+          title: `${enUsd(price)} Mortgage at ${rate}% for ${term} Years`,
+          description: `Estimated monthly payment and total interest for a ${enUsd(price)} home with 20% down at a ${rate}% rate over a ${term}-year mortgage.`,
+          intro: `This example models a ${enUsd(price)} home purchase with a 20% down payment (${enUsd(down)}) financed at ${rate}% over ${term} years. You'll see the monthly principal-and-interest payment and the total interest paid over the life of the loan.`,
+          overrides: {
+            homePrice: String(price),
+            downPayment: String(down),
+            annualRate: String(rate),
+            years: String(term),
+          },
+          koTitle: `${koKrwApprox(price)} 주택담보대출 ${rate}% ${term}년 예시`,
+          koDescription: `${koKrwApprox(price)} 주택을 자기자본 20%, 연 ${rate}% 금리, ${term}년 상환으로 받았을 때 월 상환금과 총이자를 정리한 예시입니다.`,
+          koIntro: `주택 가격 ${koKrwApprox(price)}, 자기자본 20%, 연 ${rate}%, ${term}년 만기 시나리오로 월 상환금·총이자·잔금 흐름을 한 번에 가늠해보실 수 있어요.`,
+        });
+      }
+    }
+  }
+  return result;
+}
+
+function buildCompoundInterestExamples(): ProgrammaticExample[] {
+  // 5 starting balances × 5 horizons × 2 monthly contributions × 2 rates = 100 scenarios.
+  const principals = [1000, 5000, 10000, 25000, 50000];
+  const yearsList = [5, 10, 15, 20, 25];
+  const monthlies = [100, 500];
+  const rates = [6, 8];
+  const result: ProgrammaticExample[] = [];
+  for (const principal of principals) {
+    for (const years of yearsList) {
+      for (const monthly of monthlies) {
+        for (const rate of rates) {
+          result.push({
+            slug: `${principal}-start-${monthly}-monthly-${rate}pct-${years}yr`,
+            title: `${enUsd(principal)} Starting Balance, ${enUsd(monthly)}/Month at ${rate}% Over ${years} Years`,
+            description: `See compound growth from a ${enUsd(principal)} starting balance with ${enUsd(monthly)} monthly contributions at ${rate}% annual return over ${years} years.`,
+            intro: `This compound interest example uses a ${enUsd(principal)} starting balance, ${enUsd(monthly)} monthly contributions, ${rate}% annual return, and a ${years}-year horizon to show how the ending balance and growth break down.`,
+            overrides: {
+              principal: String(principal),
+              monthlyContribution: String(monthly),
+              annualRate: String(rate),
+              years: String(years),
+            },
+            koTitle: `초기 ${koKrwApprox(principal)} · 월 ${koKrwApprox(monthly)} 적립 · 연 ${rate}% · ${years}년 복리 예시`,
+            koDescription: `초기 ${koKrwApprox(principal)}에서 매월 ${koKrwApprox(monthly)}씩 ${years}년간 연 ${rate}% 복리로 굴렸을 때 결과를 한국어로 정리한 예시입니다.`,
+            koIntro: `초기 자본 ${koKrwApprox(principal)}, 매월 ${koKrwApprox(monthly)} 적립, 연 ${rate}% 수익률 가정, ${years}년 기간으로 복리 효과가 얼마나 누적되는지 확인하실 수 있는 예시예요.`,
+          });
+        }
+      }
+    }
+  }
+  return result;
+}
+
+function buildSalesTaxExamples(): ProgrammaticExample[] {
+  // 10 prices × 10 rates = 100 scenarios. Rates cover common US state +
+  // local sales tax bands (4% no-state-tax base, up to 10%+ in high-tax cities).
+  const prices = [10, 25, 50, 75, 100, 150, 200, 500, 1000, 2500];
+  const rates = [4, 5, 6, 7, 7.25, 8, 8.25, 9, 9.5, 10];
+  const result: ProgrammaticExample[] = [];
+  for (const price of prices) {
+    for (const rate of rates) {
+      result.push({
+        slug: `${price}-price-${rate.toString().replace(".", "_")}pct`,
+        title: `Sales Tax on ${enUsd(price)} at ${rate}%`,
+        description: `Calculate the sales tax and final total on a ${enUsd(price)} purchase at a ${rate}% sales tax rate.`,
+        intro: `This example shows the tax owed and the final out-the-door price for a ${enUsd(price)} purchase taxed at ${rate}%. Useful when comparing prices across states or city tax zones.`,
+        overrides: { price: String(price), taxRate: String(rate) },
+        koTitle: `가격 ${koKrwApprox(price)} · 부가세 ${rate}% 계산 예시`,
+        koDescription: `가격 ${koKrwApprox(price)}에 ${rate}% 부가세가 붙었을 때 세액과 최종 결제 금액을 한국어로 정리한 예시입니다.`,
+        koIntro: `상품 가격 ${koKrwApprox(price)}, 부가세 ${rate}% 시나리오로 세액과 최종가격을 미리 확인하실 수 있는 예시입니다.`,
+      });
+    }
+  }
+  return result;
+}
+
+const programmaticBundles: Record<string, ProgrammaticExample[]> = {
+  "bmi-calculator": buildBmiExamples(),
+  "loan-calculator": buildLoanExamples(),
+  "mortgage-calculator": buildMortgageExamples(),
+  "compound-interest-calculator": buildCompoundInterestExamples(),
+  "sales-tax-calculator": buildSalesTaxExamples(),
+};
+
 export function isTopPriorityCalculator(slug: string) {
   return TOP_PRIORITY_SLUGS.has(slug);
 }
 
 export function getCalculatorExamples(definition: CalculatorDefinition): ProgrammaticExample[] {
+  // Programmatic bundles (100+ scenarios per calculator) take priority.
+  // These are the traffic-core calculators where long-tail SEO scales.
+  const programmatic = programmaticBundles[definition.slug];
+  if (programmatic) return programmatic;
+  // Other calculators use the legacy hand-written specificExamples
+  // or the generic 6-scenario fallback. Keep the small cap there since
+  // those calculators don't benefit from a flood of thin pages.
   return (specificExamples[definition.slug] ?? buildGenericExamples(definition)).slice(0, 6);
 }
 
@@ -208,15 +393,32 @@ export function getUseCases(definition: CalculatorDefinition) {
   ];
 }
 
+// Cap of examples surfaced in the calculator detail page hub. The full
+// list (100+ for priority calculators) still appears in the sitemap and
+// is crawled via the NearbyScenarios component on each example page.
+const HUB_EXAMPLE_DISPLAY_LIMIT = 12;
+
 export function getProgrammaticHubLinks(definition: CalculatorDefinition) {
   const base = `/calculators/${definition.category}/${definition.slug}`;
+  const allExamples = getCalculatorExamples(definition);
+  // For priority calculators with 100+ scenarios, show a representative
+  // sample on the detail page so the section stays readable. Pick evenly
+  // spaced indices so the user sees range, not just the first 12 in a row.
+  const displayExamples =
+    allExamples.length <= HUB_EXAMPLE_DISPLAY_LIMIT
+      ? allExamples
+      : Array.from({ length: HUB_EXAMPLE_DISPLAY_LIMIT }, (_, i) => {
+          const idx = Math.floor((i * allExamples.length) / HUB_EXAMPLE_DISPLAY_LIMIT);
+          return allExamples[idx];
+        });
   return {
     formula: `${base}/formula`,
     guide: `${base}/guide`,
     useCases: `${base}/use-cases`,
-    examples: getCalculatorExamples(definition).map((example) => ({
+    examples: displayExamples.map((example) => ({
       title: example.title,
       href: `${base}/examples/${example.slug}`,
     })),
+    totalExampleCount: allExamples.length,
   };
 }

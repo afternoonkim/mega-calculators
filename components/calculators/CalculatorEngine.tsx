@@ -6,6 +6,8 @@ import { CalculatorDefinition } from "@/lib/calculators/data";
 import { computeCalculator, getDefaultValues } from "@/lib/calculators/engine";
 import AdPlaceholder from "@/components/ads/AdPlaceholder";
 import CalculatorSeoContent from "@/components/calculators/CalculatorSeoContent";
+import ResultActions from "@/components/calculators/ResultActions";
+import { RecentTracker } from "@/components/calculators/RecentCalculators";
 import { localizeUiText, localizeInputLabel, localizeResultText } from "@/lib/calculators/localization";
 import type { Locale } from "@/lib/i18n";
 
@@ -38,6 +40,7 @@ export default function CalculatorEngine({ definition, relatedLinks, hubLinks, l
 
   return (
     <div className="space-y-8">
+      <RecentTracker category={definition.category} slug={definition.slug} name={definition.name} />
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
           <div className="mb-6">
@@ -100,6 +103,12 @@ export default function CalculatorEngine({ definition, relatedLinks, hubLinks, l
               </div>
             ) : null}
             {result.note ? <p className="mt-5 text-sm leading-7 text-amber-200">{localizeResultText(result.note, locale)}</p> : null}
+            <ResultActions
+              locale={locale}
+              title={definition.name}
+              resultText={`${localizeResultText(result.primary.label, locale)}: ${localizeResultText(result.primary.value, locale)}`}
+              secondaryLines={result.secondary?.map((item) => `${localizeResultText(item.label, locale)}: ${localizeResultText(item.value, locale)}`) ?? []}
+            />
             <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm leading-7 text-slate-300">
               <p>{t("Calculator results are provided for planning and educational purposes. For taxes, legal decisions, lending, or medical advice, verify the numbers with an official source or qualified professional.")}</p>
             </div>

@@ -12,16 +12,35 @@ function escapeXml(value: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
+    .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
 }
 
-function addUrl(xmlParts: string[], url: string, lastmod: string, changefreq: string, priority: string) {
+// Adds a single <url> entry, with xhtml:link hreflang annotations for every locale.
+// This is the format both Google Search Console and Naver Search Advisor accept
+// for declaring localized alternates inside the sitemap itself.
+function addUrl(
+  xmlParts: string[],
+  pathSuffix: string,
+  currentLocale: (typeof locales)[number],
+  lastmod: string,
+  changefreq: string,
+  priority: string,
+) {
+  const loc = `${baseUrl}/${currentLocale}${pathSuffix}`;
   xmlParts.push("<url>");
-  xmlParts.push(`<loc>${escapeXml(url)}</loc>`);
+  xmlParts.push(`<loc>${escapeXml(loc)}</loc>`);
   xmlParts.push(`<lastmod>${lastmod}</lastmod>`);
   xmlParts.push(`<changefreq>${changefreq}</changefreq>`);
   xmlParts.push(`<priority>${priority}</priority>`);
+  for (const locale of locales) {
+    const altUrl = `${baseUrl}/${locale}${pathSuffix}`;
+    xmlParts.push(`<xhtml:link rel="alternate" hreflang="${locale}" href="${escapeXml(altUrl)}"/>`);
+  }
+  // x-default points at the English version
+  xmlParts.push(
+    `<xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(`${baseUrl}/en${pathSuffix}`)}"/>`,
+  );
   xmlParts.push("</url>");
 }
 
@@ -29,44 +48,39 @@ export async function GET() {
   const lastmod = new Date().toISOString();
   const xmlParts: string[] = [
     '<?xml version="1.0" encoding="UTF-8"?>',
-    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
   ];
 
   for (const locale of locales) {
     for (const route of staticRoutes) {
       addUrl(
         xmlParts,
-        `${baseUrl}/${locale}${route}`,
+        route,
+        locale,
         lastmod,
         route === "" ? "daily" : "weekly",
-        route === "" ? "1.0" : "0.8"
+        route === "" ? "1.0" : "0.8",
       );
     }
 
     for (const post of getBlogPosts(locale)) {
-      addUrl(xmlParts, `${baseUrl}/${locale}/blog/${post.slug}`, post.updatedAt, "monthly", "0.8");
+      addUrl(xmlParts, `/blog/${post.slug}`, locale, post.updatedAt, "monthly", "0.8");
     }
 
     for (const guide of getGuides(locale)) {
-      addUrl(xmlParts, `${baseUrl}/${locale}/guides/${guide.slug}`, guide.updatedAt, "monthly", "0.8");
+      addUrl(xmlParts, `/guides/${guide.slug}`, locale, guide.updatedAt, "monthly", "0.8");
     }
 
     for (const category of calculatorCategories) {
-      addUrl(
-        xmlParts,
-        `${baseUrl}/${locale}/calculators/${category.slug}`,
-        lastmod,
-        "weekly",
-        "0.8"
-      );
+      addUrl(xmlParts, `/calculators/${category.slug}`, locale, lastmod, "weekly", "0.8");
     }
 
     for (const calculator of calculators) {
       const path = `/calculators/${calculator.category}/${calculator.slug}`;
-      addUrl(xmlParts, `${baseUrl}/${locale}${path}`, lastmod, "weekly", "0.9");
+      addUrl(xmlParts, path, locale, lastmod, "weekly", "0.9");
 
       for (const subPath of ["/formula", "/guide", "/use-cases"]) {
-        addUrl(xmlParts, `${baseUrl}/${locale}${path}${subPath}`, lastmod, "monthly", "0.7");
+        addUrl(xmlParts, `${path}${subPath}`, locale, lastmod, "monthly", "0.7");
       }
 
       const seenExamplePaths = new Set<string>();
@@ -74,7 +88,7 @@ export async function GET() {
         const examplePath = `${path}/examples/${example.slug}`;
         if (seenExamplePaths.has(examplePath)) continue;
         seenExamplePaths.add(examplePath);
-        addUrl(xmlParts, `${baseUrl}/${locale}${examplePath}`, lastmod, "monthly", "0.6");
+        addUrl(xmlParts, examplePath, locale, lastmod, "monthly", "0.6");
       }
     }
   }

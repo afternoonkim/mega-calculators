@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { localizeCalculatorName } from "@/lib/calculators/localization";
 import { withLocale, type Locale } from "@/lib/i18n";
+import { getFooterSisterSites } from "@/lib/seo/sister-sites";
 
 export default function SiteFooter({ locale }: { locale: Locale }) {
   const t = locale === "ko"
@@ -15,6 +16,7 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
         contact: "문의",
         privacy: "개인정보처리방침",
         terms: "이용약관",
+        related: "관련 사이트",
         description: "Mega Calculators는 실생활에서 자주 찾는 계산을 빠르게 처리할 수 있도록 만든 무료 온라인 계산기 사이트입니다. 금융, 건강, 날짜, 퍼센트, 단위 변환 같은 주제를 간편하게 계산할 수 있습니다.",
         note: "결과는 일반적인 참고용입니다. 세금, 대출, 법률, 의료처럼 중요한 판단은 공식 기관이나 전문가와 함께 확인하세요.",
         copyright: "계산 결과는 교육 및 일반 참고용으로 제공됩니다.",
@@ -30,10 +32,15 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
         contact: "Contact",
         privacy: "Privacy Policy",
         terms: "Terms of Use",
+        related: "Related sites",
         description: "Mega Calculators is a free online calculator and converter library built to answer practical questions clearly and quickly. Use it for money decisions, health estimates, date math, percentages, and everyday conversions.",
         note: "Results are intended for planning and education. When taxes, lending, legal matters, payroll, or medical decisions are involved, verify the numbers with an official source or qualified professional.",
         copyright: "Calculator outputs are provided for educational and general planning purposes only.",
       };
+
+  // Sister-site links surfaced in the footer per the user's locale.
+  // KO footer shows both bluedino + momtools; EN footer shows only momtools (en path).
+  const sisterSites = getFooterSisterSites(locale);
 
   return (
     <footer className="border-t border-slate-200 bg-white">
@@ -71,6 +78,31 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
             </div>
           </div>
         </div>
+
+        {sisterSites.length > 0 ? (
+          <div className="mt-10 border-t border-slate-200 pt-8">
+            <div className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
+              {t.related}
+            </div>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {sisterSites.map((site) => (
+                <a
+                  key={site.id}
+                  href={site.url}
+                  target="_blank"
+                  rel="noopener"
+                  className="group rounded-2xl border border-slate-200 px-5 py-4 transition hover:border-blue-300 hover:bg-blue-50"
+                >
+                  <div className="text-base font-bold text-slate-950 group-hover:text-blue-700">
+                    {site.name}
+                  </div>
+                  <div className="mt-1 text-sm leading-6 text-slate-600">{site.blurb}</div>
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         <div className="mt-8 border-t border-slate-200 pt-6 text-xs leading-6 text-slate-500">
           © {new Date().getFullYear()} Mega Calculators. {t.copyright}
         </div>

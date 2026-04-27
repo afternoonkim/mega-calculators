@@ -8,8 +8,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: isKo ? "문의" : "Contact",
     description: isKo
-      ? "계산기 오류, 콘텐츠 수정, 개인정보 관련 문의, 제휴 문의를 위한 Mega Calculators 연락 페이지입니다."
-      : "Contact Mega Calculators for calculator issues, corrections, privacy questions, or business inquiries.",
+      ? "계산기 오류, 콘텐츠 수정, 개인정보, 제휴 문의를 한 페이지에서 보내실 수 있습니다."
+      : "Reach out about a calculator issue, a correction, a privacy question, or a partnership — all from one page.",
     alternates: {
       canonical: `/${locale}/contact`,
       languages: { en: "/en/contact", ko: "/ko/contact" },
@@ -24,32 +24,32 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
   return (
     <div className="space-y-6">
       <section className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-4xl font-black tracking-tight text-slate-950">{isKo ? "문의하기" : "Contact Mega Calculators"}</h1>
-        <p className="mt-6 max-w-3xl text-base leading-8 text-slate-600">{isKo ? "계산기 오류 제보, 콘텐츠 수정 요청, 개인정보 관련 문의, 제휴 또는 비즈니스 문의를 보낼 수 있습니다." : "Use this page to report calculator issues, request corrections, ask privacy questions, or contact us about partnerships and media inquiries."}</p>
+        <h1 className="text-4xl font-black tracking-tight text-slate-950">{isKo ? "편하게 연락 주세요" : "Get in touch"}</h1>
+        <p className="mt-6 max-w-3xl text-base leading-8 text-slate-600">{isKo ? "계산기 오류를 발견하셨거나, 콘텐츠 수정을 제안하고 싶으시거나, 개인정보 관련 궁금증이 있으시거나, 제휴·미디어 문의가 있으시다면 이 페이지에서 바로 보내실 수 있어요." : "Whether you spotted a calculator issue, want a correction, have a privacy question, or are exploring a partnership, you can send everything you need from this page."}</p>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
         <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-          <h2 className="text-2xl font-bold text-slate-900">{isKo ? "일반 문의" : "General support"}</h2>
+          <h2 className="text-2xl font-bold text-slate-900">{isKo ? "일반 문의" : "General questions"}</h2>
           <div className="mt-4 space-y-4 text-sm leading-7 text-slate-600 md:text-base">
             <p>Email: <a className="font-semibold text-blue-700" href="mailto:afternoonkim93@gmail.com">afternoonkim93@gmail.com</a></p>
-            <p>{isKo ? "계산기 결과가 이상하거나 링크가 깨졌거나, 모바일 또는 데스크톱 화면에서 문제가 있다면 계산기 이름과 함께 알려주세요." : "Contact us if a calculator is not working correctly, if a page has incorrect content, or if you notice a broken link or formatting issue on mobile or desktop."}</p>
-            <p>{isKo ? "입력한 값, 기대한 결과, 사용한 기기나 브라우저를 함께 보내주시면 더 빠르게 확인할 수 있습니다." : "For faster help, include the calculator name, the values you entered, the result you expected, and the device or browser you used."}</p>
+            <p>{isKo ? "결과가 이상해 보이거나, 링크가 깨졌거나, 모바일·데스크톱 어느 한쪽 화면에서만 표시가 잘못된다면, 어떤 계산기에서 일어났는지 알려주세요." : "If a calculator is not behaving as you expected, a link is broken, or something looks off on mobile or desktop, send a quick note with the calculator name and what you saw."}</p>
+            <p>{isKo ? "입력하신 값, 기대하신 결과, 사용 중이신 기기나 브라우저를 함께 적어주시면 더 빠르게 확인하고 고쳐드릴 수 있어요." : "Sharing the values you entered, the result you expected, and the device or browser you used helps us track it down and fix it faster for you."}</p>
           </div>
         </article>
         <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-          <h2 className="text-2xl font-bold text-slate-900">{isKo ? "광고 및 제휴 문의" : "Business and media inquiries"}</h2>
+          <h2 className="text-2xl font-bold text-slate-900">{isKo ? "광고·제휴 문의" : "Partnerships and media"}</h2>
           <div className="mt-4 space-y-4 text-sm leading-7 text-slate-600 md:text-base">
             <p>Email: <a className="font-semibold text-blue-700" href="mailto:afternoonkim93@gmail.com">afternoonkim93@gmail.com</a></p>
-            <p>{isKo ? "광고 집행, 파트너십, 콘텐츠 활용, 데이터 라이선스 관련 문의는 이 주소로 보내주세요." : "Use this address for advertising questions, partnership ideas, or content and data licensing discussions."}</p>
-            <p>{isKo ? "문의량에 따라 답변까지 시간이 다를 수 있습니다." : "We aim to respond within a reasonable timeframe, but response times can vary depending on request volume."}</p>
+            <p>{isKo ? "광고 집행, 파트너십 제안, 콘텐츠 활용, 데이터 라이선스에 대한 이야기를 나누고 싶으시다면 같은 주소로 보내주세요." : "If you'd like to talk about advertising, a partnership idea, content reuse, or data licensing, the same address works."}</p>
+            <p>{isKo ? "메일을 보내셨는데 답이 늦다고 느껴지셔도 걱정하지 않으셔도 됩니다. 문의량에 따라 회신이 며칠 걸릴 수 있어요." : "If you don't hear back right away, no need to worry — replies can take a few days depending on volume."}</p>
           </div>
         </article>
       </section>
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-        <h2 className="text-2xl font-bold text-slate-900">{isKo ? "안내" : "Important note"}</h2>
-        <p className="mt-4 text-sm leading-7 text-slate-600 md:text-base">{isKo ? "Mega Calculators는 법률, 세무, 금융, 의료 자문을 제공하지 않습니다. 규제나 전문 판단이 필요한 주제는 계산기 결과를 일반 참고용으로만 사용하고 반드시 공식 자료나 전문가와 함께 확인해야 합니다." : "Mega Calculators does not provide legal, tax, financial, or medical advice. If your message relates to a regulated or professional topic, calculator outputs should be treated as general information only and verified with an appropriate professional or official source."}</p>
+        <h2 className="text-2xl font-bold text-slate-900">{isKo ? "보내시기 전에 알아두세요" : "Before you write"}</h2>
+        <p className="mt-4 text-sm leading-7 text-slate-600 md:text-base">{isKo ? "이곳에서는 법률, 세무, 금융, 의료 자문을 드릴 수 없습니다. 전문가의 판단이 필요한 주제라면 계산 결과를 일반 참고로만 활용하시고, 공식 자료나 자격을 갖춘 전문가에게 한 번 더 확인하시는 것이 안전해요." : "Please note that legal, tax, financial, and medical advice cannot be offered here. If your question touches a regulated topic, treat any calculator result as general information and verify it with an official source or a qualified professional before acting on it."}</p>
       </section>
     </div>
   );

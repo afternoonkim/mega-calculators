@@ -871,9 +871,21 @@ function localizeExampleTitleByPattern(title: string, calculatorName: string) {
 export function localizeProgrammaticExample(example: ProgrammaticExampleLike, definition: CalculatorDefinition, locale: Locale): ProgrammaticExampleLike {
   if (locale === "en") return example;
   const calculatorName = localizeCalculatorName(getLocalizedText(definition.name, "en"), locale, definition.slug);
-  const title = localizeExampleTitleByPattern(example.title, calculatorName);
-  const description = `${calculatorName}의 대표 입력값과 결과를 한국어로 확인할 수 있는 예시 페이지입니다.`;
-  const intro = `${calculatorName}를 처음 사용하는 분도 바로 이해할 수 있도록 대표 입력값을 넣은 예시입니다. 예시 결과를 먼저 확인한 뒤 내 상황에 맞게 숫자만 바꿔보세요.`;
+  // Pre-translated KO copy from the programmatic generator wins —
+  // it gives natural, search-friendly phrasing per scenario, which the
+  // pattern matcher can't produce for 100+ unique grid combinations.
+  const withKo = example as ProgrammaticExampleLike & {
+    koTitle?: string;
+    koDescription?: string;
+    koIntro?: string;
+  };
+  const title = withKo.koTitle ?? localizeExampleTitleByPattern(example.title, calculatorName);
+  const description =
+    withKo.koDescription ??
+    `${calculatorName}의 대표 입력값과 결과를 한국어로 확인할 수 있는 예시 페이지입니다.`;
+  const intro =
+    withKo.koIntro ??
+    `${calculatorName}를 처음 사용하는 분도 바로 이해할 수 있도록 대표 입력값을 넣은 예시입니다. 예시 결과를 먼저 확인한 뒤 내 상황에 맞게 숫자만 바꿔보세요.`;
   return { ...example, title, description, intro };
 }
 

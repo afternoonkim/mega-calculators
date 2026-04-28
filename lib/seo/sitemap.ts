@@ -97,24 +97,32 @@ function addUrl(xmlParts: string[], entry: SitemapEntry) {
   const normalizedPath = normalizePath(entry.pathSuffix);
   const loc = absoluteUrl(entry.locale, normalizedPath);
 
+  // NOTE: We deliberately do NOT emit `<xhtml:link rel="alternate" ...>`
+  // hreflang annotations inside the sitemap.
+  //
+  // Why: declaring `xmlns:xhtml="http://www.w3.org/1999/xhtml"` on the root
+  // urlset combined with <link rel="alternate"> children causes Chrome and
+  // some CDN proxies to treat the response as XHTML and render it as HTML.
+  // The result is a flat text run instead of an XML tree view, which makes
+  // the sitemap look broken to humans even though search engines parse the
+  // bytes correctly.
+  //
+  // Hreflang signals are still emitted via per-page <link rel="alternate"
+  // hreflang="..."/> tags in the HTML <head> (set on the locale layout and
+  // every page-level Metadata.alternates.languages). Sitemap-level hreflang
+  // is supplementary; the per-page tags are the authoritative source.
   xmlParts.push("  <url>");
   xmlParts.push(`    <loc>${escapeXml(loc)}</loc>`);
   xmlParts.push(`    <lastmod>${escapeXml(normalizeLastmod(entry.lastmod))}</lastmod>`);
   xmlParts.push(`    <changefreq>${entry.changefreq}</changefreq>`);
   xmlParts.push(`    <priority>${entry.priority}</priority>`);
-
-  for (const locale of SITEMAP_LOCALES) {
-    xmlParts.push(`    <xhtml:link rel="alternate" hreflang="${locale}" href="${escapeXml(absoluteUrl(locale, normalizedPath))}"/>`);
-  }
-
-  xmlParts.push(`    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(absoluteUrl("en", normalizedPath))}"/>`);
   xmlParts.push("  </url>");
 }
 
 export function buildUrlsetXml(entries: SitemapEntry[]): string {
   const xmlParts = [
     '<?xml version="1.0" encoding="UTF-8"?>',
-    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
   ];
 
   for (const entry of dedupeEntries(entries)) {

@@ -94,9 +94,9 @@ export function getFooterSisterSites(locale: Locale): SisterSite[] {
  * Returns null if the category is not a contextual fit.
  */
 export function categoryToSisterTopic(category: string): SisterSiteTopic | null {
-  if (category === "finance") return "finance";
-  if (category === "health") return "health";
-  if (category === "time") return "age";
+  if (category === "finance" || category === "business") return "finance";
+  if (category === "health" || category === "fitness") return "health";
+  if (category === "time-date") return "age";
   return null;
 }
 

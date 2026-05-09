@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title: isKo ? "무료 온라인 계산기 모음" : "Free Online Calculators and Converters",
     description: isKo
       ? "대출, 복리, BMI, 나이, 퍼센트, 단위 변환까지 한국어로 바로 계산하실 수 있는 무료 온라인 계산기 모음입니다."
-      : "Find free online calculators for finance, health, time, math, unit conversion, and everyday life — all in one place.",
+      : "Find free online calculators for finance, business, health, fitness, math, unit conversion, time, construction, cooking, science, education, and everyday life — all in one place.",
     alternates: {
       canonical: `/${locale}`,
       languages: { en: "/en", ko: "/ko" },
@@ -25,11 +25,11 @@ const featuredCalculators = [
   { category: "finance", slug: "compound-interest-calculator", tag: "Investing", tagKo: "투자" },
   { category: "finance", slug: "mortgage-calculator", tag: "Home", tagKo: "주택" },
   { category: "health", slug: "bmi-calculator", tag: "Health", tagKo: "건강" },
-  { category: "life", slug: "concrete-calculator", tag: "Projects", tagKo: "공사" },
-  { category: "time", slug: "age-calculator", tag: "Time", tagKo: "시간" },
-  { category: "math", slug: "kinetic-energy-calculator", tag: "Science", tagKo: "과학" },
-  { category: "unit-converters", slug: "base-converter", tag: "Conversion", tagKo: "변환" },
-  { category: "unit-converters", slug: "cups-to-tablespoons-converter", tag: "Kitchen", tagKo: "주방" },
+  { category: "construction", slug: "concrete-calculator", tag: "Projects", tagKo: "공사" },
+  { category: "time-date", slug: "age-calculator", tag: "Time", tagKo: "시간" },
+  { category: "physics-science", slug: "density-calculator", tag: "Science", tagKo: "과학" },
+  { category: "unit-converters", slug: "length-converter", tag: "Conversion", tagKo: "변환" },
+  { category: "food-cooking", slug: "cooking-volume-converter", tag: "Kitchen", tagKo: "주방" },
 ];
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
@@ -60,7 +60,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="max-w-5xl">
           <div className="inline-flex rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-200">{isKo ? "무료 온라인 도구" : "Free online tools"}</div>
           <h1 className="mt-5 text-4xl font-black tracking-tight md:text-6xl">{isKo ? "대출, 복리, BMI, 날짜, 퍼센트, 단위 변환까지 한 번에 계산하세요" : "Free calculators for money, health, dates, conversions, and daily tasks"}</h1>
-          <p className="mt-5 max-w-4xl text-base leading-8 text-slate-300 md:text-lg">{isKo ? "금융, 건강, 시간, 수학, 단위 변환, 생활 계산까지 자주 마주치는 질문에 몇 초 만에 답을 얻으실 수 있어요. 원하시는 계산기를 먼저 찾으시고, 결과 해석이 필요하시면 바로 옆의 설명 글과 가이드를 함께 확인해보세요." : "Get quick answers to everyday questions with simple, easy-to-use online calculators. Open the tool you need, see the result right away, and use the practical articles and guides whenever you want more context."}</p>
+          <p className="mt-5 max-w-4xl text-base leading-8 text-slate-300 md:text-lg">{isKo ? "금융, 비즈니스, 건강, 피트니스, 수학, 시간, 단위 변환, 생활 계산까지 자주 마주치는 질문에 몇 초 만에 답을 얻으실 수 있어요. 원하시는 계산기를 먼저 찾으시고, 결과 해석이 필요하시면 바로 옆의 설명 글과 가이드를 함께 확인해보세요." : "Get quick answers to everyday questions with simple, easy-to-use online calculators. Open the tool you need, see the result right away, and use the practical articles and guides whenever you want more context."}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href={withLocale(locale, "/calculators")} className="rounded-2xl bg-blue-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-400">{isKo ? "전체 계산기 보기" : "Browse all calculators"}</Link>
             <Link href={withLocale(locale, "/faq")} className="rounded-2xl border border-white/20 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/5">{isKo ? "자주 묻는 질문" : "Read site FAQ"}</Link>

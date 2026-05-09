@@ -16,8 +16,11 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
         contact: "문의",
         privacy: "개인정보처리방침",
         terms: "이용약관",
+        editorial: "콘텐츠 기준",
+        methodology: "계산 방식",
+        corrections: "오류 제보",
         related: "관련 사이트",
-        description: "Mega Calculators는 실생활에서 자주 찾는 계산을 빠르게 처리할 수 있도록 만든 무료 온라인 계산기 사이트입니다. 금융, 건강, 날짜, 퍼센트, 단위 변환 같은 주제를 간편하게 계산할 수 있습니다.",
+        description: "Mega Calculators는 실생활에서 자주 찾는 계산을 빠르게 처리할 수 있도록 만든 무료 온라인 계산기 사이트입니다. 금융, 비즈니스, 건강, 피트니스, 날짜, 퍼센트, 단위 변환, 생활 계산 같은 주제를 간편하게 계산할 수 있습니다.",
         note: "결과는 일반적인 참고용입니다. 세금, 대출, 법률, 의료처럼 중요한 판단은 공식 기관이나 전문가와 함께 확인하세요.",
         copyright: "계산 결과는 교육 및 일반 참고용으로 제공됩니다.",
       }
@@ -32,6 +35,9 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
         contact: "Contact",
         privacy: "Privacy Policy",
         terms: "Terms of Use",
+        editorial: "Editorial Standards",
+        methodology: "Methodology",
+        corrections: "Corrections",
         related: "Related sites",
         description: "Mega Calculators is a free online calculator and converter library built to answer practical questions clearly and quickly. Use it for money decisions, health estimates, date math, percentages, and everyday conversions.",
         note: "Results are intended for planning and education. When taxes, lending, legal matters, payroll, or medical decisions are involved, verify the numbers with an official source or qualified professional.",
@@ -64,16 +70,19 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
                 <Link href={withLocale(locale, "/contact")}>{t.contact}</Link>
                 <Link href={withLocale(locale, "/privacy")}>{t.privacy}</Link>
                 <Link href={withLocale(locale, "/terms")}>{t.terms}</Link>
+                <Link href={withLocale(locale, "/editorial-standards")}>{t.editorial}</Link>
+                <Link href={withLocale(locale, "/methodology")}>{t.methodology}</Link>
+                <Link href={withLocale(locale, "/corrections")}>{t.corrections}</Link>
               </div>
             </div>
             <div>
               <div className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">{t.popular}</div>
               <div className="mt-3 flex flex-col gap-3 text-sm text-slate-600">
-                <Link href={withLocale(locale, "/calculators/finance/compound-interest-calculator")}>{localizeCalculatorName("Compound Interest Calculator", locale)}</Link>
-                <Link href={withLocale(locale, "/calculators/finance/mortgage-calculator")}>{localizeCalculatorName("Mortgage Calculator", locale)}</Link>
-                <Link href={withLocale(locale, "/calculators/health/bmi-calculator")}>{localizeCalculatorName("BMI Calculator", locale)}</Link>
-                <Link href={withLocale(locale, "/calculators/time/age-calculator")}>{localizeCalculatorName("Age Calculator", locale)}</Link>
-                <Link href={withLocale(locale, "/calculators/math/percentage-calculator")}>{localizeCalculatorName("Percentage Calculator", locale)}</Link>
+                <Link href={withLocale(locale, "/calculators/finance/compound-interest-calculator")}>{localizeCalculatorName("Compound Interest Calculator", locale, "compound-interest-calculator")}</Link>
+                <Link href={withLocale(locale, "/calculators/finance/mortgage-calculator")}>{localizeCalculatorName("Mortgage Calculator", locale, "mortgage-calculator")}</Link>
+                <Link href={withLocale(locale, "/calculators/health/bmi-calculator")}>{localizeCalculatorName("BMI Calculator", locale, "bmi-calculator")}</Link>
+                <Link href={withLocale(locale, "/calculators/time-date/age-calculator")}>{localizeCalculatorName("Age Calculator", locale, "age-calculator")}</Link>
+                <Link href={withLocale(locale, "/calculators/math/percentage-calculator")}>{localizeCalculatorName("Percentage Calculator", locale, "percentage-calculator")}</Link>
               </div>
             </div>
           </div>

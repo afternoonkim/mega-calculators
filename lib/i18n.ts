@@ -1,5 +1,7 @@
 export const locales = ["en", "ko"] as const;
+export const plannedLocales = ["es", "ja", "de", "fr", "pt", "id"] as const;
 export type Locale = (typeof locales)[number];
+export type PlannedLocale = (typeof plannedLocales)[number];
 export const defaultLocale: Locale = "en";
 
 export function isLocale(value: string): value is Locale {
@@ -7,7 +9,7 @@ export function isLocale(value: string): value is Locale {
 }
 
 export function normalizeLocale(value?: string | null): Locale {
-  return value === "ko" ? "ko" : "en";
+  return isLocale(value ?? "") ? (value as Locale) : defaultLocale;
 }
 
 export function withLocale(locale: Locale, path: string) {

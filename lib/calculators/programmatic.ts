@@ -346,47 +346,105 @@ export function getGuideSeo(definition: CalculatorDefinition) {
 }
 
 export function getUseCases(definition: CalculatorDefinition) {
+  const name = definition.name.toLowerCase();
+  // Use-case copy keyed by the new 15-category structure. Each category
+  // gets US-anchored, user-perspective scenarios that match how readers
+  // typically arrive at this kind of calculator from Google.
   const categoryCases: Record<string, string[]> = {
     finance: [
-      `Compare multiple ${definition.name.toLowerCase()} scenarios before making a borrowing, saving, or investing decision.`,
+      `Compare multiple ${name} scenarios before making a borrowing, saving, or investing decision.`,
       `Build a quick monthly budget around the result shown by this calculator.`,
-      `Use the output as a planning estimate before reviewing a lender, broker, or financial institution quote.`,
+      `Use the output as a planning estimate before reviewing a lender, broker, or 401(k) provider quote.`,
       `Test how changes in rate, term, contribution, or starting balance affect the long-term result.`,
     ],
-    health: [
-      `Use the ${definition.name.toLowerCase()} as a quick educational check before building a broader health routine.`,
-      `Compare changes in body measurements, calories, pace, or intake targets over time.`,
-      `Use the result as a practical starting point before talking to a physician, dietitian, or coach.`,
-      `Test different assumptions to understand how small changes can affect the final estimate.`,
+    business: [
+      `Sanity-check pricing, payroll, or commission numbers before sending an invoice or contract.`,
+      `Compare a few what-if scenarios on margin, markup, or break-even when planning a launch.`,
+      `Use the ${name} as a quick reference before opening a spreadsheet or accounting tool.`,
+      `Translate hourly, salary, or sales-tax inputs into the figures you actually need.`,
     ],
-    time: [
-      `Estimate time gaps quickly when planning birthdays, schedules, deadlines, or work blocks.`,
-      `Double-check a date or time calculation without opening a spreadsheet.`,
-      `Use the result to compare multiple calendar or schedule scenarios side by side.`,
-      `Turn a manual time calculation into a reusable workflow for everyday planning.`,
+    health: [
+      `Use the ${name} as an educational check before building a broader health routine.`,
+      `Compare body measurements, hydration, or pregnancy timing over time.`,
+      `Use the result as a practical starting point before talking to a physician or other clinician.`,
+      `Test different assumptions to see how small changes affect the estimate.`,
+    ],
+    fitness: [
+      `Estimate calorie, protein, BMR, TDEE, or pace targets when planning a training block.`,
+      `Compare workout, recovery, or meal scenarios side by side without a spreadsheet.`,
+      `Use the result alongside measured outcomes (scale trends, performance metrics) over 2–4 weeks.`,
+      `Re-run the ${name} when intensity, body weight, or training volume changes.`,
     ],
     math: [
-      `Use the ${definition.name.toLowerCase()} to verify homework, business math, or spreadsheet results.`,
-      `Run quick what-if scenarios before using a more advanced analytics tool.`,
-      `Translate a written problem into a clear numeric answer with less manual work.`,
-      `Check a formula step by step before applying it in school, work, or personal projects.`,
+      `Use the ${name} to verify homework, work calculations, or spreadsheet results.`,
+      `Run quick what-if scenarios before reaching for a more advanced tool.`,
+      `Translate a word problem into a clear numeric answer with less manual work.`,
+      `Walk through a formula step by step before applying it in school, work, or a personal project.`,
+    ],
+    statistics: [
+      `Compute averages, weighted averages, probability, or standard deviation for a small dataset.`,
+      `Sanity-check survey, lab, or analytics output without booting a stats package.`,
+      `Re-run the ${name} as new data points come in to see how the result shifts.`,
+      `Use the output to support a quick comparison or report, then verify with full software.`,
     ],
     "unit-converters": [
-      `Convert between common US and metric units without memorizing conversion factors.`,
+      `Convert between US imperial and metric units without memorizing conversion factors.`,
       `Use the converter while shopping, cooking, traveling, or comparing product specifications.`,
-      `Quickly verify measurements copied from another website, document, or spreadsheet.`,
+      `Verify measurements copied from another website, document, or spreadsheet.`,
       `Reduce manual conversion mistakes when moving between systems or standards.`,
     ],
-    life: [
-      `Use the ${definition.name.toLowerCase()} for everyday decisions involving bills, school, shopping, or household planning.`,
+    "time-date": [
+      `Estimate gaps for birthdays, schedules, deadlines, or work blocks in a few seconds.`,
+      `Double-check a date or time calculation without opening a calendar or spreadsheet.`,
+      `Compare multiple schedule scenarios side by side before committing.`,
+      `Turn a manual time calculation into a reusable workflow for everyday planning.`,
+    ],
+    construction: [
+      `Estimate concrete, paint, tile, or flooring quantities before placing an order.`,
+      `Run a quick check before getting a contractor quote to validate the rough size.`,
+      `Compare two layouts or finishes on cost or material volume in a single screen.`,
+      `Save the ${name} result as a starting reference, then add 5–10% waste during purchasing.`,
+    ],
+    "food-cooking": [
+      `Convert recipe units (cups, ounces, grams) when cooking from an unfamiliar source.`,
+      `Plan party food, meal prep, or grocery budgets without building a spreadsheet.`,
+      `Compare prep cost or batch size across two or three menu options.`,
+      `Use the ${name} as a quick kitchen reference, then verify weights for baking.`,
+    ],
+    "computer-tech": [
+      `Convert KB, MB, GB, or TB when comparing storage plans or downloads.`,
+      `Sanity-check tech specs, file sizes, or bandwidth math before quoting a project.`,
+      `Use the ${name} as a fast reference next to a vendor spec sheet.`,
+      `Compare two storage or transfer scenarios on the same scale.`,
+    ],
+    "physics-science": [
+      `Convert energy, force, pressure, or torque units for engineering or coursework.`,
+      `Sanity-check lab results before reporting them in a paper or technical document.`,
+      `Compare two measurements that arrived in different unit systems.`,
+      `Use the ${name} as a quick desk reference next to a textbook or datasheet.`,
+    ],
+    education: [
+      `Plan GPA targets, study hours, or course load for a coming semester.`,
+      `Compare two scheduling scenarios without manually averaging grades.`,
+      `Use the ${name} as a planning aid when picking electives or balancing study time.`,
+      `Re-run the calculation as midterm and final grades come in.`,
+    ],
+    "everyday-life": [
+      `Split a bill, check a tip, or estimate a road-trip cost in a few seconds.`,
+      `Use the ${name} for everyday decisions involving bills, shopping, or household planning.`,
       `Compare two or more scenarios before spending money or committing to a plan.`,
-      `Use the output as a fast reference while making a practical real-world decision.`,
       `Save time on repetitive calculations that would otherwise be done by hand.`,
+    ],
+    other: [
+      `Use the ${name} for a quick what-if check when no specialized tool is needed.`,
+      `Compare a couple of input sets to see how the answer shifts.`,
+      `Treat the result as a planning estimate and verify the final number with an official source if needed.`,
+      `Save the calculator for future reference and reopen as your numbers change.`,
     ],
   };
 
   return categoryCases[definition.category] ?? [
-    `Use the ${definition.name.toLowerCase()} to test a realistic scenario before making a decision.`,
+    `Use the ${name} to test a realistic scenario before making a decision.`,
     `Compare different inputs quickly and save time on manual math.`,
     `Treat the output as a helpful estimate, then verify with an official source if needed.`,
     `Use the result as a starting point for a more detailed plan.`,

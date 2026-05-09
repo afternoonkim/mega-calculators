@@ -216,7 +216,12 @@ export default async function CalculatorExamplePage({
         </article>
       </section>
 
-      <AdSlot slotKey="contentMid" label="Example page ad" minHeightClass="min-h-[140px]" />
+      <AdSlot
+        slotKey="contentMid"
+        label={isKo ? "광고" : "Advertisement"}
+        minHeightClass="min-h-[140px]"
+        locale={locale}
+      />
 
       <section className="grid gap-6 lg:grid-cols-2">
         <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">

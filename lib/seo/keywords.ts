@@ -1,186 +1,24 @@
-// Per-category SEO keyword sets.
-// - KO list is tuned for Naver 통합검색: short, high-intent longtail Korean phrases
-//   that mirror how people actually type queries on Naver.
-// - EN list is tuned for Google: descriptive longtail in natural English.
-
 import type { Locale } from "@/lib/i18n";
 
-type CategoryKeywords = {
-  ko: string[];
-  en: string[];
-  // Korean intro snippet to weave into category description / og:description
-  // — aim for natural sentences, not keyword stuffing.
-  koIntro: string;
-  enIntro: string;
-};
+type CategoryKeywords = { ko: string[]; en: string[]; koIntro: string; enIntro: string };
 
 export const categoryKeywords: Record<string, CategoryKeywords> = {
-  finance: {
-    ko: [
-      "대출 이자 계산기",
-      "복리 계산기",
-      "주택담보대출 계산기",
-      "전세자금대출 계산기",
-      "월급 실수령액 계산기",
-      "신용카드 할부 계산기",
-      "예금 이자 계산기",
-      "적금 계산기",
-      "투자 수익률 계산기",
-      "환율 계산기",
-    ],
-    en: [
-      "loan calculator",
-      "mortgage calculator",
-      "compound interest calculator",
-      "savings calculator",
-      "investment calculator",
-      "credit card interest",
-      "amortization schedule",
-      "tip calculator",
-    ],
-    koIntro:
-      "대출 이자, 복리, 주택담보대출, 월급 실수령액처럼 돈과 관련된 계산을 한국어로 빠르게 처리하실 수 있습니다.",
-    enIntro:
-      "Compare loans, plan savings, work out compound interest, and check the real cost of borrowing — all in seconds.",
-  },
-  health: {
-    ko: [
-      "BMI 계산기",
-      "표준체중 계산기",
-      "기초대사량 계산기",
-      "체지방률 계산기",
-      "칼로리 계산기",
-      "임신 주수 계산기",
-      "배란일 계산기",
-      "혈압 정상 수치",
-      "심박수 계산기",
-    ],
-    en: [
-      "BMI calculator",
-      "calorie calculator",
-      "BMR calculator",
-      "body fat percentage",
-      "ideal weight calculator",
-      "pregnancy due date calculator",
-      "ovulation calculator",
-      "heart rate calculator",
-    ],
-    koIntro:
-      "BMI, 표준체중, 기초대사량, 임신 주수처럼 건강과 몸 상태를 점검하실 때 자주 쓰시는 계산기를 한 곳에 모았습니다.",
-    enIntro:
-      "Check your BMI, work out daily calorie needs, track pregnancy weeks, and monitor health metrics with simple, reliable tools.",
-  },
-  time: {
-    ko: [
-      "나이 계산기",
-      "만 나이 계산기",
-      "디데이 계산기",
-      "날짜 계산기",
-      "근무일수 계산기",
-      "시간 계산기",
-      "타임존 변환기",
-      "임신 출산 예정일 계산기",
-    ],
-    en: [
-      "age calculator",
-      "date calculator",
-      "days between dates",
-      "time duration calculator",
-      "countdown calculator",
-      "timezone converter",
-      "business days calculator",
-    ],
-    koIntro:
-      "만 나이, 디데이, 두 날짜 차이, 근무일수처럼 시간과 날짜를 다루는 계산을 한 번에 해결하실 수 있습니다.",
-    enIntro:
-      "Find your age in days, count down to a deadline, calculate working days between two dates, and convert across time zones.",
-  },
-  math: {
-    ko: [
-      "퍼센트 계산기",
-      "할인율 계산기",
-      "분수 계산기",
-      "제곱근 계산기",
-      "삼각함수 계산기",
-      "이차방정식 계산기",
-      "확률 계산기",
-      "수학 계산기",
-    ],
-    en: [
-      "percentage calculator",
-      "fraction calculator",
-      "square root calculator",
-      "quadratic equation",
-      "probability calculator",
-      "scientific calculator",
-      "trigonometry calculator",
-    ],
-    koIntro:
-      "퍼센트, 분수, 제곱근, 이차방정식처럼 학교와 실생활에서 자주 쓰이는 수학 계산을 한국어로 풀어드립니다.",
-    enIntro:
-      "Solve percentages, fractions, square roots, equations, and trigonometry — explained alongside the answer so you can learn while you work.",
-  },
-  "unit-converters": {
-    ko: [
-      "단위 변환기",
-      "킬로그램 파운드 변환",
-      "센티미터 인치 변환",
-      "섭씨 화씨 변환",
-      "리터 갤런 변환",
-      "평수 제곱미터 변환",
-      "마일 킬로미터 변환",
-      "온스 그램 변환",
-    ],
-    en: [
-      "unit converter",
-      "kg to lbs converter",
-      "cm to inches converter",
-      "celsius to fahrenheit",
-      "liters to gallons",
-      "miles to km",
-      "ounces to grams",
-      "metric to imperial",
-    ],
-    koIntro:
-      "킬로그램·파운드, 센티미터·인치, 섭씨·화씨, 리터·갤런처럼 자주 쓰시는 단위 변환을 빠르게 도와드립니다.",
-    enIntro:
-      "Convert between metric and imperial units instantly — weight, length, temperature, volume, area, and more.",
-  },
-  life: {
-    ko: [
-      "콘크리트 계산기",
-      "페인트 양 계산기",
-      "타일 면적 계산기",
-      "팁 계산기",
-      "연비 계산기",
-      "GPA 계산기",
-      "레시피 변환 계산기",
-      "방 면적 계산기",
-    ],
-    en: [
-      "concrete calculator",
-      "paint calculator",
-      "tile calculator",
-      "tip calculator",
-      "fuel cost calculator",
-      "GPA calculator",
-      "recipe converter",
-    ],
-    koIntro:
-      "공사, 인테리어, 자동차, 학점, 레시피처럼 일상에서 자주 마주치시는 계산을 모아 빠르게 해결하실 수 있도록 했습니다.",
-    enIntro:
-      "Practical calculators for home projects, cooking, school, driving, and the everyday math life keeps throwing at you.",
-  },
+  finance: { ko: ["대출 계산기", "복리 계산기", "주택담보대출 계산기", "저축 계산기", "투자 수익률 계산기", "배당 계산기", "은퇴 자금 계산기"], en: ["loan calculator", "mortgage calculator", "compound interest calculator", "savings calculator", "investment calculator", "dividend calculator", "retirement calculator"], koIntro: "대출, 저축, 투자, 복리, 은퇴 준비처럼 개인 금융에서 자주 필요한 계산기를 한 곳에 모았습니다.", enIntro: "Plan loans, savings, investments, compound growth, retirement goals, and borrowing costs with clear finance calculators." },
+  business: { ko: ["급여 계산기", "손익분기점 계산기", "마진 계산기", "수수료 계산기", "사업 대출 계산기", "연봉 계산기"], en: ["business calculator", "paycheck calculator", "break even calculator", "markup calculator", "commission calculator", "salary calculator"], koIntro: "급여, 수수료, 마진, 세금, 손익분기점처럼 사업과 업무 판단에 필요한 계산기를 빠르게 찾으실 수 있습니다.", enIntro: "Estimate pay, pricing, sales tax, commissions, break-even points, and other business numbers without building a spreadsheet." },
+  health: { ko: ["BMI 계산기", "표준체중 계산기", "체지방률 계산기", "임신 주수 계산기", "배란일 계산기", "물 섭취량 계산기"], en: ["BMI calculator", "ideal weight calculator", "body fat calculator", "pregnancy due date calculator", "ovulation calculator", "hydration calculator"], koIntro: "BMI, 표준체중, 체지방률, 임신·배란일처럼 건강 상태를 참고할 때 자주 쓰는 계산기를 모았습니다.", enIntro: "Check common health estimates such as BMI, ideal weight, body fat, hydration, heart rate, pregnancy dates, and ovulation timing." },
+  fitness: { ko: ["칼로리 계산기", "기초대사량 계산기", "TDEE 계산기", "단백질 계산기", "러닝 페이스 계산기", "1RM 계산기"], en: ["calorie calculator", "BMR calculator", "TDEE calculator", "protein calculator", "running pace calculator", "one rep max calculator"], koIntro: "운동, 식단, 칼로리, 단백질, 러닝 페이스처럼 피트니스 계획에 필요한 계산기를 정리했습니다.", enIntro: "Build fitness plans with calculators for calories, BMR, TDEE, protein intake, running pace, one-rep max, and workout estimates." },
+  math: { ko: ["퍼센트 계산기", "분수 계산기", "비율 계산기", "제곱근 계산기", "원 넓이 계산기", "피타고라스 계산기"], en: ["percentage calculator", "fraction calculator", "ratio calculator", "square root calculator", "circle area calculator", "Pythagorean theorem calculator"], koIntro: "퍼센트, 분수, 비율, 제곱근, 도형 공식처럼 학교와 실생활에서 자주 쓰는 수학 계산기를 모았습니다.", enIntro: "Solve everyday and classroom math problems including percentages, fractions, ratios, roots, geometry, and algebra basics." },
+  statistics: { ko: ["평균 계산기", "가중평균 계산기", "확률 계산기", "표준편차 계산기", "통계 계산기"], en: ["average calculator", "weighted average calculator", "probability calculator", "standard deviation calculator", "statistics calculator"], koIntro: "평균, 가중평균, 확률, 표준편차처럼 데이터를 이해할 때 필요한 통계 계산기를 모았습니다.", enIntro: "Analyze basic data questions with calculators for averages, weighted averages, probability, and standard deviation." },
+  "unit-converters": { ko: ["단위 변환기", "킬로그램 파운드 변환", "센티미터 인치 변환", "섭씨 화씨 변환", "리터 갤런 변환"], en: ["unit converter", "kg to lbs converter", "cm to inches converter", "celsius to fahrenheit", "liters to gallons"], koIntro: "길이, 무게, 온도, 속도, 면적, 부피처럼 자주 쓰는 단위 변환을 빠르게 처리할 수 있습니다.", enIntro: "Convert common metric and imperial units for length, weight, temperature, speed, area, volume, and fuel economy." },
+  "time-date": { ko: ["나이 계산기", "날짜 계산기", "디데이 계산기", "시간 계산기", "근무일수 계산기", "영업일 계산기"], en: ["age calculator", "date calculator", "days between dates", "time duration calculator", "business days calculator", "countdown calculator"], koIntro: "나이, 날짜 차이, 디데이, 근무시간, 영업일처럼 시간과 날짜 계산을 한 곳에서 해결하실 수 있습니다.", enIntro: "Handle age, date differences, deadlines, work hours, business days, countdowns, and time-unit calculations." },
+  construction: { ko: ["콘크리트 계산기", "페인트 계산기", "타일 계산기", "바닥재 계산기", "벽지 계산기"], en: ["concrete calculator", "paint calculator", "tile calculator", "flooring calculator", "wallpaper calculator"], koIntro: "집수리, 인테리어, 조경, 자재 수량 계산에 필요한 건축·공사 계산기를 정리했습니다.", enIntro: "Estimate materials for home projects including concrete, paint, flooring, tile, wallpaper, fencing, mulch, and pool volume." },
+  "food-cooking": { ko: ["요리 단위 변환기", "식비 계산기", "밀프렙 비용 계산기", "파티 예산 계산기"], en: ["cooking volume converter", "meal prep cost calculator", "party budget calculator", "kitchen calculator"], koIntro: "요리 단위 변환, 식비, 밀프렙, 파티 예산처럼 음식과 주방에서 필요한 계산기를 모았습니다.", enIntro: "Plan kitchen and food tasks with cooking conversions, meal prep cost estimates, and party budget calculators." },
+  "computer-tech": { ko: ["데이터 용량 변환기", "디지털 저장공간 변환기", "컴퓨터 단위 변환"], en: ["data storage converter", "digital storage converter", "computer unit converter"], koIntro: "KB, MB, GB, TB 같은 데이터 저장 용량과 기술 단위를 빠르게 비교할 수 있습니다.", enIntro: "Convert computer and storage units such as KB, MB, GB, TB, and related digital measurements." },
+  "physics-science": { ko: ["에너지 변환기", "압력 변환기", "힘 변환기", "토크 변환기", "밀도 계산기", "주파수 변환기"], en: ["energy converter", "pressure converter", "force converter", "torque converter", "density calculator", "frequency converter"], koIntro: "물리, 과학, 공학에서 자주 만나는 에너지, 압력, 힘, 토크, 밀도, 전기 단위를 계산할 수 있습니다.", enIntro: "Work with physics and science measurements including energy, pressure, power, force, torque, density, frequency, and electric charge." },
+  education: { ko: ["GPA 계산기", "학점 계산기", "공부시간 계산기", "교육 계산기"], en: ["GPA calculator", "study hours calculator", "grade calculator", "education calculator"], koIntro: "학점과 공부 시간처럼 학생과 학습자가 자주 확인하는 교육 관련 계산기를 모았습니다.", enIntro: "Use study and education calculators for GPA planning, study-hour estimates, and school-related decisions." },
+  "everyday-life": { ko: ["팁 계산기", "할인 계산기", "더치페이 계산기", "연비 계산기", "여행 예산 계산기", "반려동물 나이 계산기"], en: ["tip calculator", "discount calculator", "split bill calculator", "fuel cost calculator", "travel budget calculator", "dog age calculator"], koIntro: "팁, 할인, 더치페이, 차량비, 여행비, 반려동물 나이처럼 일상에서 자주 필요한 계산기를 모았습니다.", enIntro: "Solve everyday questions around tipping, discounts, bill splitting, driving costs, travel budgets, pets, moving, and shared expenses." },
+  other: { ko: ["기타 계산기", "온라인 계산기", "무료 계산기"], en: ["other calculators", "online calculator", "free calculator"], koIntro: "주요 카테고리에 속하지 않는 다양한 계산기를 모아두는 공간입니다.", enIntro: "Find useful calculators that do not fit neatly into the main categories." },
 };
 
-export function getCategoryKeywords(category: string, locale: Locale): string[] {
-  const item = categoryKeywords[category];
-  if (!item) return [];
-  return locale === "ko" ? item.ko : item.en;
-}
-
-export function getCategoryIntro(category: string, locale: Locale): string {
-  const item = categoryKeywords[category];
-  if (!item) return "";
-  return locale === "ko" ? item.koIntro : item.enIntro;
-}
+export function getCategoryKeywords(category: string, locale: Locale): string[] { const item = categoryKeywords[category]; if (!item) return []; return locale === "ko" ? item.ko : item.en; }
+export function getCategoryIntro(category: string, locale: Locale): string { const item = categoryKeywords[category]; if (!item) return ""; return locale === "ko" ? item.koIntro : item.enIntro; }

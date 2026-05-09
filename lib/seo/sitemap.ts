@@ -7,7 +7,7 @@ export const SITEMAP_BASE_URL = "https://mega-calculators.com";
 export const SITEMAP_LOCALES = ["en", "ko"] as const satisfies readonly Locale[];
 
 const BUILD_LASTMOD = new Date().toISOString();
-const STATIC_ROUTES = ["", "/about", "/blog", "/calculators", "/contact", "/faq", "/guides", "/privacy", "/terms"] as const;
+const STATIC_ROUTES = ["", "/about", "/blog", "/calculators", "/contact", "/faq", "/guides", "/privacy", "/terms", "/editorial-standards", "/methodology", "/corrections"] as const;
 
 type ChangeFrequency = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
 

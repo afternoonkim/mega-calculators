@@ -1,4 +1,6 @@
 import { additionalCalculators } from "@/lib/calculators/additional";
+import { applyCanonicalCalculatorCategory, calculatorCategories } from "@/lib/calculators/categories";
+export { calculatorCategories };
 export type SelectOption = { label: string; value: string }
 
 export type CalculatorInput = {
@@ -33,15 +35,6 @@ export type CalculatorDefinition = {
   unitLabels?: Record<string, string>;
   relatedSlugs?: string[];
 };
-
-export const calculatorCategories = [
-  { slug: "finance", name: "Finance Calculators" },
-  { slug: "health", name: "Health Calculators" },
-  { slug: "time", name: "Time Calculators" },
-  { slug: "math", name: "Math Calculators" },
-  { slug: "unit-converters", name: "Unit Converters" },
-  { slug: "life", name: "Life Calculators" },
-] as const;
 
 const baseCalculators: CalculatorDefinition[] = [
   {
@@ -6830,10 +6823,10 @@ const baseCalculators: CalculatorDefinition[] = [
 
 const calculatorMap = new Map<string, CalculatorDefinition>();
 for (const calculator of [...baseCalculators, ...additionalCalculators]) {
-  calculatorMap.set(`${calculator.category}::${calculator.slug}`, calculator);
+  calculatorMap.set(calculator.slug, calculator);
 }
 
-export const calculators: CalculatorDefinition[] = Array.from(calculatorMap.values());
+const rawCalculators: CalculatorDefinition[] = Array.from(calculatorMap.values()).map(applyCanonicalCalculatorCategory);
 
 const calculatorContentOverrides: Record<string, Partial<CalculatorDefinition>> = {
   "roi-calculator": {
@@ -6991,23 +6984,27 @@ const calculatorContentOverrides: Record<string, Partial<CalculatorDefinition>> 
   },
 };
 
-const enrichedCalculators = calculators.map((calculator) => {
+export const calculators: CalculatorDefinition[] = rawCalculators.map((calculator) => {
   const override = calculatorContentOverrides[calculator.slug];
   return override ? { ...calculator, ...override } : calculator;
 });
 
 export const calculatorsByCategory = calculatorCategories.map((category) => ({
   ...category,
-  items: enrichedCalculators.filter((item) => item.category === category.slug),
+  items: calculators.filter((item) => item.category === category.slug),
 }));
 
 export function getCalculator(category: string, slug: string) {
-  return enrichedCalculators.find((item) => item.category === category && item.slug === slug);
+  return calculators.find((item) => item.category === category && item.slug === slug);
+}
+
+export function getCalculatorBySlug(slug: string) {
+  return calculators.find((item) => item.slug === slug);
 }
 
 export function getRelatedCalculators(slugs: string[] | undefined) {
   if (!slugs) return [];
   return slugs
-    .map((slug) => enrichedCalculators.find((item) => item.slug === slug))
+    .map((slug) => calculators.find((item) => item.slug === slug))
     .filter((item): item is CalculatorDefinition => Boolean(item));
 }

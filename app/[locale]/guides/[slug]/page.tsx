@@ -190,6 +190,20 @@ export default async function GuideDetailPage({
         </div>
       </section>
 
+      <section className="rounded-3xl border border-blue-100 bg-blue-50 p-6 shadow-sm">
+        <h2 className="text-2xl font-bold text-slate-950">
+          {isKo ? "계산기로 바로 확인해보세요" : "Try the related calculator"}
+        </h2>
+        <p className="mt-3 text-sm leading-7 text-slate-600 md:text-base">
+          {isKo
+            ? "읽은 내용을 본인 숫자로 확인하면 결과가 더 현실적으로 보입니다. 필요한 값을 입력해 여러 조건을 비교해보세요."
+            : "Turn the idea into a number by entering your own values and comparing a few scenarios."}
+        </p>
+        <Link href={withLocale(locale, guide.relatedCalculatorPath)} className="mt-5 inline-flex rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-500">
+          {guide.relatedCalculatorLabel}
+        </Link>
+      </section>
+
       {/* Topic-matched sister site (bluedino for finance/tax in KO,
           momtools for health/age in either locale). */}
       {(() => {

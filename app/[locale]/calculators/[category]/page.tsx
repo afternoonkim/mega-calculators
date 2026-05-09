@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import AdPlaceholder from "@/components/ads/AdPlaceholder";
 import { calculatorCategories, calculatorsByCategory } from "@/lib/calculators/data";
 import { normalizeLocale, withLocale } from "@/lib/i18n";
 import {
@@ -176,8 +175,6 @@ export default async function CategoryPage({
           </div>
         ) : null}
       </section>
-
-      <AdPlaceholder label="Category ad" />
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {items.map((item) => (

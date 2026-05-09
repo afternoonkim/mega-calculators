@@ -12,7 +12,7 @@ const total = calculators.length;
 
 export const metadata: Metadata = {
   title: "All Calculators",
-  description: `Browse ${total} free online calculators and converters across finance, health, time, math, unit conversion, and life topics.`,
+  description: `Browse ${total} free online calculators and converters across finance, business, health, fitness, math, statistics, unit conversion, time and date, construction, cooking, technology, science, education, and everyday life topics.`,
   alternates: { canonical: "/calculators" },
 };
 
@@ -23,7 +23,7 @@ export default function AllCalculatorsPage() {
         <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">All calculators</div>
         <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">Browse all {total} free online calculators</h1>
         <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">
-          Explore calculators by category to quickly find finance tools, health tools, time calculators, math calculators, unit converters, and everyday life utilities.
+          Explore calculators by category to quickly find finance, business, health, fitness, math, statistics, unit converters, time and date, construction, cooking, tech, science, education, and everyday life tools.
         </p>
       </section>
 

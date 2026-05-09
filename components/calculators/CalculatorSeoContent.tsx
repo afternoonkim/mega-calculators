@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getCalculatorSeoContent } from "@/lib/calculators/seoContent";
+import { getEnhancedCalculatorContent } from "@/lib/calculators/enhancedContent";
 import type { CalculatorDefinition } from "@/lib/calculators/data";
 import { withLocale } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n";
@@ -17,9 +18,47 @@ type Props = {
 
 export default function CalculatorSeoContent({ definition, locale, relatedLinks }: Props) {
   const content = getCalculatorSeoContent(definition, locale, relatedLinks);
+  const enhanced = getEnhancedCalculatorContent(definition, locale);
 
   return (
     <>
+
+      {enhanced ? (
+        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+          <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+            <div>
+              <div className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">{locale === "ko" ? "실전 활용" : "Practical use"}</div>
+              <h2 className="mt-4 text-2xl font-bold text-slate-900">{enhanced.whenToUseTitle}</h2>
+              <div className="mt-4 space-y-3 text-sm leading-7 text-slate-600 md:text-base">{enhanced.whenToUse.map((item) => <p key={item}>{item}</p>)}</div>
+            </div>
+            <div className="rounded-2xl bg-slate-50 p-5">
+              <h3 className="text-lg font-bold text-slate-900">{enhanced.stepTitle}</h3>
+              <ol className="mt-4 space-y-3 text-sm leading-7 text-slate-600 md:text-base">{enhanced.stepExample.map((item) => <li key={item} className="rounded-2xl bg-white px-4 py-3">{item}</li>)}</ol>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {enhanced ? (
+        <section className="grid gap-6 lg:grid-cols-3">
+          <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"><h2 className="text-2xl font-bold text-slate-900">{enhanced.mistakesTitle}</h2><div className="mt-5 space-y-3">{enhanced.mistakes.map((item) => <p key={item} className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4 text-sm leading-7 text-amber-950 md:text-base">{item}</p>)}</div></article>
+          <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"><h2 className="text-2xl font-bold text-slate-900">{enhanced.interpretationTitle}</h2><div className="mt-5 space-y-3">{enhanced.interpretation.map((item) => <p key={item} className="text-sm leading-7 text-slate-600 md:text-base">{item}</p>)}</div></article>
+          <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"><h2 className="text-2xl font-bold text-slate-900">{enhanced.limitationsTitle}</h2><div className="mt-5 space-y-3">{enhanced.limitations.map((item) => <p key={item} className="text-sm leading-7 text-slate-600 md:text-base">{item}</p>)}</div></article>
+        </section>
+      ) : null}
+
+      {enhanced ? (
+        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+          <h2 className="text-2xl font-bold text-slate-900">{enhanced.relatedGuidesTitle}</h2>
+          <p className="mt-4 text-sm leading-7 text-slate-600 md:text-base">{enhanced.relatedGuidesIntro}</p>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            {enhanced.relatedGuides.map((item) => (
+              <Link key={item.href} href={withLocale(locale, item.href)} className="rounded-2xl border border-slate-200 p-5 transition hover:border-blue-300 hover:bg-blue-50"><div className="text-base font-semibold text-slate-900">{item.title}</div><p className="mt-3 text-sm leading-7 text-slate-600">{item.description}</p><div className="mt-4 text-sm font-semibold text-blue-700">{item.cta}</div></Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <div>

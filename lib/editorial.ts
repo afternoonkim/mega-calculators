@@ -175,7 +175,7 @@ const koBlogPosts: EditorialEntry[] = [
     intro:
       "퍼센트 계산기와 날짜 계산기는 단순한 도구처럼 보이지만, 실제로는 쇼핑, 급여 확인, 일정 관리, 계약 일정 계산처럼 일상 곳곳에서 자주 쓰입니다. 자주 쓰는 상황을 미리 알아두면 계산기 활용도가 훨씬 높아집니다.",
     updatedAt: "2026-04-01",
-    relatedCalculatorPath: "/calculators/time/date-duration-calculator",
+    relatedCalculatorPath: "/calculators/time-date/date-difference-calculator",
     relatedCalculatorLabel: "날짜 차이 계산기",
     sections: [
       {
@@ -604,7 +604,7 @@ const enBlogPosts: EditorialEntry[] = [
     intro:
       "Percentage and date calculators might seem like simple tools, but here's how you can use them for real decisions. They help with shopping, deadline planning, work schedules, and quick comparisons that would otherwise be easy to misread. Let's walk through the everyday moments when they're most useful.",
     updatedAt: "2026-04-01",
-    relatedCalculatorPath: "/calculators/time/date-duration-calculator",
+    relatedCalculatorPath: "/calculators/time-date/date-difference-calculator",
     relatedCalculatorLabel: "Date Duration Calculator",
     sections: [
       {
@@ -980,7 +980,7 @@ const koGuides: EditorialEntry[] = [
     intro:
       "칼로리 계산기의 숫자는 시작점입니다. 중요한 것은 그 수치를 생활 패턴과 목표에 맞게 어떻게 해석하느냐입니다.",
     updatedAt: "2026-04-01",
-    relatedCalculatorPath: "/calculators/health/calorie-calculator",
+    relatedCalculatorPath: "/calculators/fitness/calorie-calculator",
     relatedCalculatorLabel: "칼로리 계산기",
     sections: [
       { heading: "유지 칼로리의 의미", body: ["유지 칼로리는 현재 체중을 유지하기 위한 대략적인 기준값입니다.", "활동량이 바뀌면 이 수치도 함께 달라질 수 있습니다."] },
@@ -1000,7 +1000,7 @@ const koGuides: EditorialEntry[] = [
     intro:
       "날짜 차이 계산기는 단순히 며칠 남았는지 보는 도구가 아니라 일정을 쪼개고 우선순위를 정하는 데에도 도움이 됩니다.",
     updatedAt: "2026-04-01",
-    relatedCalculatorPath: "/calculators/time/date-duration-calculator",
+    relatedCalculatorPath: "/calculators/time-date/date-difference-calculator",
     relatedCalculatorLabel: "날짜 차이 계산기",
     sections: [
       { heading: "마감일까지 남은 기간 확인", body: ["전체 남은 일수를 먼저 보면 계획을 크게 잡기 쉽습니다.", "이후 주 단위나 단계별 일정으로 쪼개면 실행력이 높아집니다."] },
@@ -1183,7 +1183,7 @@ const koGuides: EditorialEntry[] = [
     publishedAt: "2026-04-26",
     updatedAt: "2026-04-26",
     evergreen: true,
-    relatedCalculatorPath: "/calculators/time/age-calculator",
+    relatedCalculatorPath: "/calculators/time-date/age-calculator",
     relatedCalculatorLabel: "나이 계산기",
     sections: [
       {
@@ -1295,7 +1295,7 @@ const enGuides: EditorialEntry[] = [
     intro:
       "Calorie calculators are helpful because they turn a vague goal into a starting estimate. The real value comes from using that estimate carefully instead of treating it like a fixed rule.",
     updatedAt: "2026-04-01",
-    relatedCalculatorPath: "/calculators/health/calorie-calculator",
+    relatedCalculatorPath: "/calculators/fitness/calorie-calculator",
     relatedCalculatorLabel: "Calorie Calculator",
     sections: [
       { heading: "What maintenance calories tell you", body: ["A maintenance estimate helps you understand roughly how much energy supports your current body weight.", "It is a planning baseline, not a guarantee, because daily activity still changes the picture."] },
@@ -1315,7 +1315,7 @@ const enGuides: EditorialEntry[] = [
     intro:
       "Date calculators are useful because they remove guesswork from planning. Instead of counting days manually, you can map deadlines, compare timelines, and build a schedule that feels more realistic.",
     updatedAt: "2026-04-01",
-    relatedCalculatorPath: "/calculators/time/date-duration-calculator",
+    relatedCalculatorPath: "/calculators/time-date/date-difference-calculator",
     relatedCalculatorLabel: "Date Duration Calculator",
     sections: [
       { heading: "Check the full timeline first", body: ["Before you divide work into tasks, it helps to know the full number of days or weeks available.", "That makes it easier to set milestones and avoid unrealistic planning." ] },

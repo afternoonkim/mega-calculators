@@ -544,6 +544,11 @@ const categoryEditorial: Record<string, {
       ko: { title: "주담대 계산기 사용 전 꼭 확인할 5가지", description: "예산과 금리, 상환방식을 어떤 순서로 확인하면 좋은지 정리한 가이드입니다.", href: "/guides/mortgage-calculator-checklist" },
     },
   },
+
+  business: {
+    blog: { en: { title: "Simple ways to use percentage and time calculators", description: "Useful when pricing, pay, and tax decisions need a quick estimate before a deeper review.", href: "/blog/everyday-percent-and-date-calculators" }, ko: { title: "퍼센트와 날짜 계산기를 일상에서 쓰는 방법", description: "마진, 세금, 급여 계산처럼 업무 숫자를 빠르게 확인할 때 참고하기 좋은 글입니다.", href: "/blog/everyday-percent-and-date-calculators" } },
+    guide: { en: { title: "How to use date and hours calculators for work schedules", description: "Useful when work hours, pay periods, and project time affect the final number.", href: "/guides/date-calculator-for-schedules" }, ko: { title: "날짜 차이 계산기로 일정 계산하기", description: "근무시간과 급여 계산을 일정과 함께 볼 때 참고하기 좋은 가이드입니다.", href: "/guides/date-calculator-for-schedules" } },
+  },
   health: {
     blog: {
       en: { title: "How to choose the right health calculator", description: "A quick article on when BMI and other health tools are useful and how to interpret them more carefully.", href: "/blog/when-bmi-calculator-is-useful" },
@@ -554,7 +559,7 @@ const categoryEditorial: Record<string, {
       ko: { title: "칼로리 계산 결과를 해석하는 방법", description: "칼로리 수치를 유지·감량·증량 계획과 연결하는 데 도움이 되는 가이드입니다.", href: "/guides/how-to-read-calorie-results" },
     },
   },
-  time: {
+  "time-date": {
     blog: {
       en: { title: "Simple ways to use percentage and time calculators", description: "Useful when a simple date or time result turns into a schedule or planning question.", href: "/blog/everyday-percent-and-date-calculators" },
       ko: { title: "퍼센트와 날짜 계산기를 일상에서 쓰는 방법", description: "일정과 날짜 차이를 실생활에서 활용하는 예시를 모은 글입니다.", href: "/blog/everyday-percent-and-date-calculators" },
@@ -584,7 +589,7 @@ const categoryEditorial: Record<string, {
       ko: { title: "날짜 차이 계산기로 일정 계산하기", description: "변환 결과를 일정이나 계획과 연결해야 할 때 참고하기 좋은 가이드입니다.", href: "/guides/date-calculator-for-schedules" },
     },
   },
-  life: {
+  "everyday-life": {
     blog: {
       en: { title: "Simple ways to use percentage and time calculators", description: "A practical article that connects everyday calculator tasks with real-life choices and deadlines.", href: "/blog/everyday-percent-and-date-calculators" },
       ko: { title: "퍼센트와 날짜 계산기를 일상에서 쓰는 방법", description: "생활 계산을 더 실용적으로 쓰는 예시를 담은 글입니다.", href: "/blog/everyday-percent-and-date-calculators" },
@@ -602,7 +607,7 @@ function buildFallbackCalculatorSeoContent(
   relatedLinks: RelatedLink[] = []
 ): CalculatorSeoContent {
   const isKo = locale === "ko";
-  const categoryContent = categoryEditorial[definition.category] ?? categoryEditorial.life;
+  const categoryContent = categoryEditorial[definition.category] ?? categoryEditorial["everyday-life"];
   const relatedArticles = [categoryContent.blog[locale], categoryContent.guide[locale]].map((item) => ({
     ...item,
     cta: isKo ? "콘텐츠 보기 →" : "Open article →",

@@ -2,8 +2,8 @@ import type { CalculatorDefinition } from "@/lib/calculators/data";
 import type { Locale } from "@/lib/i18n";
 
 const categoryNames = {
-  en: { finance: "Finance Calculators", health: "Health Calculators", time: "Time Calculators", math: "Math Calculators", "unit-converters": "Unit Converters", life: "Life Calculators" },
-  ko: { finance: "금융 계산기", health: "건강 계산기", time: "시간 계산기", math: "수학 계산기", "unit-converters": "단위 변환기", life: "생활 계산기" },
+  en: { finance: "Finance Calculators", business: "Business Calculators", health: "Health Calculators", fitness: "Fitness Calculators", math: "Math Calculators", statistics: "Statistics Calculators", "unit-converters": "Unit Converters", "time-date": "Time & Date Calculators", construction: "Construction Calculators", "food-cooking": "Food & Cooking Calculators", "computer-tech": "Computer & Tech Calculators", "physics-science": "Physics & Science Calculators", education: "Education Calculators", "everyday-life": "Everyday Life Calculators", other: "Other Calculators" },
+  ko: { finance: "금융 계산기", business: "비즈니스 계산기", health: "건강 계산기", fitness: "피트니스 계산기", math: "수학 계산기", statistics: "통계 계산기", "unit-converters": "단위 변환기", "time-date": "시간·날짜 계산기", construction: "건축·인테리어 계산기", "food-cooking": "요리·음식 계산기", "computer-tech": "컴퓨터·기술 계산기", "physics-science": "물리·과학 계산기", education: "교육 계산기", "everyday-life": "생활 계산기", other: "기타 계산기" },
 } as const;
 
 const slugKoNameMap: Record<string, string> = {
@@ -909,7 +909,7 @@ export function localizeCalculatorName(name: string | Partial<Record<Locale, str
 }
 
 function isMoneyCalculator(definition: CalculatorDefinition) {
-  return definition.category === "finance" || /(loan|mortgage|rent|budget|salary|income|tax|commission|cost|price|payment|savings|investment|dividend|worth|debt|payoff|apr|roi|inflation)/i.test(definition.slug);
+  return definition.category === "finance" || definition.category === "business" || /(loan|mortgage|rent|budget|salary|income|tax|commission|cost|price|payment|savings|investment|dividend|worth|debt|payoff|apr|roi|inflation)/i.test(definition.slug);
 }
 
 function isConverter(definition: CalculatorDefinition) {
@@ -924,13 +924,13 @@ function buildKoDescription(definition: CalculatorDefinition, localizedName: str
   if (isConverter(definition)) {
     return `${localizedName}는 자주 사용하는 단위를 한국어로 빠르게 변환해주는 무료 온라인 도구입니다. 변환 전 값과 단위를 입력하면 결과를 바로 확인할 수 있어 실생활, 학습, 업무에 모두 활용하기 좋습니다.`;
   }
-  if (definition.category === "finance") {
+  if (definition.category === "finance" || definition.category === "business") {
     return `${localizedName}는 금액, 이자율, 기간 같은 값을 바탕으로 결과를 바로 확인할 수 있는 한국어 금융 계산기입니다. 대출, 저축, 투자, 예산 점검처럼 돈과 관련된 판단을 할 때 참고용으로 활용할 수 있습니다.`;
   }
   if (definition.category === "health") {
     return `${localizedName}는 몸무게, 키, 나이, 활동량 등 건강 관련 값을 바탕으로 결과를 빠르게 확인할 수 있는 한국어 계산기입니다. 식단, 운동, 건강 관리 계획을 세울 때 참고용으로 활용하기 좋습니다.`;
   }
-  if (definition.category === "time") {
+  if (definition.category === "time-date") {
     return `${localizedName}는 날짜, 시간, 기간 차이를 빠르게 계산할 수 있는 한국어 도구입니다. 일정 관리, 근무 시간 계산, 마감일 확인 같은 상황에서 바로 활용할 수 있습니다.`;
   }
   if (definition.category === "math") {
@@ -945,13 +945,13 @@ function buildKoIntro(definition: CalculatorDefinition, localizedName: string) {
   if (isConverter(definition)) {
     return `${localizedName}는 ${joined}을 기준으로 단위를 변환하는 계산기입니다. 미국식 단위와 미터법 단위를 함께 다뤄야 할 때 빠르게 값을 비교할 수 있도록 구성했습니다.`;
   }
-  if (definition.category === "finance") {
+  if (definition.category === "finance" || definition.category === "business") {
     return `${localizedName}는 ${joined}을 입력해 결과를 바로 확인할 수 있는 금융 계산기입니다. 월 상환액, 총이자, 예상 수익, 예산 규모처럼 실제 돈 관리에 필요한 수치를 빠르게 점검할 수 있습니다.`;
   }
   if (definition.category === "health") {
     return `${localizedName}는 ${joined}을 바탕으로 건강 관련 수치를 확인하는 계산기입니다. 운동 계획, 식단 관리, 기본 건강 지표 확인 전에 참고용으로 쓰기 좋습니다.`;
   }
-  if (definition.category === "time") {
+  if (definition.category === "time-date") {
     return `${localizedName}는 ${joined}을 입력해 날짜와 시간 차이를 계산하는 도구입니다. 일정 간격, 남은 기간, 근무 시간처럼 반복해서 계산해야 하는 상황에서 시간을 절약할 수 있습니다.`;
   }
   if (definition.category === "math") {
@@ -964,13 +964,13 @@ function buildKoFormulaText(definition: CalculatorDefinition, localizedName: str
   if (isConverter(definition)) {
     return `${localizedName}는 입력한 수치에 표준 단위 환산 비율을 적용해 결과를 계산합니다. 즉, 기준 단위로 한 번 변환한 뒤 원하는 단위로 다시 바꾸는 방식이라 입력값만 정확하면 결과를 빠르게 비교할 수 있습니다.`;
   }
-  if (definition.category === "finance") {
+  if (definition.category === "finance" || definition.category === "business") {
     return `${localizedName} 결과는 입력한 금액, 이자율, 기간, 수익률 등의 값을 바탕으로 일반적으로 널리 쓰이는 금융 계산 공식을 적용해 산출됩니다. 실제 상품 조건에는 수수료, 세금, 우대금리, 상환 방식 차이가 반영될 수 있으므로 최종 판단 전에는 실제 조건을 함께 확인하는 것이 좋습니다.`;
   }
   if (definition.category === "health") {
     return `${localizedName}는 키, 몸무게, 나이, 활동량 등 입력값을 이용해 일반적으로 알려진 건강 계산 공식이나 추정식을 적용합니다. 결과는 참고용 수치이며 개인 건강 상태를 완전히 대신하지는 않습니다.`;
   }
-  if (definition.category === "time") {
+  if (definition.category === "time-date") {
     return `${localizedName}는 입력한 날짜와 시간을 기준으로 차이, 합산, 변환 결과를 계산합니다. 달력 규칙과 시간 단위 환산을 반영해 결과를 보여주며, 반복 계산을 손으로 할 때보다 빠르게 확인할 수 있습니다.`;
   }
   if (definition.category === "math") {
@@ -989,7 +989,7 @@ function buildKoHowToUse(definition: CalculatorDefinition) {
     isMoneyCalculator(definition) ? "금액 관련 계산기라면 한국어 화면에서 원화 기준으로 값을 확인해보세요." : "입력값을 조금씩 바꿔보면서 결과가 어떻게 달라지는지 비교해보세요.",
     "결과 영역에서 핵심 수치와 함께 보조 결과도 같이 확인합니다.",
   ];
-  if (definition.category === "finance") {
+  if (definition.category === "finance" || definition.category === "business") {
     steps.push("대출, 투자, 세금 관련 결과는 실제 상품 조건이나 공식 자료와 함께 다시 확인하세요.");
   } else if (definition.category === "health") {
     steps.push("건강 관련 수치는 참고용으로 보고, 중요한 판단은 전문가 상담과 함께 확인하세요.");
@@ -1001,7 +1001,7 @@ function buildKoHowToUse(definition: CalculatorDefinition) {
 
 function buildKoExample(definition: CalculatorDefinition, localizedName: string) {
   const labels = localizedInputLabels(definition).slice(0, 3);
-  if (definition.category === "finance") {
+  if (definition.category === "finance" || definition.category === "business") {
     return `${localizedName}에서는 금액, 이자율, 기간을 넣어 결과가 어떻게 달라지는지 바로 확인할 수 있습니다. 먼저 기본값으로 계산해본 뒤 내 상황에 맞는 숫자로 바꿔보면 실제 비교가 훨씬 쉬워집니다.`;
   }
   if (definition.category === "health") {

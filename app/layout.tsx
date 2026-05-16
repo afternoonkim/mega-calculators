@@ -11,8 +11,16 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   verification: {
     google: "utGZoboUYhCKflQygCPsZ_K8CdJiQaOfYBeunri0AcE",
+    // Optional Bing Webmaster Tools verification token. Set
+    // NEXT_PUBLIC_BING_SITE_VERIFICATION in the Vercel env after creating
+    // the property at https://www.bing.com/webmasters and Bing's crawler
+    // (bingbot) will start treating the property as verified, which
+    // unlocks the Site Explorer and Search Performance reports.
     other: {
       "naver-site-verification": "c7b8ff2a84274ce6403736a44777d0e08942cee8",
+      ...(process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+        ? { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION }
+        : {}),
     },
   },
   icons: {

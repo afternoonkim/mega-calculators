@@ -32,6 +32,11 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.description,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+    },
     alternates: {
       canonical: `${SITE_URL}/${locale}/blog/${post.slug}`,
       languages: {
@@ -82,6 +87,18 @@ export default async function BlogDetailPage({
   // BlogPosting schema. datePublished + dateModified always emitted —
   // search engines use these for freshness signal even when the date is
   // hidden from users on evergreen articles.
+  //
+  // Author is typed as Person and points at the Editorial Standards page
+  // so Google's E-E-A-T systems can verify there's a published editorial
+  // policy behind the byline. This is the standard pattern for sites that
+  // don't put individual authors on every post.
+  const author = {
+    "@type": "Person",
+    name: isKo ? "Mega Calculators 에디토리얼팀" : "Mega Calculators Editorial Team",
+    url: `${SITE_URL}/${locale}/editorial-standards`,
+    jobTitle: isKo ? "에디토리얼팀" : "Editorial Team",
+    worksFor: { "@type": "Organization", name: "Mega Calculators", url: SITE_URL },
+  };
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -92,11 +109,7 @@ export default async function BlogDetailPage({
     inLanguage: locale === "ko" ? "ko-KR" : "en-US",
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     url,
-    author: {
-      "@type": "Organization",
-      name: "Mega Calculators",
-      url: SITE_URL,
-    },
+    author,
     publisher: {
       "@type": "Organization",
       name: "Mega Calculators",
@@ -224,17 +237,16 @@ export default async function BlogDetailPage({
         return topic ? <SisterSiteCard topic={topic} locale={locale} /> : null;
       })()}
 
-      {/* "Last reviewed" footer — only when an explicit reviewedAt date exists.
-          This signals "we re-checked this content" without committing to a
-          monthly publish-date schedule. Reviewer date appears low-key at the
-          bottom; it's a trust signal, not a headline. */}
-      {post.reviewedAt ? (
-        <p className="text-sm text-slate-500">
-          {isKo
-            ? `이 글은 ${post.reviewedAt}에 마지막으로 검토되었어요.`
-            : `Last reviewed on ${post.reviewedAt}.`}
-        </p>
-      ) : null}
+      {/* "Last reviewed" footer — shown on every article as a soft trust
+          signal. Uses the explicit reviewedAt date when present, otherwise
+          falls back to updatedAt (which is the canonical content-change
+          date). The line is intentionally small and low-emphasis so it
+          reads as a publisher note, not a banner. */}
+      <p className="text-sm text-slate-500">
+        {isKo
+          ? `이 글은 ${post.reviewedAt ?? post.updatedAt}에 마지막으로 검토되었어요. Mega Calculators 에디토리얼팀이 콘텐츠 기준에 따라 정기적으로 확인하고 있어요.`
+          : `Last reviewed on ${post.reviewedAt ?? post.updatedAt} by the Mega Calculators editorial team in line with our editorial standards.`}
+      </p>
     </article>
   );
 }

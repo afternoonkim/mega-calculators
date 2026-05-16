@@ -32,6 +32,11 @@ export async function generateMetadata({
   return {
     title: guide.title,
     description: guide.description,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+    },
     alternates: {
       canonical: `${SITE_URL}/${locale}/guides/${guide.slug}`,
       languages: {
@@ -79,9 +84,19 @@ export default async function GuideDetailPage({
   const publishedAt = guide.publishedAt ?? guide.updatedAt;
   const url = `${SITE_URL}/${locale}/guides/${guide.slug}`;
 
-  // HowTo schema would also fit a guide, but we keep it as Article for
-  // consistency. datePublished and dateModified are surfaced in JSON-LD
-  // even when the visible date is suppressed on evergreen content.
+  // Article schema with a Person-typed author. Pairing this with the
+  // HowTo schema below gives Google two complementary signals: "this is
+  // a published article from a known editorial team" + "this is also a
+  // step-by-step procedure". HowTo is the Rich Result format that lets
+  // Google display each section as a numbered step in the SERP preview,
+  // and Article carries the E-E-A-T author byline.
+  const author = {
+    "@type": "Person",
+    name: isKo ? "Mega Calculators 에디토리얼팀" : "Mega Calculators Editorial Team",
+    url: `${SITE_URL}/${locale}/editorial-standards`,
+    jobTitle: isKo ? "에디토리얼팀" : "Editorial Team",
+    worksFor: { "@type": "Organization", name: "Mega Calculators", url: SITE_URL },
+  };
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -92,8 +107,27 @@ export default async function GuideDetailPage({
     inLanguage: locale === "ko" ? "ko-KR" : "en-US",
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     url,
-    author: { "@type": "Organization", name: "Mega Calculators", url: SITE_URL },
+    author,
     publisher: { "@type": "Organization", name: "Mega Calculators", url: SITE_URL },
+  };
+  // HowTo — gives guide pages the step-by-step rich result. Each section
+  // heading becomes a step name and the joined body paragraphs become
+  // the step text. The schema is only useful when the guide actually
+  // walks through a procedure; for purely informational guides Google
+  // may not render the rich result but the markup doesn't hurt.
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: guide.title,
+    description: guide.description,
+    inLanguage: locale === "ko" ? "ko-KR" : "en-US",
+    step: guide.sections.map((section, idx) => ({
+      "@type": "HowToStep",
+      position: idx + 1,
+      name: section.heading,
+      text: section.body.join(" "),
+      url: `${url}#step-${idx + 1}`,
+    })),
   };
 
   const faqSchema = {
@@ -121,6 +155,10 @@ export default async function GuideDetailPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
       />
       <script
         type="application/ld+json"
@@ -162,8 +200,12 @@ export default async function GuideDetailPage({
       </header>
 
       <div className="space-y-6">
-        {guide.sections.map((section) => (
-          <section key={section.heading} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        {guide.sections.map((section, idx) => (
+          <section
+            key={section.heading}
+            id={`step-${idx + 1}`}
+            className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
+          >
             <h2 className="text-2xl font-bold text-slate-950">{section.heading}</h2>
             <div className="mt-4 space-y-4">
               {section.body.map((paragraph, index) => (
@@ -211,13 +253,14 @@ export default async function GuideDetailPage({
         return topic ? <SisterSiteCard topic={topic} locale={locale} /> : null;
       })()}
 
-      {guide.reviewedAt ? (
-        <p className="text-sm text-slate-500">
-          {isKo
-            ? `이 가이드는 ${guide.reviewedAt}에 마지막으로 검토되었어요.`
-            : `Last reviewed on ${guide.reviewedAt}.`}
-        </p>
-      ) : null}
+      {/* "Last reviewed" footer — always shown so each guide carries a
+          dated trust signal. reviewedAt wins; otherwise we fall back to
+          updatedAt so the line reflects the most recent content change. */}
+      <p className="text-sm text-slate-500">
+        {isKo
+          ? `이 가이드는 ${guide.reviewedAt ?? guide.updatedAt}에 마지막으로 검토되었어요. Mega Calculators 에디토리얼팀이 콘텐츠 기준에 따라 점검하고 있어요.`
+          : `Last reviewed on ${guide.reviewedAt ?? guide.updatedAt} by the Mega Calculators editorial team in line with our editorial standards.`}
+      </p>
     </article>
   );
 }

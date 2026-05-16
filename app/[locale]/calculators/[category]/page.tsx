@@ -46,6 +46,11 @@ export async function generateMetadata({
     title,
     description,
     keywords,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+    },
     alternates: {
       canonical: `${SITE_URL}/${locale}/calculators/${match.slug}`,
       languages: {

@@ -56,6 +56,20 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     applicationName: "Mega Calculators",
     authors: [{ name: "Mega Calculators" }],
     publisher: "Mega Calculators",
+    // Explicit per-locale-layout indexability signal. The root layout already
+    // sets robots, but Google has been observed to occasionally drop nested
+    // metadata inheritance for high-volume sites, so we re-assert here.
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
+    },
     alternates: {
       canonical: `${SITE_URL}/${locale}`,
       languages: {

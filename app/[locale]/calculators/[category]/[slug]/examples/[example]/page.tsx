@@ -13,6 +13,7 @@ import {
   localizeProgrammaticExample,
   localizeResultText,
 } from "@/lib/calculators/localization";
+import { getScenarioInterpretation } from "@/lib/calculators/scenarioInterpretation";
 
 const SITE_URL = "https://mega-calculators.com";
 
@@ -43,6 +44,14 @@ export async function generateMetadata({
   return {
     title: isKo ? `${exampleData.title} | 예시 계산` : `${exampleData.title} | Example Calculation`,
     description: exampleData.description,
+    // Strong explicit signal so example pages don't fall to "crawled — not
+    // indexed". Each programmatic scenario page is a long-tail target that
+    // deserves indexing once paired with unique per-scenario interpretation.
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+    },
     alternates: {
       canonical: url,
       languages: {
@@ -222,6 +231,30 @@ export default async function CalculatorExamplePage({
         minHeightClass="min-h-[140px]"
         locale={locale}
       />
+
+      {/* Scenario-specific interpretation paragraph — adds genuinely unique
+          content per example page so Google's "Helpful Content" classifier
+          doesn't collapse all 100 scenarios of a single calculator into
+          "thin variants of one page". The paragraph is computed from the
+          actual input values + result, so each URL gets a distinct body. */}
+      {(() => {
+        const interpretation = getScenarioInterpretation({
+          definition: calculator,
+          values,
+          primaryValue: String(result.primary.value),
+          primaryLabel: String(result.primary.label),
+          locale,
+        });
+        if (!interpretation) return null;
+        return (
+          <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+            <h2 className="text-2xl font-bold text-slate-900">
+              {isKo ? "이 시나리오는 어떻게 해석하면 좋아요" : "What this scenario tells you"}
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-slate-600 md:text-base">{interpretation}</p>
+          </section>
+        );
+      })()}
 
       <section className="grid gap-6 lg:grid-cols-2">
         <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">

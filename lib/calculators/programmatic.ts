@@ -76,12 +76,7 @@ function formatExampleValue(definition: CalculatorDefinition, value: string) {
   return value;
 }
 
-function withOverrides(defaults: Record<string, string>, overrides: Record<string, string>) {
-  return { ...defaults, ...Object.fromEntries(Object.entries(overrides).map(([k, v]) => [k, String(v)])) };
-}
-
 function buildGenericExamples(definition: CalculatorDefinition) {
-  const defaults = Object.fromEntries(definition.inputs.map((input) => [input.name, input.defaultValue ?? ""]));
   const numericInputs = definition.inputs.filter((input) => input.type === "number" && input.defaultValue && Number.isFinite(Number(input.defaultValue)));
   if (!numericInputs.length) {
     return [

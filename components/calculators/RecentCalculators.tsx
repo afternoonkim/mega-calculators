@@ -77,12 +77,10 @@ export function RecentTracker({
  * keeps the homepage SSR snapshot identical for SEO bots.
  */
 export function RecentCalculatorsList({ locale }: { locale: Locale }) {
-  const [items, setItems] = useState<RecentCalculator[] | null>(null);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    setItems(readRecents());
-  }, []);
+  const [items, setItems] = useState<RecentCalculator[] | null>(() => {
+    if (typeof window === "undefined") return null;
+    return readRecents();
+  });
 
   if (!items || items.length === 0) return null;
 

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import AdSlot from "@/components/ads/AdSlot";
 
 export const metadata: Metadata = {
   title: "FAQ",

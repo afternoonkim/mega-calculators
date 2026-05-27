@@ -894,7 +894,7 @@ export function localizeCategoryName(category: string, locale: Locale) {
 }
 
 export function localizeCalculatorName(name: string | Partial<Record<Locale, string>>, locale: Locale, slug?: string) {
-  const englishName = getLocalizedText(name as any, "en");
+  const englishName = getLocalizedText(name, "en");
   if (locale === "en") return englishName;
   if (slug && slugKoNameMap[slug]) return slugKoNameMap[slug];
   if (nameKoOverrides[englishName]) return nameKoOverrides[englishName];
@@ -1068,7 +1068,7 @@ export function localizeDisplayValue(label: string, value: string, locale: Local
   if (locale === "en") return value;
   const raw = String(value ?? "").trim();
   if (!raw || raw === "—") return raw || "—";
-  const labelKo = localizeInputLabel(getLocalizedText(label as any, locale), locale);
+  const labelKo = localizeInputLabel(getLocalizedText(label, locale), locale);
   const num = Number(raw.replace(/,/g, ""));
   const isMoney = /(원|금액|가격|비용|소득|연봉|지출|월세|자산|부채|수수료|계약금|주가|원금|잔액|예산|매출|대출)/.test(labelKo);
   if (Number.isFinite(num) && isMoney) {
@@ -1078,7 +1078,7 @@ export function localizeDisplayValue(label: string, value: string, locale: Local
 }
 
 export function localizeInputLabel(label: string | Partial<Record<Locale, string>>, locale: Locale) {
-  const rawLabel = getLocalizedText(label as any, locale);
+  const rawLabel = getLocalizedText(label, locale);
   if (locale === "en") return rawLabel;
   const cleaned = replaceCurrencySymbols(String(rawLabel)).trim();
   const translated = translateKnownLabel(cleaned);
@@ -1100,7 +1100,7 @@ export function localizeCalculatorDefinition(definition: CalculatorDefinition, l
     faq: definition.faq.map((item) => ({ q: getLocalizedText(item.q, locale), a: getLocalizedText(item.a, locale) })),
     inputs: definition.inputs.map((input) => ({ ...input, label: getLocalizedText(input.label, locale), options: input.options?.map((option) => ({ ...option, label: getLocalizedText(option.label, locale) })) })),
   };
-  const localizedName = localizeCalculatorName(getLocalizedText(definition.name as any, "en"), locale, definition.slug);
+  const localizedName = localizeCalculatorName(getLocalizedText(definition.name, "en"), locale, definition.slug);
   return {
     ...definition,
     categoryName: localizeCategoryName(definition.category, locale),
@@ -1129,5 +1129,5 @@ export function localizeUiText(text: string, locale: Locale) {
 
 export function calculatorKeywordLine(definition: CalculatorDefinition, locale: Locale) {
   if (locale === "en") return getLocalizedText(definition.name, locale);
-  return `${localizeCalculatorName(getLocalizedText(definition.name as any, "en"), locale, definition.slug)} | ${localizeCategoryName(definition.category, locale)} | 온라인 계산기`;
+  return `${localizeCalculatorName(getLocalizedText(definition.name, "en"), locale, definition.slug)} | ${localizeCategoryName(definition.category, locale)} | 온라인 계산기`;
 }

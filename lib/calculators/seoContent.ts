@@ -608,10 +608,19 @@ function buildFallbackCalculatorSeoContent(
 ): CalculatorSeoContent {
   const isKo = locale === "ko";
   const categoryContent = categoryEditorial[definition.category] ?? categoryEditorial["everyday-life"];
-  const relatedArticles = [categoryContent.blog[locale], categoryContent.guide[locale]].map((item) => ({
-    ...item,
-    cta: isKo ? "콘텐츠 보기 →" : "Open article →",
-  }));
+  const relatedArticles = relatedLinks.length
+    ? relatedLinks.slice(0, 3).map((item) => ({
+        title: item.name,
+        description: isKo
+          ? `${item.name} 페이지에서 관련 계산 흐름을 이어서 확인해보세요.`
+          : `Continue with ${item.name} to compare a related calculation workflow.`,
+        href: item.href,
+        cta: isKo ? "계산기 보기 →" : "Open calculator →",
+      }))
+    : [categoryContent.blog[locale], categoryContent.guide[locale]].map((item) => ({
+        ...item,
+        cta: isKo ? "콘텐츠 보기 →" : "Open article →",
+      }));
 
   return {
     slug: definition.slug,

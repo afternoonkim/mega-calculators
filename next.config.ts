@@ -127,10 +127,15 @@ const nextConfig: NextConfig = {
     ]);
 
     return [
-      { source: "/cal/cal/calculator", destination: "/cal/calculator", permanent: true },
-      { source: "/cal/cal/fire", destination: "/cal/fire", permanent: true },
-      { source: "/cal/cal/capital-gains", destination: "/cal/capital-gains", permanent: true },
-      { source: "/cal/cal/retirement-tax", destination: "/cal/retirement-tax", permanent: true },
+      { source: "/cal", destination: "/en/calculators", permanent: true },
+      { source: "/cal/calculator", destination: "/en/calculators", permanent: true },
+      { source: "/cal/cal/calculator", destination: "/en/calculators", permanent: true },
+      { source: "/cal/fire", destination: "/en/calculators/finance/retirement-calculator", permanent: true },
+      { source: "/cal/cal/fire", destination: "/en/calculators/finance/retirement-calculator", permanent: true },
+      { source: "/cal/capital-gains", destination: "/en/calculators/finance/capital-gains-tax-calculator", permanent: true },
+      { source: "/cal/cal/capital-gains", destination: "/en/calculators/finance/capital-gains-tax-calculator", permanent: true },
+      { source: "/cal/retirement-tax", destination: "/en/calculators/finance/retirement-calculator", permanent: true },
+      { source: "/cal/cal/retirement-tax", destination: "/en/calculators/finance/retirement-calculator", permanent: true },
       { source: "/calculators/time", destination: "/calculators/time-date", permanent: true },
       { source: "/:locale/calculators/time", destination: "/:locale/calculators/time-date", permanent: true },
       { source: "/calculators/life", destination: "/calculators/everyday-life", permanent: true },

@@ -9,6 +9,8 @@ export const SITEMAP_LOCALES = ["en", "ko"] as const satisfies readonly Locale[]
 const BUILD_LASTMOD = new Date().toISOString();
 const STATIC_ROUTES = ["", "/about", "/blog", "/calculators", "/contact", "/faq", "/guides", "/privacy", "/terms", "/editorial-standards", "/methodology", "/corrections"] as const;
 
+const RESOURCE_SUBPATHS = ["/formula", "/guide", "/use-cases"] as const;
+
 type ChangeFrequency = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
 
 export type SitemapEntry = {
@@ -25,27 +27,12 @@ export const sitemapIndexItems = [
   { loc: `${SITEMAP_BASE_URL}/sitemap-examples.xml`, lastmod: BUILD_LASTMOD },
 ] as const;
 
-// Use `application/xml` (not `text/xml`) — some CDN/proxy layers re-write
-// `text/xml` to `text/html` for legacy compatibility, which makes browsers
-// (and crawlers) render the body as HTML and silently strip unknown tags
-// like <urlset>, <url>, <xhtml:link>. That's the symptom we hit:
-// /sitemap.xml renders as a tree view, but the larger child sitemaps come
-// through as plain text. Switching to application/xml is the standard
-// modern MIME type for XML and is not subject to that legacy rewrite.
-//
-// Cache-Control: serve from edge cache for 1 hour, allow stale-while-
-// revalidate for a day. Sitemap content barely changes between requests
-// and the function is expensive (the examples sitemap iterates ~1100 paths
-// across two locales). `force-dynamic` was making every crawl hit the
-// serverless function from scratch, which can time out on large responses.
 export const sitemapResponseHeaders: HeadersInit = {
   "Content-Type": "application/xml; charset=utf-8",
   "Cache-Control": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400",
 };
 
 export function createXmlResponse(xml: string): Response {
-  // Build a fresh Headers instance per response so the shared object
-  // reference can never be mutated mid-request by an upstream layer.
   const headers = new Headers(sitemapResponseHeaders);
   return new Response(xml, {
     status: 200,
@@ -97,20 +84,6 @@ function addUrl(xmlParts: string[], entry: SitemapEntry) {
   const normalizedPath = normalizePath(entry.pathSuffix);
   const loc = absoluteUrl(entry.locale, normalizedPath);
 
-  // NOTE: We deliberately do NOT emit `<xhtml:link rel="alternate" ...>`
-  // hreflang annotations inside the sitemap.
-  //
-  // Why: declaring `xmlns:xhtml="http://www.w3.org/1999/xhtml"` on the root
-  // urlset combined with <link rel="alternate"> children causes Chrome and
-  // some CDN proxies to treat the response as XHTML and render it as HTML.
-  // The result is a flat text run instead of an XML tree view, which makes
-  // the sitemap look broken to humans even though search engines parse the
-  // bytes correctly.
-  //
-  // Hreflang signals are still emitted via per-page <link rel="alternate"
-  // hreflang="..."/> tags in the HTML <head> (set on the locale layout and
-  // every page-level Metadata.alternates.languages). Sitemap-level hreflang
-  // is supplementary; the per-page tags are the authoritative source.
   xmlParts.push("  <url>");
   xmlParts.push(`    <loc>${escapeXml(loc)}</loc>`);
   xmlParts.push(`    <lastmod>${escapeXml(normalizeLastmod(entry.lastmod))}</lastmod>`);
@@ -188,7 +161,7 @@ export function getStaticSitemapEntries(): SitemapEntry[] {
   return entries;
 }
 
-export function getCalculatorSitemapEntries(): SitemapEntry[] {
+export function getCoreCalculatorSitemapEntries(): SitemapEntry[] {
   const entries: SitemapEntry[] = [];
 
   for (const locale of SITEMAP_LOCALES) {
@@ -203,22 +176,59 @@ export function getCalculatorSitemapEntries(): SitemapEntry[] {
     }
 
     for (const calculator of calculators) {
-      const path = `/calculators/${calculator.category}/${calculator.slug}`;
-      entries.push({ locale, pathSuffix: path, lastmod: BUILD_LASTMOD, changefreq: "weekly", priority: "0.9" });
+      entries.push({
+        locale,
+        pathSuffix: `/calculators/${calculator.category}/${calculator.slug}`,
+        lastmod: BUILD_LASTMOD,
+        changefreq: "weekly",
+        priority: "0.9",
+      });
+    }
+  }
 
-      for (const subPath of ["/formula", "/guide", "/use-cases"] as const) {
+  return entries;
+}
+
+export function getCalculatorResourceSitemapEntries(): SitemapEntry[] {
+  const entries: SitemapEntry[] = [];
+
+  for (const locale of SITEMAP_LOCALES) {
+    for (const calculator of calculators) {
+      const path = `/calculators/${calculator.category}/${calculator.slug}`;
+
+      for (const subPath of RESOURCE_SUBPATHS) {
         entries.push({
           locale,
           pathSuffix: `${path}${subPath}`,
           lastmod: BUILD_LASTMOD,
           changefreq: "monthly",
-          priority: "0.7",
+          priority: "0.6",
         });
       }
     }
   }
 
   return entries;
+}
+
+export function getCalculatorSitemapEntries(): SitemapEntry[] {
+  return [...getCoreCalculatorSitemapEntries(), ...getCalculatorResourceSitemapEntries()];
+}
+
+export function getPrimarySitemapEntries(): SitemapEntry[] {
+  // /sitemap.xml is intentionally a direct URL set rather than a sitemap index.
+  // Search Console was showing the submitted sitemap index as "0 discovered pages"
+  // when child sitemap processing was delayed, which made the site look empty.
+  // The primary sitemap now carries the important, crawl-worthy URLs directly:
+  // static hubs, blog/guides, category hubs, calculator detail pages, and the
+  // formula/guide/use-case support pages that are linked from each calculator.
+  // High-volume example pages stay out of the primary sitemap to avoid feeding
+  // thousands of near-template pages to Google before the core calculators settle.
+  return [
+    ...getStaticSitemapEntries(),
+    ...getCoreCalculatorSitemapEntries(),
+    ...getCalculatorResourceSitemapEntries(),
+  ];
 }
 
 export function getExampleSitemapEntries(): SitemapEntry[] {
@@ -238,7 +248,7 @@ export function getExampleSitemapEntries(): SitemapEntry[] {
           pathSuffix: examplePath,
           lastmod: BUILD_LASTMOD,
           changefreq: "monthly",
-          priority: "0.6",
+          priority: "0.4",
         });
       }
     }

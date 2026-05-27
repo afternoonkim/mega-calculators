@@ -17,11 +17,7 @@ export default function ResultActions({ locale, resultText, secondaryLines = [],
   const isKo = locale === "ko";
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState<"idle" | "copied-url" | "shared">("idle");
-  const [canShare, setCanShare] = useState(false);
-
-  useEffect(() => {
-    setCanShare(typeof navigator !== "undefined" && typeof navigator.share === "function");
-  }, []);
+  const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
 
   // Auto-clear "copied" state after 2 seconds.
   useEffect(() => {

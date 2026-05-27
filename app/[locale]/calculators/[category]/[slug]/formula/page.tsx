@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import AdPlaceholder from "@/components/ads/AdPlaceholder";
 import AdSlot from "@/components/ads/AdSlot";
-import CalculatorEngine from "@/components/calculators/CalculatorEngine";
-import { calculatorCategories, calculators, calculatorsByCategory, getCalculator, getRelatedCalculators } from "@/lib/calculators/data";
-import { computeCalculator, getDefaultValues } from "@/lib/calculators/engine";
-import { getCalculatorExamples, getFormulaSeo, getGuideSeo, getProgrammaticHubLinks, getUseCases } from "@/lib/calculators/programmatic";
+import { calculators, getCalculator } from "@/lib/calculators/data";
+import { getCalculatorExamples, getFormulaSeo, getProgrammaticHubLinks } from "@/lib/calculators/programmatic";
 import { normalizeLocale, withLocale } from "@/lib/i18n";
-import { calculatorKeywordLine, localizeCalculatorDefinition, localizeCalculatorName, localizeCategoryName, localizeDescription, localizeProgrammaticExample, localizeUiText } from "@/lib/calculators/localization";
+import { localizeCalculatorDefinition, localizeCalculatorName, localizeCategoryName, localizeProgrammaticExample } from "@/lib/calculators/localization";
 
 export function generateStaticParams() { return calculators.flatMap((calculator) => ([{ locale: "en", category: calculator.category, slug: calculator.slug }, { locale: "ko", category: calculator.category, slug: calculator.slug }])); }
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; category: string; slug: string }> }): Promise<Metadata> { const { locale: rawLocale, category, slug } = await params; const locale = normalizeLocale(rawLocale); const calculator = getCalculator(category, slug); if (!calculator) return {}; const seo = getFormulaSeo(calculator); const title = locale === "ko" ? `${localizeCalculatorName(calculator.name, locale, calculator.slug)} 공식` : `${seo.title} | Mega Calculators`; return { title, description: locale === "ko" ? `${localizeCalculatorName(calculator.name, locale, calculator.slug)} 계산 공식과 변수 의미를 한국어로 정리한 페이지입니다.` : seo.description, alternates: { canonical: `/${locale}/calculators/${calculator.category}/${calculator.slug}/formula`, languages: { en: `/en/calculators/${calculator.category}/${calculator.slug}/formula`, ko: `/ko/calculators/${calculator.category}/${calculator.slug}/formula` } } }; }

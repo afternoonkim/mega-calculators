@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import AdPlaceholder from "@/components/ads/AdPlaceholder";
 import AdSlot from "@/components/ads/AdSlot";
-import CalculatorEngine from "@/components/calculators/CalculatorEngine";
-import { calculatorCategories, calculators, calculatorsByCategory, getCalculator, getRelatedCalculators } from "@/lib/calculators/data";
-import { computeCalculator, getDefaultValues } from "@/lib/calculators/engine";
-import { getCalculatorExamples, getFormulaSeo, getGuideSeo, getProgrammaticHubLinks, getUseCases } from "@/lib/calculators/programmatic";
+import { calculators, getCalculator } from "@/lib/calculators/data";
+import { getGuideSeo, getProgrammaticHubLinks } from "@/lib/calculators/programmatic";
 import { normalizeLocale, withLocale } from "@/lib/i18n";
-import { calculatorKeywordLine, localizeCalculatorDefinition, localizeCalculatorName, localizeCategoryName, localizeDescription, localizeUiText } from "@/lib/calculators/localization";
+import { localizeCalculatorDefinition, localizeCalculatorName, localizeCategoryName } from "@/lib/calculators/localization";
 
 export function generateStaticParams() { return calculators.flatMap((calculator) => ([{ locale: "en", category: calculator.category, slug: calculator.slug }, { locale: "ko", category: calculator.category, slug: calculator.slug }])); }
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; category: string; slug: string }> }): Promise<Metadata> { const { locale: rawLocale, category, slug } = await params; const locale = normalizeLocale(rawLocale); const calculator = getCalculator(category, slug); if (!calculator) return {}; const seo = getGuideSeo(calculator); return { title: locale === "ko" ? `${localizeCalculatorName(calculator.name, locale, calculator.slug)} 사용 가이드` : seo.title, description: locale === "ko" ? `${localizeCalculatorName(calculator.name, locale, calculator.slug)} 입력 방법과 결과 해석 순서를 단계별로 정리했습니다.` : seo.description, alternates: { canonical: `/${locale}/calculators/${calculator.category}/${calculator.slug}/guide`, languages: { en: `/en/calculators/${calculator.category}/${calculator.slug}/guide`, ko: `/ko/calculators/${calculator.category}/${calculator.slug}/guide` } } }; }

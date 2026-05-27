@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import AdPlaceholder from "@/components/ads/AdPlaceholder";
 import AdSlot from "@/components/ads/AdSlot";
-import CalculatorEngine from "@/components/calculators/CalculatorEngine";
-import { calculatorCategories, calculators, calculatorsByCategory, getCalculator, getRelatedCalculators } from "@/lib/calculators/data";
-import { computeCalculator, getDefaultValues } from "@/lib/calculators/engine";
-import { getCalculatorExamples, getFormulaSeo, getGuideSeo, getProgrammaticHubLinks, getUseCases } from "@/lib/calculators/programmatic";
+import { calculators, getCalculator } from "@/lib/calculators/data";
+import { getProgrammaticHubLinks, getUseCases } from "@/lib/calculators/programmatic";
 import { normalizeLocale, withLocale } from "@/lib/i18n";
-import { calculatorKeywordLine, localizeCalculatorDefinition, localizeCalculatorName, localizeCategoryName, localizeDescription, localizeUiText } from "@/lib/calculators/localization";
+import { localizeCalculatorDefinition, localizeCalculatorName, localizeCategoryName } from "@/lib/calculators/localization";
 
 export function generateStaticParams() { return calculators.flatMap((calculator) => ([{ locale: "en", category: calculator.category, slug: calculator.slug }, { locale: "ko", category: calculator.category, slug: calculator.slug }])); }
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; category: string; slug: string }> }): Promise<Metadata> { const { locale: rawLocale, category, slug } = await params; const locale = normalizeLocale(rawLocale); const calculator = getCalculator(category, slug); if (!calculator) return {}; return { title: locale === "ko" ? `${localizeCalculatorName(calculator.name, locale, calculator.slug)} 활용 사례` : `When to Use the ${calculator.name}`, description: locale === "ko" ? `${localizeCalculatorName(calculator.name, locale, calculator.slug)}를 언제 쓰면 좋은지 실제 상황 중심으로 정리했습니다.` : `Practical ways to use the ${calculator.name.toLowerCase()} in everyday planning and decision-making.`, alternates: { canonical: `/${locale}/calculators/${calculator.category}/${calculator.slug}/use-cases`, languages: { en: `/en/calculators/${calculator.category}/${calculator.slug}/use-cases`, ko: `/ko/calculators/${calculator.category}/${calculator.slug}/use-cases` } } }; }

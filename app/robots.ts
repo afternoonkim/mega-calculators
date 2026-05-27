@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/_next/", "/uploads/"],
+        disallow: ["/api/", "/_next/", "/uploads/", "/*/calculators/*/*/embed"],
       },
       // Google primary crawler
       {

@@ -1,10 +1,10 @@
 import Script from "next/script";
-import { getAdClientId } from "@/lib/ads";
+import { ADFIT_ENABLED, getAdClientId } from "@/lib/ads";
 
 export default function AdSenseScript() {
   const adClient = getAdClientId();
 
-  if (!adClient) return null;
+  if (ADFIT_ENABLED || !adClient) return null;
 
   return (
     <Script

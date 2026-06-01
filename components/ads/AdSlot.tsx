@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
-import { adSlotMap, type AdSlotKey, getAdClientId, SHOW_AD_PLACEHOLDERS } from "@/lib/ads";
+import { useEffect, useRef } from "react";
+import {
+  ADFIT_ENABLED,
+  adFitSlotMap,
+  adSlotMap,
+  type AdSlotKey,
+  getAdClientId,
+  SHOW_AD_PLACEHOLDERS,
+} from "@/lib/ads";
 import type { Locale } from "@/lib/i18n";
 
 declare global {
@@ -22,29 +29,65 @@ export default function AdSlot({
   className?: string;
   minHeightClass?: string;
   /**
-   * Locale of the surrounding page so the placeholder copy (shown only
-   * during the AdSense pre-approval period) matches the page locale.
+   * Locale of the surrounding page so the label matches the page locale.
    */
   locale?: Locale;
 }) {
+  const adFitContainerRef = useRef<HTMLDivElement>(null);
+  const adFitUnit = adFitSlotMap[slotKey];
+  const shouldRenderAdFit = ADFIT_ENABLED && Boolean(adFitUnit?.unit);
   const adClient = getAdClientId();
   const adSlot = adSlotMap[slotKey];
-  const shouldRenderLiveAd = Boolean(adClient && adSlot);
+  const shouldRenderAdSense = !shouldRenderAdFit && Boolean(adClient && adSlot);
   const isKo = locale === "ko";
   const headLabel = label ?? (isKo ? "광고" : "Advertisement");
 
   useEffect(() => {
-    if (!shouldRenderLiveAd) return;
+    if (!shouldRenderAdFit || !adFitContainerRef.current) return;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://t1.daumcdn.net/kas/static/ba.min.js";
+    adFitContainerRef.current.appendChild(script);
+
+    return () => {
+      script.remove();
+    };
+  }, [shouldRenderAdFit, adFitUnit?.unit, slotKey]);
+
+  useEffect(() => {
+    if (!shouldRenderAdSense) return;
 
     try {
       window.adsbygoogle = window.adsbygoogle || [];
       window.adsbygoogle.push({});
     } catch {
-      // no-op: this keeps the placeholder-safe component from breaking the page
+      // no-op: this keeps the ad component from breaking the page
     }
-  }, [shouldRenderLiveAd, slotKey]);
+  }, [shouldRenderAdSense, slotKey]);
 
-  if (!shouldRenderLiveAd) {
+  if (shouldRenderAdFit) {
+    return (
+      <div className={className}>
+        <div className={`overflow-hidden rounded-3xl border border-slate-200 bg-white p-2 text-center shadow-sm ${minHeightClass}`}>
+          <div className="px-2 pb-2 text-center text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-400">
+            {headLabel}
+          </div>
+          <div ref={adFitContainerRef} className="flex w-full justify-center overflow-hidden">
+            <ins
+              className="kakao_ad_area"
+              style={{ display: "none" }}
+              data-ad-unit={adFitUnit.unit}
+              data-ad-width={String(adFitUnit.width)}
+              data-ad-height={String(adFitUnit.height)}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!shouldRenderAdSense) {
     if (!SHOW_AD_PLACEHOLDERS) return null;
 
     return (
@@ -53,12 +96,12 @@ export default function AdSlot({
           <div className="flex h-full flex-col items-center justify-center text-center">
             <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-500">{headLabel}</div>
             <div className="mt-2 text-sm font-semibold text-slate-700">
-              {isKo ? "광고가 들어갈 자리예요" : "Reserved ad space"}
+              {isKo ? "광고 영역입니다" : "Reserved ad space"}
             </div>
             <p className="mt-2 max-w-2xl text-xs leading-6 text-slate-500 md:text-sm">
               {isKo
-                ? "AdSense 승인 이후 환경 변수에 슬롯 ID를 입력하시면 이 자리에서 광고가 자동으로 노출됩니다."
-                : "This area is pre-configured for AdSense. After approval, add the client ID and slot ID to the environment variables to activate ads."}
+                ? "광고 노출을 잠시 꺼둔 상태입니다."
+                : "Ad rendering is currently disabled for this environment."}
             </p>
           </div>
         </div>

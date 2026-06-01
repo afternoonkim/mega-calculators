@@ -9,6 +9,7 @@ import { getEnhancedCalculatorContent } from "@/lib/calculators/enhancedContent"
 import ResultActions from "@/components/calculators/ResultActions";
 import { RecentTracker } from "@/components/calculators/RecentCalculators";
 import AdvisoryNotice from "@/components/calculators/AdvisoryNotice";
+import AdSlot from "@/components/ads/AdSlot";
 import { localizeUiText, localizeInputLabel, localizeResultText } from "@/lib/calculators/localization";
 import type { Locale } from "@/lib/i18n";
 
@@ -41,6 +42,14 @@ export default function CalculatorEngine({ definition, relatedLinks, hubLinks, l
         </div>
         <div className="space-y-6"><div className="rounded-3xl border border-slate-200 bg-slate-950 p-6 text-white shadow-sm md:p-8"><div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-300">{t("Instant result")}</div><div className="mt-5 rounded-3xl bg-white/5 p-6"><div className="text-sm text-slate-300">{localizeResultText(result.primary.label, locale)}</div><div className="mt-3 break-words text-3xl font-extrabold tracking-tight text-white md:text-4xl">{localizeResultText(result.primary.value, locale)}</div></div>{result.secondary?.length ? (<div className="mt-6 space-y-3">{result.secondary.map((item, index) => (<div key={`${item.label}-${index}`} className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"><span className="text-sm text-slate-300">{localizeResultText(item.label, locale)}</span><span className="break-words text-right text-sm font-semibold text-white">{localizeResultText(item.value, locale)}</span></div>))}</div>) : null}{result.note ? <p className="mt-5 text-sm leading-7 text-amber-200">{localizeResultText(result.note, locale)}</p> : null}<ResultActions locale={locale} title={definition.name} resultText={`${localizeResultText(result.primary.label, locale)}: ${localizeResultText(result.primary.value, locale)}`} secondaryLines={result.secondary?.map((item) => `${localizeResultText(item.label, locale)}: ${localizeResultText(item.value, locale)}`) ?? []} /><div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm leading-7 text-slate-300"><h2 className="text-base font-bold text-white">{enhanced?.interpretationTitle ?? (locale === "ko" ? "결과를 읽는 방법" : "How to read this result")}</h2><div className="mt-3 space-y-3">{(enhanced?.interpretation ?? [t("Calculator results are provided for planning and educational purposes. For taxes, legal decisions, lending, or medical advice, verify the numbers with an official source or qualified professional.")]).map((item) => (<p key={item}>{item}</p>))}</div></div></div></div>
       </section>
+      {!embedMode ? (
+        <AdSlot
+          slotKey="contentMid"
+          label={locale === "ko" ? "광고" : "Advertisement"}
+          minHeightClass="min-h-[120px]"
+          locale={locale}
+        />
+      ) : null}
       {!embedMode ? <AdvisoryNotice definition={definition} locale={locale} /> : null}
       {embedMode ? <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center text-sm text-slate-600"><a href={canonicalUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-700">Powered by Mega Calculators</a></div> : null}
       {embedMode ? null : (<section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"><h2 className="text-2xl font-bold text-slate-900">{locale === "ko" ? "이 계산기 공유하기" : "Embed this calculator"}</h2><p className="mt-3 text-sm leading-7 text-slate-600 md:text-base">{locale === "ko" ? "아래 코드를 블로그나 웹사이트에 넣으면 이 계산기를 간단히 공유할 수 있습니다." : "Copy this iframe code to place the calculator on your blog or website."}</p><div className="mt-5 overflow-x-auto rounded-2xl bg-slate-950 p-4"><code className="whitespace-pre text-sm leading-7 text-slate-100">{embedCode}</code></div><button type="button" onClick={copyEmbedCode} className="mt-4 inline-flex rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-500">{copied ? (locale === "ko" ? "복사 완료" : "Copied") : (locale === "ko" ? "임베드 코드 복사" : "Copy embed code")}</button></section>)}

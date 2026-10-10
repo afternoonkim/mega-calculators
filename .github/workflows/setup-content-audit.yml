@@ -26,7 +26,20 @@ jobs:
           cache: npm
 
       - name: Prepare persistent content audit
-        run: python scripts/setup-content-audit.py
+        run: |
+          set +e
+          python scripts/setup-content-audit.py > /tmp/setup-content-audit.log 2>&1
+          status=$?
+          cat /tmp/setup-content-audit.log
+          if [ "$status" -ne 0 ]; then
+            cp /tmp/setup-content-audit.log scripts/setup-content-audit-error.log
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add scripts/setup-content-audit-error.log
+            git commit -m "chore: capture content audit setup error"
+            git push origin HEAD:main
+            exit "$status"
+          fi
 
       - name: Install dependencies
         run: npm ci

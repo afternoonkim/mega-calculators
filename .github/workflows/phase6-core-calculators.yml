@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/phase6-core-calculators.yml
       - scripts/phase6_core_calculators.py
+      - scripts/phase6_fix_inputs.py
 
 permissions:
   contents: write
@@ -24,6 +25,9 @@ jobs:
         with:
           node-version: 20
           cache: npm
+
+      - name: Patch migration helper
+        run: python scripts/phase6_fix_inputs.py
 
       - name: Apply core calculator upgrades
         run: python scripts/phase6_core_calculators.py

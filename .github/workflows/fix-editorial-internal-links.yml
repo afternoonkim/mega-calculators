@@ -1,0 +1,68 @@
+name: Fix editorial internal links
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/fix-editorial-internal-links.py"
+      - ".github/workflows/fix-editorial-internal-links.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Apply internal link fixes
+        run: python scripts/fix-editorial-internal-links.py
+
+      - name: Verify routing guards
+        run: |
+          grep -F 'if (category === "time-date") {' lib/calculators/enhancedContent.ts
+          ! grep -F 'if (category === "time") {' lib/calculators/enhancedContent.ts
+          grep -F 'href: stripLocaleFromPathname(item.href)' lib/calculators/seoContent.ts
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Test
+        run: npm test
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit functional change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            lib/calculators/enhancedContent.ts \
+            lib/calculators/seoContent.ts \
+            lib/calculators/internalLinks.test.ts
+          if git diff --cached --quiet; then
+            echo "No functional changes to commit"
+            exit 0
+          fi
+          git commit -m "fix: keep calculator related links locale-safe"
+          git push origin HEAD:main

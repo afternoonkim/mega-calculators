@@ -1,6 +1,7 @@
 import { calculatorCategories, calculators } from "@/lib/calculators/data";
 import { getCalculatorExamples } from "@/lib/calculators/programmatic";
-import { getBlogPosts, getGuides } from "@/lib/editorial";
+import { getBlogPosts } from "@/lib/editorialCurrent";
+import { getGuides } from "@/lib/editorial";
 import type { Locale } from "@/lib/i18n";
 
 export const SITEMAP_BASE_URL = "https://mega-calculators.com";

@@ -1,0 +1,69 @@
+name: Phase 3 User Perspective
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/phase3_user_perspective_cleanup.py
+      - .github/workflows/phase3-user-perspective.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Apply phase 3 cleanup
+        run: python scripts/phase3_user_perspective_cleanup.py
+
+      - name: Assert user-facing cleanup
+        run: |
+          grep -q '가입 없이' app/'[locale]'/page.tsx
+          grep -q '결과와 설명' app/'[locale]'/page.tsx
+          if grep -q '전체 계산기" : "Total calculators' app/'[locale]'/page.tsx; then exit 1; fi
+          if grep -q '개 도구" : "tools' app/'[locale]'/page.tsx; then exit 1; fi
+          if grep -q '꾸준히 늘려가기 위한 비용' app/'[locale]'/faq/page.tsx; then exit 1; fi
+          if grep -q '앞으로 광고나 분석 도구' app/'[locale]'/about/page.tsx; then exit 1; fi
+          grep -q '신뢰 및 정책' components/layout/SiteFooter.tsx
+          grep -q 'Trust & policies' components/layout/SiteFooter.tsx
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Test
+        run: npm test
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit phase 3 cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/'[locale]'/page.tsx \
+                  app/'[locale]'/about/page.tsx \
+                  app/'[locale]'/faq/page.tsx \
+                  components/layout/SiteFooter.tsx
+          git commit -m "ux: finish user-centered site copy cleanup"
+          git push

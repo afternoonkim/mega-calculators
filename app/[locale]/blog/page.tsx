@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getBlogPosts } from "@/lib/editorial";
+import { getBlogPosts } from "@/lib/editorialCurrent";
 import { normalizeLocale, withLocale } from "@/lib/i18n";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -40,10 +40,6 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {posts.map((post) => (
           <article key={post.slug} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            {/* Listing cards always show the same label so the grid stays
-                visually consistent. Seasonal/dated information is surfaced
-                on the article detail header instead, where it actually
-                matters for the reader. */}
             <div className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">
               {isKo ? "읽을 거리" : "Article"}
             </div>

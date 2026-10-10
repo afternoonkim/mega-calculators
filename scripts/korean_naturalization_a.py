@@ -99,6 +99,10 @@ replace(
             '"직접 공식을 계산하지 않아도 계산기는 바로 사용할 수 있습니다. 이 페이지는 공식이 궁금한 사용자를 위해 개념과 해석 기준을 정리한 안내 페이지입니다."',
             '"직접 공식을 계산하지 않아도 계산기는 바로 사용할 수 있습니다. 결과가 왜 그렇게 나오는지 궁금할 때 핵심 개념과 해석 기준을 확인해보세요."',
         ),
+        (
+            '"여러 일정 시나리오를 나란히 비교할 때 활용할 수 있습니다."',
+            '"여러 일정을 나란히 비교할 때 활용할 수 있습니다."',
+        ),
     ],
 )
 
@@ -140,6 +144,7 @@ replace(
     "lib/calculators/seoContent.ts",
     [
         ('scenariosTitle: "직접 비교해보기 좋은 시나리오"', 'scenariosTitle: "이렇게 비교해보세요"'),
+        ('scenariosTitle: isKo ? "직접 비교해보기 좋은 시나리오" : "Practical scenarios to test"', 'scenariosTitle: isKo ? "이렇게 비교해보세요" : "Practical scenarios to test"'),
     ],
 )
 

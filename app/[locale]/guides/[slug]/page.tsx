@@ -5,6 +5,7 @@ import { getGuide, getGuides } from "@/lib/editorial";
 import { normalizeLocale, withLocale } from "@/lib/i18n";
 import SisterSiteCard from "@/components/layout/SisterSiteCard";
 import { editorialSlugToSisterTopic } from "@/lib/seo/sister-sites";
+import { getEditorialHreflangUrls } from "@/lib/editorialAlternates";
 
 const SITE_URL = "https://mega-calculators.com";
 
@@ -28,6 +29,7 @@ export async function generateMetadata({
   }
 
   const isKo = locale === "ko";
+  const hreflang = getEditorialHreflangUrls("guides", guide.slug, SITE_URL);
 
   return {
     title: guide.title,
@@ -39,11 +41,7 @@ export async function generateMetadata({
     },
     alternates: {
       canonical: `${SITE_URL}/${locale}/guides/${guide.slug}`,
-      languages: {
-        en: `${SITE_URL}/en/guides/${guide.slug}`,
-        ko: `${SITE_URL}/ko/guides/${guide.slug}`,
-        "x-default": `${SITE_URL}/en/guides/${guide.slug}`,
-      },
+      ...(hreflang ? { languages: hreflang } : {}),
     },
     openGraph: {
       title: guide.title,

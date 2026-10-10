@@ -1,3 +1,5 @@
+import { getEditorialLocaleSwitchPath } from "@/lib/editorialAlternates";
+
 export const locales = ["en", "ko"] as const;
 export const plannedLocales = ["es", "ja", "de", "fr", "pt", "id"] as const;
 export type Locale = (typeof locales)[number];
@@ -28,6 +30,8 @@ export function stripLocaleFromPathname(pathname: string) {
 }
 
 export function switchLocaleInPathname(pathname: string, locale: Locale) {
+  const editorialPath = getEditorialLocaleSwitchPath(pathname, locale);
+  if (editorialPath) return editorialPath;
   return withLocale(locale, stripLocaleFromPathname(pathname));
 }
 

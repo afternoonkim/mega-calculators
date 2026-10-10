@@ -5,6 +5,7 @@ import { getBlogPost, getBlogPosts } from "@/lib/editorialCurrent";
 import { normalizeLocale, withLocale } from "@/lib/i18n";
 import SisterSiteCard from "@/components/layout/SisterSiteCard";
 import { editorialSlugToSisterTopic } from "@/lib/seo/sister-sites";
+import { getEditorialHreflangUrls } from "@/lib/editorialAlternates";
 
 const SITE_URL = "https://mega-calculators.com";
 
@@ -28,6 +29,7 @@ export async function generateMetadata({
   }
 
   const isKo = locale === "ko";
+  const hreflang = getEditorialHreflangUrls("blog", post.slug, SITE_URL);
 
   return {
     title: post.title,
@@ -39,11 +41,7 @@ export async function generateMetadata({
     },
     alternates: {
       canonical: `${SITE_URL}/${locale}/blog/${post.slug}`,
-      languages: {
-        en: `${SITE_URL}/en/blog/${post.slug}`,
-        ko: `${SITE_URL}/ko/blog/${post.slug}`,
-        "x-default": `${SITE_URL}/en/blog/${post.slug}`,
-      },
+      ...(hreflang ? { languages: hreflang } : {}),
     },
     openGraph: {
       title: post.title,

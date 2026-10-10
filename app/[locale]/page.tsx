@@ -35,7 +35,6 @@ const featuredCalculators = [
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const locale = normalizeLocale((await params).locale);
   const isKo = locale === "ko";
-  const totalCalculators = calculators.length;
   const categoryCards = calculatorCategories.map((category) => ({
     ...category,
     name: localizeCategoryName(category.slug, locale),
@@ -97,9 +96,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </div>
         </div>
         <div className="mt-10 grid gap-4 md:grid-cols-3">
-          <StatCard label={isKo ? "전체 계산기" : "Total calculators"} value={`${totalCalculators}`} />
-          <StatCard label={isKo ? "주요 카테고리" : "Main categories"} value={`${categoryCards.length}`} />
-          <StatCard label={isKo ? "자주 쓰는 분야" : "Popular uses"} value={isKo ? "금융, 건강, 생활" : "Finance, health, projects"} />
+          <StatCard label={isKo ? "가입 없이" : "No sign-up"} value={isKo ? "바로 계산" : "Start right away"} />
+          <StatCard label={isKo ? "무료로" : "Free to use"} value={isKo ? "원하는 만큼" : "Run any calculator"} />
+          <StatCard label={isKo ? "결과와 설명" : "Results + context"} value={isKo ? "한 화면에서" : "In one place"} />
         </div>
       </section>
 
@@ -140,8 +139,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {categoryCards.map((category) => (
             <Link key={category.slug} href={withLocale(locale, `/calculators/${category.slug}`)} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200">
-              <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">{category.items.length} {isKo ? "개 도구" : "tools"}</div>
-              <h3 className="mt-3 text-2xl font-bold text-slate-950">{category.name}</h3>
+              <h3 className="text-2xl font-bold text-slate-950">{category.name}</h3>
               <p className="mt-3 text-sm leading-7 text-slate-600">{isKo ? `${category.name} 관련 계산기를 한 곳에서 빠르게 찾아보시고, 한국어 설명과 함께 바로 계산을 시작해보실 수 있어요.` : `Browse calculators in ${category.name.toLowerCase()} for quick answers, easy comparisons, and everyday planning.`}</p>
             </Link>
           ))}

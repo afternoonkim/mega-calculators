@@ -8,6 +8,7 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
     ? {
         explore: "바로가기",
         popular: "인기 계산기",
+        trust: "신뢰 및 정책",
         all: "전체 계산기",
         blog: "블로그",
         guides: "가이드",
@@ -27,6 +28,7 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
     : {
         explore: "Explore",
         popular: "Popular calculators",
+        trust: "Trust & policies",
         all: "All calculators",
         blog: "Blog",
         guides: "Guides",
@@ -58,7 +60,7 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{t.note}</p>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2">
+          <div className="grid gap-6 sm:grid-cols-3">
             <div>
               <div className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">{t.explore}</div>
               <div className="mt-3 flex flex-col gap-3 text-sm text-slate-600">
@@ -68,11 +70,6 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
                 <Link href={withLocale(locale, "/faq")}>{t.faq}</Link>
                 <Link href={withLocale(locale, "/about")}>{t.about}</Link>
                 <Link href={withLocale(locale, "/contact")}>{t.contact}</Link>
-                <Link href={withLocale(locale, "/privacy")}>{t.privacy}</Link>
-                <Link href={withLocale(locale, "/terms")}>{t.terms}</Link>
-                <Link href={withLocale(locale, "/editorial-standards")}>{t.editorial}</Link>
-                <Link href={withLocale(locale, "/methodology")}>{t.methodology}</Link>
-                <Link href={withLocale(locale, "/corrections")}>{t.corrections}</Link>
               </div>
             </div>
             <div>
@@ -83,6 +80,16 @@ export default function SiteFooter({ locale }: { locale: Locale }) {
                 <Link href={withLocale(locale, "/calculators/health/bmi-calculator")}>{localizeCalculatorName("BMI Calculator", locale, "bmi-calculator")}</Link>
                 <Link href={withLocale(locale, "/calculators/time-date/age-calculator")}>{localizeCalculatorName("Age Calculator", locale, "age-calculator")}</Link>
                 <Link href={withLocale(locale, "/calculators/math/percentage-calculator")}>{localizeCalculatorName("Percentage Calculator", locale, "percentage-calculator")}</Link>
+              </div>
+            </div>
+            <div>
+              <div className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">{t.trust}</div>
+              <div className="mt-3 flex flex-col gap-3 text-sm text-slate-600">
+                <Link href={withLocale(locale, "/privacy")}>{t.privacy}</Link>
+                <Link href={withLocale(locale, "/terms")}>{t.terms}</Link>
+                <Link href={withLocale(locale, "/editorial-standards")}>{t.editorial}</Link>
+                <Link href={withLocale(locale, "/methodology")}>{t.methodology}</Link>
+                <Link href={withLocale(locale, "/corrections")}>{t.corrections}</Link>
               </div>
             </div>
           </div>

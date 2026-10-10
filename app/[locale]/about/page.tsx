@@ -49,10 +49,10 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       </section>
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-        <h2 className="text-2xl font-bold text-slate-900">{isKo ? "함께 만들어가요" : "Help shape what comes next"}</h2>
+        <h2 className="text-2xl font-bold text-slate-900">{isKo ? "사용하면서 불편한 점이 있다면" : "If something gets in your way"}</h2>
         <div className="mt-4 space-y-4 text-sm leading-7 text-slate-600 md:text-base">
-          <p>{isKo ? "이미 있는 계산기 옆에 더 읽을 만한 글과 가이드를 꾸준히 더해, 화면에서 보신 결과가 자연스럽게 실제 결정으로 이어지도록 보강하고 있어요. 사용 중에 오류나 헷갈리는 표현이 보이면 언제든지 알려주세요. 의견을 받아 조금씩 더 나아지고 있습니다." : "More articles and guides are added regularly so the result on your screen leads naturally into a real decision. If you spot an error, an unclear sentence, or something that could work better for you, let us know any time — your feedback shapes what gets improved next."}</p>
-          <p>{isKo ? "앞으로 광고나 분석 도구가 함께 쓰일 수 있지만, 페이지를 여셨을 때 가장 먼저 보이는 것은 언제나 깨끗한 화면과 명확한 결과입니다." : "Analytics and advertising may support the site, but the first thing you will see on any page is always a clean layout and a clear answer."}</p>
+          <p>{isKo ? "계산 결과가 이상하거나 설명이 헷갈리거나 사용하기 불편한 부분이 보이면 언제든지 알려주세요. 어떤 계산기에서 무엇이 불편했는지 남겨주시면 확인하고 개선하는 데 큰 도움이 됩니다." : "If a result looks wrong, an explanation is unclear, or something makes the calculator harder to use, let us know. Telling us which calculator you were using and what felt confusing helps us improve it."}</p>
+          <p>{isKo ? "광고가 표시되는 경우에도 계산 입력과 결과 확인을 방해하지 않는 화면을 우선합니다." : "When ads are shown, the calculator inputs and results are kept as the priority so you can get your answer without unnecessary distraction."}</p>
         </div>
       </section>
     </div>

@@ -7,7 +7,7 @@ const faqItems = {
     { q: "Are the results accurate enough to rely on?", a: "Results are designed for planning and educational use. They can still differ from lender disclosures, tax filings, medical guidance, employer policies, or legal documents, so it's a good idea to verify important decisions with an official source or a qualified professional." },
     { q: "Will I get financial, legal, tax, or medical advice here?", a: "No. You'll only find informational tools and explanations. Nothing here should be treated as professional advice." },
     { q: "Can I report a bug or ask for a correction?", a: "Yes — please do. If a calculator looks wrong, a formula seems off, or a link is broken, send a quick note from the contact page with the calculator name, the values you entered, and what you expected to see." },
-    { q: "Why do some pages show ads?", a: "Ads help cover hosting, maintenance, and the steady expansion of the calculator library. The layout is kept clean so ads don't get in the way of finding your answer." },
+    { q: "Why do some pages show ads?", a: "Some pages may show ads, but ads do not change calculator results. The layout keeps the inputs and results as the priority so you can use the calculator without unnecessary distraction." },
     { q: "What personal data do you collect?", a: "Only limited technical information such as analytics, cookies, and any details you choose to share when you contact us. The privacy policy explains it in more detail if you'd like to read further." },
   ],
   ko: [
@@ -15,7 +15,7 @@ const faqItems = {
     { q: "결과가 100% 정확하다고 믿어도 될까요?", a: "결과는 일반적인 참고와 계획 수립을 돕기 위한 것입니다. 실제 대출 조건, 세금 신고, 의료 판단, 회사 규정, 법적 문서와는 차이가 있을 수 있으니 중요한 결정 전에는 공식 자료나 전문가와 한 번 더 확인해보시는 것이 안전해요." },
     { q: "금융, 세무, 의료 자문도 받을 수 있나요?", a: "아니요. 이곳에서는 정보 제공용 계산기와 설명만 보실 수 있어요. 전문 자문으로 받아들이지 않으시는 것이 좋습니다." },
     { q: "오류를 발견했어요. 어떻게 알려드리나요?", a: "문의 페이지에서 바로 메시지를 보내주세요. 계산기 이름, 입력하신 값, 기대하신 결과를 함께 적어주시면 더 빠르게 확인하고 고쳐드릴 수 있어요." },
-    { q: "광고는 왜 보이나요?", a: "서버 운영과 유지보수, 그리고 계산기를 꾸준히 늘려가기 위한 비용을 광고가 함께 지원하고 있어요. 답을 찾으시는 데 방해되지 않도록 화면은 최대한 깔끔하게 유지하려고 합니다." },
+    { q: "광고는 왜 보이나요?", a: "일부 페이지에는 광고가 표시될 수 있지만 계산 결과에는 영향을 주지 않습니다. 입력과 결과 확인을 방해하지 않도록 계산기 화면을 우선해서 구성하고 있어요." },
     { q: "어떤 개인정보가 수집되나요?", a: "분석 정보, 쿠키, 문의를 보내실 때 직접 입력하신 정보처럼 제한적인 데이터만 수집될 수 있어요. 더 자세한 내용은 개인정보처리방침에서 확인하실 수 있습니다." },
   ],
 } as const;

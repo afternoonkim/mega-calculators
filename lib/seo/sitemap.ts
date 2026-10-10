@@ -1,5 +1,5 @@
 import { calculatorCategories, calculators } from "@/lib/calculators/data";
-import { getCalculatorExamples } from "@/lib/calculators/programmatic";
+import { getIndexableCalculatorExamples, isTopPriorityCalculator } from "@/lib/calculators/programmatic";
 import { getBlogPosts } from "@/lib/editorialCurrent";
 import { getGuides } from "@/lib/editorial";
 import type { Locale } from "@/lib/i18n";
@@ -10,7 +10,7 @@ export const SITEMAP_LOCALES = ["en", "ko"] as const satisfies readonly Locale[]
 const BUILD_LASTMOD = new Date().toISOString();
 const STATIC_ROUTES = ["", "/about", "/blog", "/calculators", "/contact", "/faq", "/guides", "/privacy", "/terms", "/editorial-standards", "/methodology", "/corrections"] as const;
 
-const RESOURCE_SUBPATHS = ["/formula", "/guide", "/use-cases"] as const;
+const RESOURCE_SUBPATHS = ["/formula", "/guide"] as const;
 
 type ChangeFrequency = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
 
@@ -195,6 +195,7 @@ export function getCalculatorResourceSitemapEntries(): SitemapEntry[] {
 
   for (const locale of SITEMAP_LOCALES) {
     for (const calculator of calculators) {
+      if (!isTopPriorityCalculator(calculator.slug)) continue;
       const path = `/calculators/${calculator.category}/${calculator.slug}`;
 
       for (const subPath of RESOURCE_SUBPATHS) {
@@ -240,7 +241,7 @@ export function getExampleSitemapEntries(): SitemapEntry[] {
       const path = `/calculators/${calculator.category}/${calculator.slug}`;
       const seenExamplePaths = new Set<string>();
 
-      for (const example of getCalculatorExamples(calculator)) {
+      for (const example of getIndexableCalculatorExamples(calculator)) {
         const examplePath = `${path}/examples/${example.slug}`;
         if (seenExamplePaths.has(examplePath)) continue;
         seenExamplePaths.add(examplePath);

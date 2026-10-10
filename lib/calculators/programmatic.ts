@@ -326,6 +326,26 @@ export function getCalculatorExamples(definition: CalculatorDefinition): Program
   return (specificExamples[definition.slug] ?? buildGenericExamples(definition)).slice(0, 6);
 }
 
+const INDEXABLE_EXAMPLE_LIMIT = 6;
+
+function pickRepresentativeExamples(examples: ProgrammaticExample[], limit = INDEXABLE_EXAMPLE_LIMIT) {
+  const unique = Array.from(new Map(examples.map((example) => [example.slug, example])).values());
+  if (unique.length <= limit) return unique;
+  return Array.from({ length: limit }, (_, index) => {
+    const position = Math.floor((index * unique.length) / limit);
+    return unique[Math.min(position, unique.length - 1)];
+  });
+}
+
+export function getIndexableCalculatorExamples(definition: CalculatorDefinition): ProgrammaticExample[] {
+  if (!isTopPriorityCalculator(definition.slug)) return [];
+  return pickRepresentativeExamples(getCalculatorExamples(definition));
+}
+
+export function isIndexableCalculatorExample(definition: CalculatorDefinition, exampleSlug: string) {
+  return getIndexableCalculatorExamples(definition).some((example) => example.slug === exampleSlug);
+}
+
 export function getFormulaSeo(definition: CalculatorDefinition) {
   return {
     title: `${definition.name} Formula`,
@@ -453,17 +473,8 @@ const HUB_EXAMPLE_DISPLAY_LIMIT = 12;
 
 export function getProgrammaticHubLinks(definition: CalculatorDefinition) {
   const base = `/calculators/${definition.category}/${definition.slug}`;
-  const allExamples = getCalculatorExamples(definition);
-  // For priority calculators with 100+ scenarios, show a representative
-  // sample on the detail page so the section stays readable. Pick evenly
-  // spaced indices so the user sees range, not just the first 12 in a row.
-  const displayExamples =
-    allExamples.length <= HUB_EXAMPLE_DISPLAY_LIMIT
-      ? allExamples
-      : Array.from({ length: HUB_EXAMPLE_DISPLAY_LIMIT }, (_, i) => {
-          const idx = Math.floor((i * allExamples.length) / HUB_EXAMPLE_DISPLAY_LIMIT);
-          return allExamples[idx];
-        });
+  const allExamples = getIndexableCalculatorExamples(definition);
+  const displayExamples = allExamples.slice(0, HUB_EXAMPLE_DISPLAY_LIMIT);
   return {
     formula: `${base}/formula`,
     guide: `${base}/guide`,

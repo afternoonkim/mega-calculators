@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import AdSlot from "@/components/ads/AdSlot";
 import { calculators, getCalculator } from "@/lib/calculators/data";
 import { computeCalculator, getDefaultValues } from "@/lib/calculators/engine";
-import { getCalculatorExamples, getProgrammaticHubLinks } from "@/lib/calculators/programmatic";
+import { getCalculatorExamples, getProgrammaticHubLinks, isIndexableCalculatorExample } from "@/lib/calculators/programmatic";
 import { normalizeLocale, withLocale } from "@/lib/i18n";
 import {
   localizeCalculatorDefinition,
@@ -44,14 +44,17 @@ export async function generateMetadata({
   return {
     title: isKo ? `${exampleData.title} | 예시 계산` : `${exampleData.title} | Example Calculation`,
     description: exampleData.description,
-    // Strong explicit signal so example pages don't fall to "crawled — not
-    // indexed". Each programmatic scenario page is a long-tail target that
-    // deserves indexing once paired with unique per-scenario interpretation.
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
-    },
+    robots: isIndexableCalculatorExample(calculator, exampleData.slug)
+      ? {
+          index: true,
+          follow: true,
+          googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+        }
+      : {
+          index: false,
+          follow: true,
+          googleBot: { index: false, follow: true },
+        },
     alternates: {
       canonical: url,
       languages: {

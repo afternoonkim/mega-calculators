@@ -1,0 +1,64 @@
+name: Fix editorial locale alternates
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/fix-editorial-locale-alternates.py"
+      - ".github/workflows/fix-editorial-locale-alternates.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Apply locale alternate fix
+        run: python scripts/fix-editorial-locale-alternates.py
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Test
+        run: npm test
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit functional change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            lib/editorialAlternates.ts \
+            lib/editorialAlternates.test.ts \
+            lib/i18n.ts \
+            'app/[locale]/blog/[slug]/page.tsx' \
+            'app/[locale]/guides/[slug]/page.tsx'
+          if git diff --cached --quiet; then
+            echo "No functional changes to commit"
+            exit 0
+          fi
+          git commit -m "fix: align editorial locale alternates"
+          git push origin HEAD:main

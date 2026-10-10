@@ -5,6 +5,7 @@ import { normalizeLocale, withLocale } from "@/lib/i18n";
 import { localizeCalculatorDefinition, localizeCalculatorName, localizeCategoryName } from "@/lib/calculators/localization";
 import { getBlogPosts, getGuides } from "@/lib/editorial";
 import { RecentCalculatorsList } from "@/components/calculators/RecentCalculators";
+import CalculatorSearch from "@/components/search/CalculatorSearch";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const locale = normalizeLocale((await params).locale);
@@ -88,20 +89,20 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8 md:space-y-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
 
-      <section className="rounded-[2rem] bg-slate-950 px-6 py-12 text-white shadow-sm md:px-10 md:py-16">
+      <section className="rounded-3xl bg-slate-950 px-5 py-8 text-white shadow-sm md:rounded-[2rem] md:px-10 md:py-16">
         <div className="max-w-5xl">
-          <div className="inline-flex rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-200">{isKo ? "무료 온라인 계산기" : "Free online tools"}</div>
-          <h1 className="mt-5 text-4xl font-black tracking-tight md:text-6xl">{isKo ? "대출, 복리, BMI, 날짜, 퍼센트, 단위 변환까지 한 번에 계산하세요" : "Free calculators for money, health, dates, conversions, and daily tasks"}</h1>
-          <p className="mt-5 max-w-4xl text-base leading-8 text-slate-300 md:text-lg">{isKo ? "금융, 비즈니스, 건강, 피트니스, 수학, 시간, 단위 변환, 생활 계산까지 자주 필요한 계산 결과를 몇 초 만에 확인할 수 있어요. 필요한 계산기를 먼저 찾고, 결과가 궁금하면 설명과 가이드도 함께 확인해보세요." : "Get quick answers to everyday questions with simple, easy-to-use online calculators. Open the tool you need, see the result right away, and use the practical articles and guides whenever you want more context."}</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={withLocale(locale, "/calculators")} className="rounded-2xl bg-blue-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-400">{isKo ? "전체 계산기 보기" : "Browse all calculators"}</Link>
-            <Link href={withLocale(locale, "/faq")} className="rounded-2xl border border-white/20 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/5">{isKo ? "자주 묻는 질문" : "Read site FAQ"}</Link>
+          <div className="hidden rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-200 md:inline-flex">{isKo ? "무료 온라인 계산기" : "Free online tools"}</div>
+          <h1 className="text-3xl font-black leading-tight tracking-tight md:mt-5 md:text-6xl">{isKo ? "대출, 복리, BMI, 날짜, 퍼센트, 단위 변환까지 한 번에 계산하세요" : "Free calculators for money, health, dates, conversions, and daily tasks"}</h1>
+          <p className="mt-4 text-sm leading-6 text-slate-300 md:hidden">{isKo ? "필요한 계산기를 찾아 숫자를 입력하면 결과를 바로 확인할 수 있어요." : "Find the calculator you need, enter your numbers, and see the result right away."}</p><p className="mt-5 hidden max-w-4xl text-base leading-8 text-slate-300 md:block md:text-lg">{isKo ? "금융, 비즈니스, 건강, 피트니스, 수학, 시간, 단위 변환, 생활 계산까지 자주 필요한 계산 결과를 몇 초 만에 확인할 수 있어요. 필요한 계산기를 먼저 찾고, 결과가 궁금하면 설명과 가이드도 함께 확인해보세요." : "Get quick answers to everyday questions with simple, easy-to-use online calculators. Open the tool you need, see the result right away, and use the practical articles and guides whenever you want more context."}</p><div className="mt-5 md:hidden"><CalculatorSearch locale={locale} compact /></div>
+          <div className="mt-5 flex flex-wrap gap-3 md:mt-8">
+            <Link href={withLocale(locale, "/calculators")} className="inline-flex w-full justify-center rounded-2xl bg-blue-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-400 sm:w-auto">{isKo ? "전체 계산기 보기" : "Browse all calculators"}</Link>
+            <Link href={withLocale(locale, "/faq")} className="hidden rounded-2xl border border-white/20 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/5 sm:inline-flex">{isKo ? "자주 묻는 질문" : "Read site FAQ"}</Link>
           </div>
         </div>
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
+        <div className="mt-10 hidden gap-4 md:grid md:grid-cols-3">
           <StatCard label={isKo ? "가입 없이" : "No sign-up"} value={isKo ? "바로 계산" : "Start right away"} />
           <StatCard label={isKo ? "무료로" : "Free to use"} value={isKo ? "원하는 만큼" : "Run any calculator"} />
           <StatCard label={isKo ? "결과와 설명" : "Results + context"} value={isKo ? "한 화면에서" : "In one place"} />

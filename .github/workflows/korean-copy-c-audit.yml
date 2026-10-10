@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - scripts/korean_naturalization_c.py
+      - scripts/run_korean_naturalization_c.py
       - .github/workflows/korean-copy-c-audit.yml
 
 permissions:
@@ -24,7 +25,7 @@ jobs:
           cache: npm
 
       - name: Apply Korean naturalization C
-        run: python scripts/korean_naturalization_c.py
+        run: python scripts/run_korean_naturalization_c.py
 
       - name: Assert C cleanup
         run: |

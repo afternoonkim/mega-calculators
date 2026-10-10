@@ -1,0 +1,17 @@
+name: Korean Copy C Audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/korean-copy-c-audit.yml
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Find tone cleanup candidates
+        run: |
+          echo '=== C candidates ==='
+          grep -R -n --include='*.ts' --include='*.tsx' -E '콘텐츠|활용|계획 수립|가정값|가정한|스펙 시트|밀프렙|보조 결과값|보조 수치|참고용 시작점|실전 활용|참고용 계획 수치|빠른 참고|일반 참고|계획 수치' app components lib || true

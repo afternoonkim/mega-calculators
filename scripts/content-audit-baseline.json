@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-10",
+  "note": "Legacy findings are tolerated only because they predate this gate. New findings fail CI. Refresh deliberately after reviewed cleanup, not automatically.",
+  "knownEntryCount": 38,
+  "legacyFindings": []
+}

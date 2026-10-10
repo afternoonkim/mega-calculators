@@ -190,7 +190,7 @@ function parseEditorial(source) {
     const lowerName = name.toLowerCase();
     const locale = lowerName.startsWith("ko") ? "ko" : lowerName.startsWith("en") ? "en" : "unknown";
     const kind = lowerName.includes("blog") ? "blog" : lowerName.includes("guide") ? "guide" : lowerName;
-    const arrayStart = source.indexOf("[", match.index);
+    const arrayStart = match.index + match[0].lastIndexOf("[");
     const arrayEnd = findMatching(source, arrayStart, "[", "]");
     if (arrayEnd < 0) throw new Error(`Could not parse ${name}`);
 

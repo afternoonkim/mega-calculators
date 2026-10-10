@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getBlogPost, getBlogPosts } from "@/lib/editorial";
+import { getBlogPost, getBlogPosts } from "@/lib/editorialCurrent";
 import { normalizeLocale, withLocale } from "@/lib/i18n";
 import SisterSiteCard from "@/components/layout/SisterSiteCard";
 import { editorialSlugToSisterTopic } from "@/lib/seo/sister-sites";
@@ -229,19 +229,11 @@ export default async function BlogDetailPage({
         </Link>
       </section>
 
-      {/* Topic-matched sister site (bluedino for finance/tax in KO,
-          momtools for health/age in either locale). Returns null when no
-          match — no card shown on those articles. */}
       {(() => {
         const topic = editorialSlugToSisterTopic(post.slug);
         return topic ? <SisterSiteCard topic={topic} locale={locale} /> : null;
       })()}
 
-      {/* "Last reviewed" footer — shown on every article as a soft trust
-          signal. Uses the explicit reviewedAt date when present, otherwise
-          falls back to updatedAt (which is the canonical content-change
-          date). The line is intentionally small and low-emphasis so it
-          reads as a publisher note, not a banner. */}
       <p className="text-sm text-slate-500">
         {isKo
           ? `이 글은 ${post.reviewedAt ?? post.updatedAt}에 마지막으로 검토되었어요. Mega Calculators 에디토리얼팀이 콘텐츠 기준에 따라 정기적으로 확인하고 있어요.`

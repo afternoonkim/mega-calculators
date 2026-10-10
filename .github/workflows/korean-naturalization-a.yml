@@ -1,0 +1,70 @@
+name: Korean Naturalization A
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/korean_naturalization_a.py
+      - .github/workflows/korean-naturalization-a.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Apply Korean naturalization A
+        run: python scripts/korean_naturalization_a.py
+
+      - name: Assert A cleanup
+        run: |
+          if grep -R -n --include='*.ts' --include='*.tsx' '한국어 설명과 함께\|한국어로 정리한 페이지\|카테고리 페이지 →\|안내 페이지입니다\|한국 기준(대한비만학회)으로 결과를 해석\|5~10% 손실분' app components lib; then exit 1; fi
+          if grep -R -n --include='*.ts' --include='*.tsx' '직접 비교해보기 좋은 시나리오\|일정 시나리오\|시간표 시나리오\|참고용 시나리오' app components lib; then exit 1; fi
+          grep -q '함께 확인하면 좋은 내용' app/'[locale]'/calculators/'[category]'/'[slug]'/formula/page.tsx
+          grep -q '계산 결과와 함께 해석할 때 알아둘 점' app/'[locale]'/calculators/'[category]'/'[slug]'/use-cases/page.tsx
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Test
+        run: npm test
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit A cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/'[locale]'/page.tsx \
+                  app/'[locale]'/calculators/page.tsx \
+                  app/'[locale]'/calculators/'[category]'/page.tsx \
+                  app/'[locale]'/calculators/'[category]'/'[slug]'/formula/page.tsx \
+                  app/'[locale]'/calculators/'[category]'/'[slug]'/guide/page.tsx \
+                  app/'[locale]'/calculators/'[category]'/'[slug]'/use-cases/page.tsx \
+                  app/'[locale]'/faq/page.tsx \
+                  lib/trustPages.ts \
+                  lib/calculators/seoContent.ts
+          git commit -m "ux: naturalize critical Korean copy"
+          git push

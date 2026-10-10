@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/phase5-seo-quality.yml
       - scripts/phase5_seo_quality.py
+      - scripts/phase5_dedupe_fix.py
 
 permissions:
   contents: write
@@ -26,7 +27,9 @@ jobs:
           cache: npm
 
       - name: Apply SEO quality gate
-        run: python scripts/phase5_seo_quality.py
+        run: |
+          python scripts/phase5_seo_quality.py
+          python scripts/phase5_dedupe_fix.py
 
       - name: Assert SEO surface is tightened
         run: |

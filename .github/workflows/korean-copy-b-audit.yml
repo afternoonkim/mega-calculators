@@ -1,0 +1,17 @@
+name: Korean Copy B Audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/korean-copy-b-audit.yml
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Find mechanical Korean copy
+        run: |
+          echo '=== 하실 수 / 활용하시 / 참고용 / 도구 / 세분화 / 시뮬레이션 / 가늠 ==='
+          grep -R -n --include='*.ts' --include='*.tsx' -E '하실 수|활용하시|참고용|도구|세분화|시뮬레이션|가늠' app components lib || true

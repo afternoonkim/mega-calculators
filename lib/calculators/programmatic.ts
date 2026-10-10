@@ -183,7 +183,7 @@ function buildBmiExamples(): ProgrammaticExample[] {
         intro: `This example calculates BMI for someone ${h} cm (${ft}'${inchRem}") tall weighing ${w} kg (${lbs} lb), and shows where it falls on the standard WHO/CDC BMI category scale.`,
         overrides: { heightCm: String(h), weightKg: String(w) },
         koTitle: `키 ${h}cm 몸무게 ${w}kg BMI 결과`,
-        koDescription: `키 ${h}cm 몸무게 ${w}kg일 때 BMI 값과 한국 비만 분류(대한비만학회 기준)를 한눈에 확인하실 수 있어요.`,
+        koDescription: `키 ${h}cm 몸무게 ${w}kg일 때 BMI 값과 한국 비만 분류(대한비만학회 기준)를 한눈에 확인할 수 있어요.`,
         koIntro: `키 ${h}cm 몸무게 ${w}kg일 때 BMI가 어느 범위에 들어가는지, 그리고 한국 기준(저체중·정상·과체중·비만)에서 어떻게 해석하면 좋을지 함께 정리해드려요.`,
       });
     }
@@ -207,8 +207,8 @@ function buildLoanExamples(): ProgrammaticExample[] {
         intro: `This example models a ${enUsd(amount)} loan at ${rate}% APR repaid over ${term} year${term === 1 ? "" : "s"}. You'll see the monthly payment, total interest, and total repayment so you can compare it against your lender quote.`,
         overrides: { loanAmount: String(amount), annualRate: String(rate), years: String(term) },
         koTitle: `${koKrwApprox(amount)} 대출 ${term}년 ${rate}% 예시`,
-        koDescription: `${koKrwApprox(amount)} 원리금균등 대출을 ${term}년 ${rate}% 금리로 받았을 때 월 상환금과 총이자를 한국어로 확인하실 수 있어요.`,
-        koIntro: `대출 원금 ${koKrwApprox(amount)}, 상환 기간 ${term}년, 연 ${rate}% 금리 시나리오로 월 상환금과 총이자를 미리 가늠해보실 수 있도록 정리한 예시입니다.`,
+        koDescription: `${koKrwApprox(amount)} 원리금균등 대출을 ${term}년 ${rate}% 금리로 받았을 때 월 상환금과 총이자를 한눈에 확인할 수 있어요.`,
+        koIntro: `대출 원금 ${koKrwApprox(amount)}, 상환 기간 ${term}년, 연 ${rate}% 금리 조건에서 월 상환금과 총이자가 어떻게 달라지는지 보여주는 예시입니다.`,
       });
     }
   }
@@ -239,7 +239,7 @@ function buildMortgageExamples(): ProgrammaticExample[] {
           },
           koTitle: `${koKrwApprox(price)} 주택담보대출 ${rate}% ${term}년 예시`,
           koDescription: `${koKrwApprox(price)} 주택을 자기자본 20%, 연 ${rate}% 금리, ${term}년 상환으로 받았을 때 월 상환금과 총이자를 정리한 예시입니다.`,
-          koIntro: `주택 가격 ${koKrwApprox(price)}, 자기자본 20%, 연 ${rate}%, ${term}년 만기 시나리오로 월 상환금·총이자·잔금 흐름을 한 번에 가늠해보실 수 있어요.`,
+          koIntro: `주택 가격 ${koKrwApprox(price)}, 자기자본 20%, 연 ${rate}%, ${term}년 만기 조건에서 월 상환금·총이자·잔금 흐름을 한 번에 확인할 수 있어요.`,
         });
       }
     }
@@ -271,7 +271,7 @@ function buildCompoundInterestExamples(): ProgrammaticExample[] {
             },
             koTitle: `초기 ${koKrwApprox(principal)} · 월 ${koKrwApprox(monthly)} 적립 · 연 ${rate}% · ${years}년 복리 예시`,
             koDescription: `초기 ${koKrwApprox(principal)}에서 매월 ${koKrwApprox(monthly)}씩 ${years}년간 연 ${rate}% 복리로 굴렸을 때 결과를 한국어로 정리한 예시입니다.`,
-            koIntro: `초기 자본 ${koKrwApprox(principal)}, 매월 ${koKrwApprox(monthly)} 적립, 연 ${rate}% 수익률 가정, ${years}년 기간으로 복리 효과가 얼마나 누적되는지 확인하실 수 있는 예시예요.`,
+            koIntro: `초기 자본 ${koKrwApprox(principal)}, 매월 ${koKrwApprox(monthly)} 적립, 연 ${rate}% 수익률 가정, ${years}년 동안 복리 효과가 얼마나 누적되는지 보여주는 예시예요.`,
           });
         }
       }
@@ -296,7 +296,7 @@ function buildSalesTaxExamples(): ProgrammaticExample[] {
         overrides: { price: String(price), taxRate: String(rate) },
         koTitle: `가격 ${koKrwApprox(price)} · 부가세 ${rate}% 계산 예시`,
         koDescription: `가격 ${koKrwApprox(price)}에 ${rate}% 부가세가 붙었을 때 세액과 최종 결제 금액을 한국어로 정리한 예시입니다.`,
-        koIntro: `상품 가격 ${koKrwApprox(price)}, 부가세 ${rate}% 시나리오로 세액과 최종가격을 미리 확인하실 수 있는 예시입니다.`,
+        koIntro: `상품 가격 ${koKrwApprox(price)}, 부가세 ${rate}%를 적용했을 때 세액과 최종 가격을 보여주는 예시입니다.`,
       });
     }
   }

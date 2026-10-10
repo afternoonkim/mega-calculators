@@ -87,9 +87,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       <section className="rounded-[2rem] bg-slate-950 px-6 py-12 text-white shadow-sm md:px-10 md:py-16">
         <div className="max-w-5xl">
-          <div className="inline-flex rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-200">{isKo ? "무료 온라인 도구" : "Free online tools"}</div>
+          <div className="inline-flex rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-200">{isKo ? "무료 온라인 계산기" : "Free online tools"}</div>
           <h1 className="mt-5 text-4xl font-black tracking-tight md:text-6xl">{isKo ? "대출, 복리, BMI, 날짜, 퍼센트, 단위 변환까지 한 번에 계산하세요" : "Free calculators for money, health, dates, conversions, and daily tasks"}</h1>
-          <p className="mt-5 max-w-4xl text-base leading-8 text-slate-300 md:text-lg">{isKo ? "금융, 비즈니스, 건강, 피트니스, 수학, 시간, 단위 변환, 생활 계산까지 자주 마주치는 질문에 몇 초 만에 답을 얻으실 수 있어요. 원하시는 계산기를 먼저 찾으시고, 결과 해석이 필요하시면 바로 옆의 설명 글과 가이드를 함께 확인해보세요." : "Get quick answers to everyday questions with simple, easy-to-use online calculators. Open the tool you need, see the result right away, and use the practical articles and guides whenever you want more context."}</p>
+          <p className="mt-5 max-w-4xl text-base leading-8 text-slate-300 md:text-lg">{isKo ? "금융, 비즈니스, 건강, 피트니스, 수학, 시간, 단위 변환, 생활 계산까지 자주 필요한 계산 결과를 몇 초 만에 확인할 수 있어요. 필요한 계산기를 먼저 찾고, 결과가 궁금하면 설명과 가이드도 함께 확인해보세요." : "Get quick answers to everyday questions with simple, easy-to-use online calculators. Open the tool you need, see the result right away, and use the practical articles and guides whenever you want more context."}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href={withLocale(locale, "/calculators")} className="rounded-2xl bg-blue-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-400">{isKo ? "전체 계산기 보기" : "Browse all calculators"}</Link>
             <Link href={withLocale(locale, "/faq")} className="rounded-2xl border border-white/20 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/5">{isKo ? "자주 묻는 질문" : "Read site FAQ"}</Link>
@@ -194,11 +194,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="max-w-4xl">
           <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">{isKo ? "왜 Mega Calculators인가" : "Why people use Mega Calculators"}</div>
           <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">{isKo ? "복잡하지 않게, 필요한 계산만 빠르게" : "A calculator site built to be practical"}</h2>
-          <p className="mt-4 text-base leading-8 text-slate-600">{isKo ? "복잡한 화면에 시간을 빼앗기지 않으셔도 됩니다. 입력과 결과가 한눈에 보이고, 결과 옆에 짧은 설명과 가이드가 함께 있어 숫자를 어떻게 활용하시면 좋을지 바로 이어가실 수 있어요." : "You won't waste time hunting through a cluttered screen. Forms are short, results are easy to read, and short explanations sit right next to each result so you can put the answer to use right away."}</p>
+          <p className="mt-4 text-base leading-8 text-slate-600">{isKo ? "복잡한 화면을 헤맬 필요 없이 입력값과 결과를 한눈에 확인할 수 있습니다. 결과 옆의 짧은 설명과 가이드를 보면서 숫자의 의미도 바로 이해해보세요." : "You won't waste time hunting through a cluttered screen. Forms are short, results are easy to read, and short explanations sit right next to each result so you can put the answer to use right away."}</p>
         </div>
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
-          <InfoCard title={isKo ? "바로 계산" : "Fast answers"} description={isKo ? "숫자만 입력하시면 핵심 결과와 보조 수치를 곧바로 확인하실 수 있어요." : "Open a calculator, type in your numbers, and see a clear result — no digging required."} />
-          <InfoCard title={isKo ? "읽기 쉬운 설명" : "Useful explanations"} description={isKo ? "한국어 안내와 활용 예시를 함께 제공해, 결과의 의미를 쉽게 이해하실 수 있도록 도와드려요." : "Read a short explanation, follow simple usage steps, and check an example so you understand exactly what the number means."} />
+          <InfoCard title={isKo ? "바로 계산" : "Fast answers"} description={isKo ? "숫자를 입력하면 핵심 결과와 함께 필요한 수치를 바로 확인할 수 있어요." : "Open a calculator, type in your numbers, and see a clear result — no digging required."} />
+          <InfoCard title={isKo ? "읽기 쉬운 설명" : "Useful explanations"} description={isKo ? "짧은 설명과 계산 예시를 함께 보면서 결과의 의미를 쉽게 이해할 수 있어요." : "Read a short explanation, follow simple usage steps, and check an example so you understand exactly what the number means."} />
           <InfoCard title={isKo ? "넓은 주제 범위" : "Everyday coverage"} description={isKo ? "금융, 건강, 날짜, 수학, 단위 변환, 생활 계산 등 자주 찾으시는 주제를 폭넓게 다룹니다." : "Use these calculators for money, health, dates, home projects, cooking, schoolwork, and the conversions you do most often."} />
         </div>
       </section>

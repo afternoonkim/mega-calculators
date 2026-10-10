@@ -9,7 +9,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title: locale === "ko" ? "블로그" : "Blog",
     description:
       locale === "ko"
-        ? "계산기를 더 잘 활용하시는 데 도움이 되는 팁과 실생활 사례를 모았습니다."
+        ? "계산기를 더 잘 활용하는 데 도움이 되는 팁과 실생활 사례를 모았습니다."
         : "Practical articles to help you make the most of every calculator — for money, health, time, and the everyday decisions in between.",
     alternates: {
       canonical: `/${locale}/blog`,

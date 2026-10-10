@@ -39,7 +39,7 @@ export async function generateMetadata({
     : `${match.name} - Free Online Tools`;
 
   const description = isKo
-    ? `${intro} 모두 무료이고, 별도 가입 없이 바로 사용하실 수 있어요.`
+    ? `${intro} 모두 무료이며 별도 가입 없이 바로 사용할 수 있습니다.`
     : `${intro} Free, no sign-up, ${match.items.length} tools.`;
 
   return {
@@ -202,12 +202,12 @@ export default async function CategoryPage({
           <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-600 md:text-base">
             <li className="rounded-2xl bg-slate-50 px-4 py-3">
               {isKo
-                ? "비슷한 계산기를 한 번에 비교하실 수 있어요."
+                ? "비슷한 계산기를 한눈에 비교해보세요."
                 : "Compare related tools without opening multiple tabs."}
             </li>
             <li className="rounded-2xl bg-slate-50 px-4 py-3">
               {isKo
-                ? `${name} 관련 계산을 빠르게 찾으실 수 있어요.`
+                ? `${name} 관련 계산을 빠르게 찾아보세요.`
                 : `Find quick answers for common questions in ${match.name.toLowerCase()}.`}
             </li>
             <li className="rounded-2xl bg-slate-50 px-4 py-3">

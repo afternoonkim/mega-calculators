@@ -42,11 +42,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     : "Mega Calculators — Free Online Calculators and Converters";
 
   const description = isKo
-    ? "대출 이자, 복리, BMI, 나이, 퍼센트, 단위 변환까지 자주 쓰시는 계산기를 한국어로 빠르게 사용하실 수 있어요. 별도 가입 없이 바로 결과를 확인하실 수 있습니다."
+    ? "대출 이자, 복리, BMI, 나이, 퍼센트, 단위 변환까지 자주 쓰는 계산기를 빠르게 이용할 수 있어요. 별도 가입 없이 바로 결과를 확인할 수 있습니다."
     : "Free, fast online calculators for finance, health, time, math, and unit conversion. Get clear answers in seconds — no sign-up, no install.";
 
   const ogDescription = isKo
-    ? "대출, 복리, BMI, 나이, 퍼센트, 단위 변환까지 한국어로 무료 계산하실 수 있는 온라인 계산기 모음입니다."
+    ? "대출, 복리, BMI, 나이, 퍼센트, 단위 변환까지 무료로 이용할 수 있는 온라인 계산기 모음입니다."
     : "Free online calculators for money, health, time, math, and conversions. Clear answers, no sign-up.";
 
   return {

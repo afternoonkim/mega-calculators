@@ -43,7 +43,7 @@ export async function GET(
     ? "Mega Calculators 블로그"
     : "Mega Calculators Blog";
   const channelDescription = isKo
-    ? "계산기를 더 잘 활용하실 수 있도록 돕는 글들"
+    ? "계산기를 더 잘 활용하는 데 도움이 되는 글들"
     : "Articles to help you read calculator results with confidence";
   const feedUrl = `${SITE_URL}/${locale}/blog/rss.xml`;
   const channelLink = `${SITE_URL}/${locale}/blog`;

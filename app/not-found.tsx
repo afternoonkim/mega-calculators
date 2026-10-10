@@ -15,7 +15,7 @@ export default async function NotFound() {
         </h1>
         <p className="mt-4 text-base leading-8 text-slate-600">
           {isKo
-            ? "주소가 바뀌었거나 페이지가 사라졌을 수 있어요. 전체 계산기 목록에서 원하시는 도구를 찾아보세요."
+            ? "주소가 바뀌었거나 페이지가 사라졌을 수 있어요. 전체 계산기 목록에서 필요한 계산기를 찾아보세요."
             : "The page you are looking for might have moved or no longer exists. You can find what you need in the full list of calculators."}
         </p>
         <Link

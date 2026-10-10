@@ -32,7 +32,7 @@ export default async function TermsPage({ params }: { params: Promise<{ locale: 
         </section>
         <section>
           <h2 className="text-2xl font-bold text-slate-900">3. {isKo ? "정확성과 서비스 제공" : "Accuracy and availability"}</h2>
-          <p className="mt-3">{isKo ? "유용하고 읽기 쉬운 도구를 제공하기 위해 노력하지만, 모든 페이지가 오류 없이 완전하다고 보장하지는 않습니다. 사이트 기능은 언제든지 변경, 업데이트, 중단될 수 있습니다." : "We aim to provide useful and readable tools, but we do not guarantee that every page is error-free, complete, or suitable for every purpose. Site features may change, be updated, or become unavailable at any time."}</p>
+          <p className="mt-3">{isKo ? "유용하고 읽기 쉬운 계산기를 제공하기 위해 노력하지만, 모든 페이지가 오류 없이 완전하다고 보장하지는 않습니다. 사이트 기능은 언제든지 변경, 업데이트, 중단될 수 있습니다." : "We aim to provide useful and readable tools, but we do not guarantee that every page is error-free, complete, or suitable for every purpose. Site features may change, be updated, or become unavailable at any time."}</p>
         </section>
         <section>
           <h2 className="text-2xl font-bold text-slate-900">4. {isKo ? "허용된 사용" : "Acceptable use"}</h2>

@@ -747,13 +747,13 @@ const longSentenceMap: Record<string, string> = {
   "This comparison is intentionally simplified. It does not include home appreciation, maintenance, taxes, insurance, or investment returns on cash.": "이 비교는 이해를 돕기 위한 단순 비교입니다. 주택 가격 상승, 유지보수비, 세금, 보험료, 현금 투자 수익 등은 포함하지 않습니다.",
   "Compare multiple scenarios before making a borrowing, saving, or investing decision.": "대출, 저축, 투자 결정을 내리기 전에 여러 조건을 비교해볼 수 있습니다.",
   "Build a quick monthly budget around the result shown by this calculator.": "계산 결과를 기준으로 월간 예산을 빠르게 정리할 수 있습니다.",
-  "Use the output as a planning estimate before reviewing a lender, broker, or financial institution quote.": "금융기관 조건을 검토하기 전에 참고용 계획 수치로 활용할 수 있습니다.",
+  "Use the output as a planning estimate before reviewing a lender, broker, or financial institution quote.": "금융기관 조건을 검토하기 전에 예상 금액을 미리 확인하는 데 활용할 수 있습니다.",
   "Test how changes in rate, term, contribution, or starting balance affect the long-term result.": "금리, 기간, 납입액, 시작 금액이 달라질 때 결과가 어떻게 바뀌는지 비교할 수 있습니다.",
-  "Use the result as a practical starting point before talking to a physician, dietitian, or coach.": "의사, 영양사, 코치와 상담하기 전에 참고용 시작점으로 활용할 수 있습니다.",
+  "Use the result as a practical starting point before talking to a physician, dietitian, or coach.": "의사, 영양사, 코치와 상담하기 전에 현재 수치를 정리하는 데 활용할 수 있습니다.",
   "Test different assumptions to understand how small changes can affect the final estimate.": "가정을 바꿔보면서 작은 변화가 최종 결과에 어떤 영향을 주는지 확인할 수 있습니다.",
   "Estimate time gaps quickly when planning birthdays, schedules, deadlines, or work blocks.": "생일, 일정, 마감일, 근무 시간을 계획할 때 시간 차이를 빠르게 확인할 수 있습니다.",
   "Double-check a date or time calculation without opening a spreadsheet.": "스프레드시트를 열지 않아도 날짜와 시간 계산을 빠르게 다시 확인할 수 있습니다.",
-  "Use the result to compare multiple calendar or schedule scenarios side by side.": "여러 일정 시나리오를 나란히 비교할 때 활용할 수 있습니다.",
+  "Use the result to compare multiple calendar or schedule scenarios side by side.": "여러 일정을 나란히 비교할 때 활용할 수 있습니다.",
   "Turn a manual time calculation into a reusable workflow for everyday planning.": "반복적인 시간 계산을 일상 계획에 바로 쓸 수 있는 방식으로 바꿔줍니다.",
   "Run quick what-if scenarios before using a more advanced analytics tool.": "더 복잡한 분석 도구를 쓰기 전에 간단한 가정 비교를 해볼 수 있습니다.",
   "Translate a written problem into a clear numeric answer with less manual work.": "서술형 문제를 숫자 결과로 빠르게 바꿔 확인할 수 있습니다.",
@@ -771,7 +771,7 @@ const longSentenceMap: Record<string, string> = {
   "Example pages help you understand a calculator faster because they remove the blank-screen problem. Instead of guessing which numbers to enter, you can review a practical scenario and then adjust the values to match your own needs.": "예시 페이지를 보면 어떤 값을 넣어야 할지 감을 빠르게 잡을 수 있습니다. 먼저 실제 예시를 확인한 뒤 내 상황에 맞게 숫자만 바꿔보면 됩니다.",
   "This is especially useful for users who searched for a very specific long-tail question and want a quick answer before opening the full interactive tool.": "특정 조건으로 검색해 들어온 사용자도 계산기를 열기 전에 결과 흐름을 빠르게 파악할 수 있도록 구성했습니다.",
   "The formula section explains the math logic behind the calculator result. It is useful when you want to understand what each variable means or double-check the result with your own manual work or spreadsheet.": "공식 페이지는 계산 결과가 어떤 원리로 나오는지 이해하기 쉽게 정리한 공간입니다. 변수의 의미를 확인하거나 직접 계산한 값과 비교할 때 도움이 됩니다.",
-  "You do not need to solve the formula manually to use the calculator. The purpose of this page is to give context, improve trust, and answer search queries from users who specifically want the formula.": "직접 공식을 계산하지 않아도 계산기는 바로 사용할 수 있습니다. 이 페이지는 공식이 궁금한 사용자를 위해 개념과 해석 기준을 정리한 안내 페이지입니다.",
+  "You do not need to solve the formula manually to use the calculator. The purpose of this page is to give context, improve trust, and answer search queries from users who specifically want the formula.": "직접 공식을 계산하지 않아도 계산기는 바로 사용할 수 있습니다. 결과가 왜 그렇게 나오는지 궁금할 때 핵심 개념과 해석 기준을 확인해보세요.",
 };
 
 function replaceCurrencySymbols(text: string) {
@@ -922,16 +922,16 @@ function localizedInputLabels(definition: CalculatorDefinition) {
 
 function buildKoDescription(definition: CalculatorDefinition, localizedName: string) {
   if (isConverter(definition)) {
-    return `${localizedName}는 자주 사용하는 단위를 한국어로 빠르게 변환해주는 무료 온라인 도구입니다. 변환 전 값과 단위를 입력하면 결과를 바로 확인할 수 있어 실생활, 학습, 업무에 모두 활용하기 좋습니다.`;
+    return `${localizedName}는 자주 사용하는 단위를 빠르게 바꿔볼 수 있는 무료 온라인 변환 계산기입니다. 값과 단위를 입력하면 결과를 바로 확인할 수 있어 실생활, 학습, 업무에서 편리하게 사용할 수 있습니다.`;
   }
   if (definition.category === "finance" || definition.category === "business") {
-    return `${localizedName}는 금액, 이자율, 기간 같은 값을 바탕으로 결과를 바로 확인할 수 있는 한국어 금융 계산기입니다. 대출, 저축, 투자, 예산 점검처럼 돈과 관련된 판단을 할 때 참고용으로 활용할 수 있습니다.`;
+    return `${localizedName}는 금액, 이자율, 기간 같은 값을 입력해 결과를 바로 확인하는 금융 계산기입니다. 대출, 저축, 투자, 예산을 비교할 때 필요한 숫자를 빠르게 확인할 수 있습니다.`;
   }
   if (definition.category === "health") {
-    return `${localizedName}는 몸무게, 키, 나이, 활동량 등 건강 관련 값을 바탕으로 결과를 빠르게 확인할 수 있는 한국어 계산기입니다. 식단, 운동, 건강 관리 계획을 세울 때 참고용으로 활용하기 좋습니다.`;
+    return `${localizedName}는 몸무게, 키, 나이, 활동량 등 건강 관련 값을 입력해 결과를 빠르게 확인하는 계산기입니다. 식단이나 운동 계획을 세울 때 현재 수치를 확인하는 데 활용할 수 있습니다.`;
   }
   if (definition.category === "time-date") {
-    return `${localizedName}는 날짜, 시간, 기간 차이를 빠르게 계산할 수 있는 한국어 도구입니다. 일정 관리, 근무 시간 계산, 마감일 확인 같은 상황에서 바로 활용할 수 있습니다.`;
+    return `${localizedName}는 날짜, 시간, 기간 차이를 빠르게 계산하는 계산기입니다. 일정 관리, 근무 시간 계산, 마감일 확인이 필요할 때 바로 사용할 수 있습니다.`;
   }
   if (definition.category === "math") {
     return `${localizedName}는 수식과 숫자 계산을 빠르게 처리할 수 있는 한국어 수학 계산기입니다. 학습, 검산, 업무용 기초 계산에 활용하기 좋습니다.`;
@@ -949,13 +949,13 @@ function buildKoIntro(definition: CalculatorDefinition, localizedName: string) {
     return `${localizedName}는 ${joined}을 입력해 결과를 바로 확인할 수 있는 금융 계산기입니다. 월 상환액, 총이자, 예상 수익, 예산 규모처럼 실제 돈 관리에 필요한 수치를 빠르게 점검할 수 있습니다.`;
   }
   if (definition.category === "health") {
-    return `${localizedName}는 ${joined}을 바탕으로 건강 관련 수치를 확인하는 계산기입니다. 운동 계획, 식단 관리, 기본 건강 지표 확인 전에 참고용으로 쓰기 좋습니다.`;
+    return `${localizedName}는 ${joined}을 바탕으로 건강 관련 수치를 확인하는 계산기입니다. 운동 계획이나 식단 관리 전에 현재 수치를 확인하는 데 활용할 수 있습니다.`;
   }
   if (definition.category === "time-date") {
-    return `${localizedName}는 ${joined}을 입력해 날짜와 시간 차이를 계산하는 도구입니다. 일정 간격, 남은 기간, 근무 시간처럼 반복해서 계산해야 하는 상황에서 시간을 절약할 수 있습니다.`;
+    return `${localizedName}는 ${joined}을 입력해 날짜와 시간 차이를 계산합니다. 일정 간격, 남은 기간, 근무 시간처럼 반복되는 계산을 빠르게 처리할 수 있습니다.`;
   }
   if (definition.category === "math") {
-    return `${localizedName}는 ${joined}을 바탕으로 수학 결과를 빠르게 계산할 수 있는 도구입니다. 직접 계산한 값을 다시 확인하거나 여러 조건을 비교할 때 활용하기 좋습니다.`;
+    return `${localizedName}는 ${joined}을 바탕으로 수학 결과를 빠르게 계산합니다. 직접 계산한 값을 검산하거나 여러 조건을 비교할 때 유용합니다.`;
   }
   return `${localizedName}는 ${joined}을 기준으로 결과를 계산해주는 온라인 계산기입니다. 빈칸에 값을 넣고 바로 결과를 확인할 수 있도록 간단하게 구성했습니다.`;
 }

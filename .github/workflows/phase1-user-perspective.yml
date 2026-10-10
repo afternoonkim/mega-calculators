@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - scripts/phase1_user_perspective_cleanup.py
+      - scripts/phase1_legacy_user_perspective_cleanup.py
       - .github/workflows/phase1-user-perspective.yml
 
 permissions:
@@ -25,16 +25,17 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Apply user-perspective cleanup
-        run: python scripts/phase1_user_perspective_cleanup.py
+      - name: Apply remaining user-perspective cleanup
+        run: python scripts/phase1_legacy_user_perspective_cleanup.py
 
       - name: Assert internal-facing copy is gone
         run: |
-          ! grep -R "answer search queries" app components
-          ! grep -R "long-tail question" app components
-          ! grep -R "예시 페이지" app/'[locale]'/calculators/'[category]'/'[slug]'/formula/page.tsx
-          ! grep -R "관련 페이지 이동" app/'[locale]'/calculators/'[category]'/'[slug]'/examples/'[example]'/page.tsx
-          ! grep -R "More tools for this calculator" components/calculators/CalculatorEngine.tsx
+          if grep -R "answer search queries" app components; then exit 1; fi
+          if grep -R "long-tail question" app components; then exit 1; fi
+          if grep -R "Continue exploring this calculator cluster" app components; then exit 1; fi
+          if grep -R "예시 페이지" app/'[locale]'/calculators/'[category]'/'[slug]'/formula/page.tsx; then exit 1; fi
+          if grep -R "관련 페이지 이동" app/'[locale]'/calculators/'[category]'/'[slug]'/examples/'[example]'/page.tsx; then exit 1; fi
+          if grep -R "More tools for this calculator" components/calculators/CalculatorEngine.tsx; then exit 1; fi
 
       - name: Install dependencies
         run: npm ci
@@ -51,14 +52,13 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Commit phase 1 cleanup
+      - name: Commit remaining phase 1 cleanup
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/'[locale]'/calculators/'[category]'/'[slug]'/formula/page.tsx \
-                  app/'[locale]'/calculators/'[category]'/'[slug]'/guide/page.tsx \
-                  app/'[locale]'/calculators/'[category]'/'[slug]'/use-cases/page.tsx \
-                  app/'[locale]'/calculators/'[category]'/'[slug]'/examples/'[example]'/page.tsx \
-                  components/calculators/CalculatorEngine.tsx
-          git commit -m "ux: rewrite calculator support copy for users"
+          git add app/calculators/'[category]'/'[slug]'/formula/page.tsx \
+                  app/calculators/'[category]'/'[slug]'/guide/page.tsx \
+                  app/calculators/'[category]'/'[slug]'/use-cases/page.tsx \
+                  app/calculators/'[category]'/'[slug]'/examples/'[example]'/page.tsx
+          git commit -m "ux: remove internal copy from legacy calculator routes"
           git push

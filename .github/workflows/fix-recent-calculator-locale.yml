@@ -1,0 +1,64 @@
+name: Fix recent calculator locale
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/fix-recent-calculator-locale.py"
+      - ".github/workflows/fix-recent-calculator-locale.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Apply recent calculator locale fix
+        run: python scripts/fix-recent-calculator-locale.py
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Test
+        run: npm test
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit functional change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            lib/calculators/recent.ts \
+            lib/calculators/recent.test.ts \
+            components/calculators/RecentCalculators.tsx \
+            components/calculators/CalculatorEngine.tsx \
+            'app/[locale]/page.tsx'
+          if git diff --cached --quiet; then
+            echo "No functional changes to commit"
+            exit 0
+          fi
+          git commit -m "fix: isolate recent calculator names by locale"
+          git push origin HEAD:main

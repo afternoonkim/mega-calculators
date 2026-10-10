@@ -228,19 +228,19 @@ const uiDirectMap: Record<string, string> = {
   "More tools for this calculator": "이 계산기와 함께 보면 좋은 페이지",
   "Formula": "공식",
   "Guide": "가이드",
-  "Use cases": "활용 사례",
+  "Use cases": "사용 예시",
   "Examples": "예시",
   "Open example →": "예시 보기 →",
   "View formula →": "공식 보기 →",
   "Read guide →": "가이드 보기 →",
-  "See use cases →": "활용 사례 보기 →",
+  "See use cases →": "사용 예시 보기 →",
   "About this calculator": "계산기 안내",
   "How this calculator works": "계산 방식 안내",
   "How to use it": "사용 방법",
   "Example": "예시",
   "Related calculators": "관련 계산기",
   "Open calculator →": "계산기 열기 →",
-  "Calculator results are provided for planning and educational purposes. For taxes, legal decisions, lending, or medical advice, verify the numbers with an official source or qualified professional.": "계산 결과는 계획 수립과 학습용 참고 자료입니다. 세금, 법률, 대출, 의료처럼 중요한 판단이 필요한 경우에는 공식 자료나 전문가와 함께 다시 확인하세요.",
+  "Calculator results are provided for planning and educational purposes. For taxes, legal decisions, lending, or medical advice, verify the numbers with an official source or qualified professional.": "계산 결과는 계획을 세우거나 학습할 때 참고하는 자료입니다. 세금, 법률, 대출, 의료처럼 중요한 판단이 필요한 경우에는 공식 자료나 전문가와 함께 다시 확인하세요.",
   "No matching calculators found. Try words like mortgage, calorie, GPA, discount, or converter.": "검색 결과가 없습니다. 대출, 칼로리, 학점, 할인, 변환기 같은 단어로 다시 검색해보세요.",
   "Calculators": "계산기",
   "Home": "홈",
@@ -333,7 +333,7 @@ const uiDirectMap: Record<string, string> = {
   "Factorial": "팩토리얼",
   "Read the guide": "가이드 보기",
   "Read guide": "가이드 보기",
-  "See use cases": "활용 사례 보기",
+  "See use cases": "사용 예시 보기",
   "View formula": "공식 보기",
   "Mega Calculators": "Mega Calculators",
 };
@@ -747,13 +747,13 @@ const longSentenceMap: Record<string, string> = {
   "This comparison is intentionally simplified. It does not include home appreciation, maintenance, taxes, insurance, or investment returns on cash.": "이 비교는 이해를 돕기 위한 단순 비교입니다. 주택 가격 상승, 유지보수비, 세금, 보험료, 현금 투자 수익 등은 포함하지 않습니다.",
   "Compare multiple scenarios before making a borrowing, saving, or investing decision.": "대출, 저축, 투자 결정을 내리기 전에 여러 조건을 비교해볼 수 있습니다.",
   "Build a quick monthly budget around the result shown by this calculator.": "계산 결과를 기준으로 월간 예산을 빠르게 정리할 수 있습니다.",
-  "Use the output as a planning estimate before reviewing a lender, broker, or financial institution quote.": "금융기관 조건을 검토하기 전에 예상 금액을 미리 확인하는 데 활용할 수 있습니다.",
+  "Use the output as a planning estimate before reviewing a lender, broker, or financial institution quote.": "금융기관 조건을 검토하기 전에 예상 금액을 미리 확인할 수 있습니다.",
   "Test how changes in rate, term, contribution, or starting balance affect the long-term result.": "금리, 기간, 납입액, 시작 금액이 달라질 때 결과가 어떻게 바뀌는지 비교할 수 있습니다.",
-  "Use the result as a practical starting point before talking to a physician, dietitian, or coach.": "의사, 영양사, 코치와 상담하기 전에 현재 수치를 정리하는 데 활용할 수 있습니다.",
+  "Use the result as a practical starting point before talking to a physician, dietitian, or coach.": "의사, 영양사, 코치와 상담하기 전에 현재 수치를 정리해볼 수 있습니다.",
   "Test different assumptions to understand how small changes can affect the final estimate.": "가정을 바꿔보면서 작은 변화가 최종 결과에 어떤 영향을 주는지 확인할 수 있습니다.",
   "Estimate time gaps quickly when planning birthdays, schedules, deadlines, or work blocks.": "생일, 일정, 마감일, 근무 시간을 계획할 때 시간 차이를 빠르게 확인할 수 있습니다.",
   "Double-check a date or time calculation without opening a spreadsheet.": "스프레드시트를 열지 않아도 날짜와 시간 계산을 빠르게 다시 확인할 수 있습니다.",
-  "Use the result to compare multiple calendar or schedule scenarios side by side.": "여러 일정을 나란히 비교할 때 활용할 수 있습니다.",
+  "Use the result to compare multiple calendar or schedule scenarios side by side.": "여러 일정을 나란히 비교할 때 유용합니다.",
   "Turn a manual time calculation into a reusable workflow for everyday planning.": "반복적인 시간 계산을 일상 계획에 바로 쓸 수 있는 방식으로 바꿔줍니다.",
   "Run quick what-if scenarios before using a more advanced analytics tool.": "더 복잡한 분석 도구를 쓰기 전에 간단한 가정 비교를 해볼 수 있습니다.",
   "Translate a written problem into a clear numeric answer with less manual work.": "서술형 문제를 숫자 결과로 빠르게 바꿔 확인할 수 있습니다.",
@@ -762,7 +762,7 @@ const longSentenceMap: Record<string, string> = {
   "Use the converter while shopping, cooking, traveling, or comparing product specifications.": "쇼핑, 요리, 여행, 제품 사양 비교 상황에서 바로 사용할 수 있습니다.",
   "Quickly verify measurements copied from another website, document, or spreadsheet.": "다른 사이트나 문서에서 가져온 수치를 빠르게 다시 확인할 수 있습니다.",
   "Reduce manual conversion mistakes when moving between systems or standards.": "단위 체계가 바뀔 때 생기기 쉬운 실수를 줄여줍니다.",
-  "Use the output as a fast reference while making a practical real-world decision.": "실생활에서 결정을 내릴 때 빠른 참고 수치로 활용할 수 있습니다.",
+  "Use the output as a fast reference while making a practical real-world decision.": "실생활에서 결정을 내릴 때 대략적인 수치를 빠르게 확인할 수 있습니다.",
   "Save time on repetitive calculations that would otherwise be done by hand.": "손으로 반복 계산하던 시간을 줄일 수 있습니다.",
   "This estimate includes principal and interest only. Property taxes, homeowners insurance, HOA fees, and PMI can increase the real payment.": "이 계산은 원금과 이자만 반영한 참고값입니다. 재산세, 주택 보험료, 관리비, PMI가 포함되면 실제 상환액은 더 커질 수 있습니다.",
   "The payment is not large enough to reduce the balance after interest.": "현재 상환액으로는 이자를 제외한 원금이 줄지 않습니다.",
@@ -934,7 +934,7 @@ function buildKoDescription(definition: CalculatorDefinition, localizedName: str
     return `${localizedName}는 날짜, 시간, 기간 차이를 빠르게 계산하는 계산기입니다. 일정 관리, 근무 시간 계산, 마감일 확인이 필요할 때 바로 사용할 수 있습니다.`;
   }
   if (definition.category === "math") {
-    return `${localizedName}는 수식과 숫자 계산을 빠르게 처리할 수 있는 한국어 수학 계산기입니다. 학습, 검산, 업무용 기초 계산에 활용하기 좋습니다.`;
+    return `${localizedName}는 수식과 숫자 계산을 빠르게 처리할 수 있는 계산기입니다. 학습, 검산, 업무용 기초 계산이 필요할 때 유용합니다.`;
   }
   return `${localizedName}는 필요한 값만 입력하면 결과를 바로 확인할 수 있는 한국어 온라인 계산기입니다. 모바일과 PC 모두에서 쉽고 빠르게 사용할 수 있습니다.`;
 }

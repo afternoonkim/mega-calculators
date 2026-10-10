@@ -24,7 +24,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
       <div className="mt-8 space-y-8 text-sm leading-7 text-slate-600 md:text-base">
         <section>
           <h2 className="text-2xl font-bold text-slate-900">1. {isKo ? "개요" : "Overview"}</h2>
-          <p className="mt-3">{isKo ? "Mega Calculators는 무료 온라인 계산기 및 정보 콘텐츠 사이트입니다. 이 문서는 사이트 이용 중 수집될 수 있는 정보, 활용 방식, 이용자의 선택권을 설명합니다." : "Mega Calculators is a free online calculator and content website. This policy explains what information may be collected when you use the site, how that information may be used, and what choices may be available to you."}</p>
+          <p className="mt-3">{isKo ? "Mega Calculators는 무료 온라인 계산기와 관련 안내를 제공하는 사이트입니다. 이 문서는 사이트 이용 중 수집될 수 있는 정보, 사용 방식, 이용자의 선택권을 설명합니다." : "Mega Calculators is a free online calculator and content website. This policy explains what information may be collected when you use the site, how that information may be used, and what choices may be available to you."}</p>
         </section>
         <section>
           <h2 className="text-2xl font-bold text-slate-900">2. {isKo ? "수집될 수 있는 정보" : "Information we may collect"}</h2>
@@ -48,8 +48,8 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
           </div>
         </section>
         <section>
-          <h2 className="text-2xl font-bold text-slate-900">5. {isKo ? "정보 활용 목적" : "How information may be used"}</h2>
-          <p className="mt-3">{isKo ? "운영, 문의 대응, 계산기와 콘텐츠 개선, 성과 분석, 악용 방지, 광고 지원을 위해 정보가 활용될 수 있습니다." : "Information may be used to operate the website, respond to messages, improve calculators and content, analyze performance, prevent abuse, and support advertising."}</p>
+          <h2 className="text-2xl font-bold text-slate-900">5. {isKo ? "정보를 사용하는 목적" : "How information may be used"}</h2>
+          <p className="mt-3">{isKo ? "사이트 운영, 문의 대응, 계산기와 설명 개선, 이용 현황 분석, 악용 방지, 광고 제공을 위해 정보가 사용될 수 있습니다." : "Information may be used to operate the website, respond to messages, improve calculators and content, analyze performance, prevent abuse, and support advertising."}</p>
         </section>
         <section>
           <h2 className="text-2xl font-bold text-slate-900">6. {isKo ? "정보 공유" : "Data sharing"}</h2>

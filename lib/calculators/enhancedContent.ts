@@ -38,13 +38,13 @@ function guideLinks(locale: Locale, slug: string, category: string): EnhancedCal
   }
   if (category === "time") {
     return [
-      { title: isKo ? "날짜와 시간 계산 활용법" : "Use date and time calculators for schedules", description: isKo ? "나이, 기간, 근무시간, 마감일을 헷갈리지 않게 계산하는 방법입니다." : "A guide for turning dates, ages, and work hours into clearer schedule decisions.", href: "/guides/date-calculator-for-schedules", cta: isKo ? "일정 계산 가이드 보기 →" : "Plan schedules →" },
-      { title: isKo ? "일상 속 퍼센트와 날짜 계산" : "Everyday percent and date calculators", description: isKo ? "할인율, 날짜 차이, 근무 시간처럼 자주 쓰는 계산 상황을 모았습니다." : "Common everyday situations where quick percentage and date math helps.", href: "/blog/everyday-percent-and-date-calculators", cta: isKo ? "활용 예시 보기 →" : "See examples →" },
+      { title: isKo ? "날짜와 시간 계산 방법" : "Use date and time calculators for schedules", description: isKo ? "나이, 기간, 근무시간, 마감일을 헷갈리지 않게 계산하는 방법입니다." : "A guide for turning dates, ages, and work hours into clearer schedule decisions.", href: "/guides/date-calculator-for-schedules", cta: isKo ? "일정 계산 가이드 보기 →" : "Plan schedules →" },
+      { title: isKo ? "일상 속 퍼센트와 날짜 계산" : "Everyday percent and date calculators", description: isKo ? "할인율, 날짜 차이, 근무 시간처럼 자주 쓰는 계산 상황을 모았습니다." : "Common everyday situations where quick percentage and date math helps.", href: "/blog/everyday-percent-and-date-calculators", cta: isKo ? "사용 예시 보기 →" : "See examples →" },
     ];
   }
   return [
     { title: isKo ? "계산기 결과를 비교하는 방법" : "How to compare calculator results", description: isKo ? "입력값을 조금씩 바꿔 여러 결과를 비교하면 숫자의 의미를 더 쉽게 이해할 수 있습니다." : "Test more than one input set so the final number is easier to understand.", href: "/blog/how-to-compare-calculator-results", cta: isKo ? "비교 방법 보기 →" : "Read article →" },
-    { title: isKo ? `${localizeCategoryName(category, locale)} 활용 가이드` : `${localizeCategoryName(category, locale)} guide`, description: isKo ? "비슷한 계산기를 함께 사용하면 결과를 다른 관점에서 비교할 수 있습니다." : "Use related calculators to compare the same question from another angle.", href: `/calculators/${category}`, cta: isKo ? "관련 계산기 보기 →" : "Browse related tools →" },
+    { title: isKo ? `${localizeCategoryName(category, locale)} 함께 보기` : `${localizeCategoryName(category, locale)} guide`, description: isKo ? "비슷한 계산기를 함께 사용하면 결과를 다른 관점에서 비교할 수 있습니다." : "Use related calculators to compare the same question from another angle.", href: `/calculators/${category}`, cta: isKo ? "관련 계산기 보기 →" : "Browse related tools →" },
   ];
 }
 

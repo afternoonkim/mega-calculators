@@ -8,7 +8,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: isKo ? "소개" : "About",
     description: isKo
-      ? "Mega Calculators에서 어떤 계산기를 이용할 수 있는지, 누구에게 도움이 되는지, 결과를 어떻게 활용하면 좋은지 소개합니다."
+      ? "Mega Calculators에서 어떤 계산기를 이용할 수 있는지, 누구에게 도움이 되는지, 결과를 어떻게 이해하면 좋은지 소개합니다."
       : "See what you can do with Mega Calculators, who it is built for, and how to get the most out of every calculator page.",
     alternates: {
       canonical: `/${locale}/about`,
@@ -40,10 +40,10 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           </div>
         </article>
         <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-          <h2 className="text-2xl font-bold text-slate-900">{isKo ? "페이지를 이렇게 활용해보세요" : "How to get the most out of each page"}</h2>
+          <h2 className="text-2xl font-bold text-slate-900">{isKo ? "계산 결과를 더 잘 이해하려면" : "How to get the most out of each page"}</h2>
           <div className="mt-4 space-y-4 text-sm leading-7 text-slate-600 md:text-base">
             <p>{isKo ? "표준 공식을 바탕으로 입력 칸을 단순하게 구성했기 때문에, 값을 입력하면 결과가 바로 나옵니다. 결과 아래의 짧은 설명을 함께 보면 숫자의 의미도 더 쉽게 이해할 수 있어요." : "Forms are kept short and based on standard formulas, so you can fill in the values and get the result right away. Reading the short explanation under the result helps you interpret the number more confidently."}</p>
-            <p>{isKo ? "결과는 교육과 일반 참고용입니다. 세금, 대출, 보험, 의료, 법률처럼 공식적인 판단이 필요한 주제라면, 공식 자료나 전문가와 함께 한 번 더 확인하시는 것이 안전합니다." : "Treat the output as planning and educational guidance. For lending, tax, insurance, medical, or legal decisions, double-check the result with an official source or a qualified professional before you act on it."}</p>
+            <p>{isKo ? "결과는 학습이나 간단한 비교에 참고하는 용도입니다. 세금, 대출, 보험, 의료, 법률처럼 공식적인 판단이 필요한 주제라면, 공식 자료나 전문가와 함께 한 번 더 확인하시는 것이 안전합니다." : "Treat the output as planning and educational guidance. For lending, tax, insurance, medical, or legal decisions, double-check the result with an official source or a qualified professional before you act on it."}</p>
           </div>
         </article>
       </section>

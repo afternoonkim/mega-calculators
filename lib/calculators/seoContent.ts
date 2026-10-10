@@ -357,7 +357,7 @@ const koContent: Record<string, CalculatorSeoContent> = {
       { title: "목표 금액 달성 시점 비교", description: "기간을 바꾸거나 적립액을 바꿔서 목표 달성 가능성을 더 현실적으로 볼 수 있습니다." },
     ],
     relatedContentTitle: "관련 글과 가이드",
-    relatedContentIntro: "계산 결과를 실제 판단으로 연결할 때는 아래 콘텐츠를 같이 보면 더 도움이 됩니다.",
+    relatedContentIntro: "계산 결과를 실제 판단으로 연결할 때는 아래 글과 가이드를 같이 보면 더 도움이 됩니다.",
     relatedContent: [
       { title: "대출 계산기와 주담대 계산기 차이 쉽게 이해하기", description: "투자 성장과 대출 비용을 함께 비교해야 할 때 읽기 좋은 글입니다.", href: "/blog/loan-calculator-vs-mortgage-calculator", cta: "글 보기 →" },
       { title: "주담대 계산기 사용 전 꼭 확인할 5가지", description: "큰 금융 결정을 앞두고 월 부담과 총비용을 같이 보는 방법을 정리한 가이드입니다.", href: "/guides/mortgage-calculator-checklist", cta: "가이드 보기 →" },
@@ -397,7 +397,7 @@ const koContent: Record<string, CalculatorSeoContent> = {
       { title: "대환대출 현실 점검", description: "현재 부담과 새 조건을 비교해서 대환의 실익이 있는지 살펴볼 수 있습니다." },
     ],
     relatedContentTitle: "같이 보면 좋은 글과 가이드",
-    relatedContentIntro: "월 납입액만 보는 것보다 아래 콘텐츠와 함께 비교하면 판단이 더 쉬워집니다.",
+    relatedContentIntro: "월 납입액만 보는 것보다 아래 글과 함께 비교하면 판단이 더 쉬워집니다.",
     relatedContent: [
       { title: "대출 계산기와 주담대 계산기 차이 쉽게 이해하기", description: "일반 대출 계산기와 주담대 계산기를 언제 구분해서 써야 하는지 설명하는 글입니다.", href: "/blog/loan-calculator-vs-mortgage-calculator", cta: "글 보기 →" },
       { title: "주담대 계산기 사용 전 꼭 확인할 5가지", description: "예산, 금리, 상환방식 순서로 주담대 결과를 읽는 체크리스트입니다.", href: "/guides/mortgage-calculator-checklist", cta: "가이드 보기 →" },
@@ -437,7 +437,7 @@ const koContent: Record<string, CalculatorSeoContent> = {
       { title: "생활 패턴 점검", description: "BMI 수치를 계기로 활동량이나 식습관을 다시 살펴볼 필요가 있는지 판단할 수 있습니다." },
     ],
     relatedContentTitle: "같이 보면 좋은 글과 가이드",
-    relatedContentIntro: "BMI를 숫자 하나로 끝내지 않고 더 넓게 이해하고 싶다면 아래 콘텐츠를 함께 보세요.",
+    relatedContentIntro: "BMI를 숫자 하나로 끝내지 않고 더 넓게 이해하고 싶다면 아래 글과 가이드를 함께 보세요.",
     relatedContent: [
       { title: "BMI 계산기는 언제 참고하면 좋을까", description: "BMI를 어디까지 참고하고 어떤 경우에 보조 지표가 필요한지 설명하는 글입니다.", href: "/blog/when-bmi-calculator-is-useful", cta: "글 보기 →" },
       { title: "칼로리 계산 결과를 해석하는 방법", description: "BMI 결과 이후 식단과 활동량을 어떻게 연결해볼지 정리한 가이드입니다.", href: "/guides/how-to-read-calorie-results", cta: "가이드 보기 →" },
@@ -477,7 +477,7 @@ const koContent: Record<string, CalculatorSeoContent> = {
       { title: "서류 기입 확인", description: "정확한 나이가 필요한 문서 작성이나 기록 확인에 도움이 됩니다." },
     ],
     relatedContentTitle: "같이 보면 좋은 글과 가이드",
-    relatedContentIntro: "나이 계산에서 더 넓은 일정 계산으로 넘어가고 싶다면 아래 콘텐츠를 함께 보세요.",
+    relatedContentIntro: "나이 계산에서 더 넓은 일정 계산으로 넘어가고 싶다면 아래 글과 가이드를 함께 보세요.",
     relatedContent: [
       { title: "퍼센트와 날짜 계산기를 일상에서 쓰는 방법", description: "일상 속 날짜·퍼센트 계산 사례를 묶어 설명한 글입니다.", href: "/blog/everyday-percent-and-date-calculators", cta: "글 보기 →" },
       { title: "날짜 차이 계산기로 일정 계산하기", description: "기준일, 마감일, 일정 계획까지 연결해서 보는 방법을 정리한 가이드입니다.", href: "/guides/date-calculator-for-schedules", cta: "가이드 보기 →" },
@@ -517,7 +517,7 @@ const koContent: Record<string, CalculatorSeoContent> = {
       { title: "성적·실적 변화 확인", description: "얼마나 좋아졌는지 혹은 줄었는지 비율로 보면서 변화의 크기를 판단할 수 있습니다." },
     ],
     relatedContentTitle: "같이 보면 좋은 글과 가이드",
-    relatedContentIntro: "퍼센트 계산을 일상 속 다른 계산과 함께 쓰고 싶다면 아래 콘텐츠가 도움이 됩니다.",
+    relatedContentIntro: "퍼센트 계산을 일상 속 다른 계산과 함께 쓰고 싶다면 아래 글과 가이드가 도움이 됩니다.",
     relatedContent: [
       { title: "퍼센트와 날짜 계산기를 일상에서 쓰는 방법", description: "할인율, 날짜 차이, 근무 시간처럼 자주 쓰는 예시를 모은 글입니다.", href: "/blog/everyday-percent-and-date-calculators", cta: "글 보기 →" },
       { title: "날짜 차이 계산기로 일정 계산하기", description: "퍼센트 계산과 함께 일정 계획이나 마감일 계산이 필요할 때 참고하기 좋은 가이드입니다.", href: "/guides/date-calculator-for-schedules", cta: "가이드 보기 →" },
@@ -619,7 +619,7 @@ function buildFallbackCalculatorSeoContent(
       }))
     : [categoryContent.blog[locale], categoryContent.guide[locale]].map((item) => ({
         ...item,
-        cta: isKo ? "콘텐츠 보기 →" : "Open article →",
+        cta: isKo ? "관련 글 보기 →" : "Open article →",
       }));
 
   return {
@@ -685,9 +685,9 @@ function buildFallbackCalculatorSeoContent(
           { title: "Short-term vs. long-term comparison", description: `If time is part of the formula, test a shorter and longer case to see whether duration changes the answer more than expected.` },
           { title: "Pre-decision reality check", description: `Before you act on the result, compare it with the official conditions, fee structure, or deadline rules that apply in real life.` },
         ],
-    relatedContentTitle: isKo ? "같이 보면 좋은 콘텐츠" : "Related guides and articles",
+    relatedContentTitle: isKo ? "같이 보면 좋은 글과 가이드" : "Related guides and articles",
     relatedContentIntro: isKo
-      ? `이 계산기를 더 실용적으로 활용하려면 아래 글과 가이드를 함께 확인해보세요. 계산 결과를 실제 판단으로 연결하는 데 도움이 됩니다.`
+      ? `이 계산기를 더 유용하게 사용하려면 아래 글과 가이드를 함께 확인해보세요. 계산 결과를 실제 판단으로 연결하는 데 도움이 됩니다.`
       : `Use these supporting pages when you want more context than a single result can provide. They help connect the number to a more practical decision.`,
     relatedContent: relatedArticles,
   };

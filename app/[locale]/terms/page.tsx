@@ -24,11 +24,11 @@ export default async function TermsPage({ params }: { params: Promise<{ locale: 
       <div className="mt-8 space-y-8 text-sm leading-7 text-slate-600 md:text-base">
         <section>
           <h2 className="text-2xl font-bold text-slate-900">1. {isKo ? "일반 이용" : "General use"}</h2>
-          <p className="mt-3">{isKo ? "Mega Calculators는 일반 정보, 교육, 계획 수립을 위한 사이트입니다. 사이트를 이용하면 합법적이고 책임 있는 방식으로 사용하는 데 동의한 것으로 봅니다." : "Mega Calculators is provided for general informational, educational, and planning purposes. By using the site, you agree to use it lawfully and responsibly."}</p>
+          <p className="mt-3">{isKo ? "Mega Calculators는 일반 정보 확인, 학습, 계획을 돕기 위한 사이트입니다. 사이트를 이용하면 합법적이고 책임 있는 방식으로 사용하는 데 동의한 것으로 봅니다." : "Mega Calculators is provided for general informational, educational, and planning purposes. By using the site, you agree to use it lawfully and responsibly."}</p>
         </section>
         <section>
           <h2 className="text-2xl font-bold text-slate-900">2. {isKo ? "전문 자문 아님" : "No professional advice"}</h2>
-          <p className="mt-3">{isKo ? "계산기 결과와 텍스트 콘텐츠는 법률, 세금, 금융, 회계, 대출, 보험, 의료 자문이 아닙니다. 중요한 결정은 공식 자료나 전문가 확인이 필요합니다." : "Calculator outputs and written content do not constitute legal, tax, financial, accounting, lending, insurance, or medical advice. Important decisions should be verified with official sources or qualified professionals."}</p>
+          <p className="mt-3">{isKo ? "계산 결과와 사이트의 설명·글은 법률, 세금, 금융, 회계, 대출, 보험, 의료 자문이 아닙니다. 중요한 결정은 공식 자료나 전문가 확인이 필요합니다." : "Calculator outputs and written content do not constitute legal, tax, financial, accounting, lending, insurance, or medical advice. Important decisions should be verified with official sources or qualified professionals."}</p>
         </section>
         <section>
           <h2 className="text-2xl font-bold text-slate-900">3. {isKo ? "정확성과 서비스 제공" : "Accuracy and availability"}</h2>

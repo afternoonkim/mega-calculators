@@ -27,7 +27,7 @@ export default function CalculatorSeoContent({ definition, locale, relatedLinks 
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
           <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
             <div>
-              <div className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">{locale === "ko" ? "실전 활용" : "Practical use"}</div>
+              <div className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">{locale === "ko" ? "이럴 때 유용해요" : "Practical use"}</div>
               <h2 className="mt-4 text-2xl font-bold text-slate-900">{enhanced.whenToUseTitle}</h2>
               <div className="mt-4 space-y-3 text-sm leading-7 text-slate-600 md:text-base">{enhanced.whenToUse.map((item) => <p key={item}>{item}</p>)}</div>
             </div>
@@ -63,7 +63,7 @@ export default function CalculatorSeoContent({ definition, locale, relatedLinks 
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <div>
             <div className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
-              {locale === "ko" ? "활용 가이드" : "Planning guide"}
+              {locale === "ko" ? "계산 전에 확인하세요" : "Planning guide"}
             </div>
             <h2 className="mt-4 text-2xl font-bold text-slate-900">{content.audienceTitle}</h2>
             <p className="mt-4 text-sm leading-7 text-slate-600 md:text-base">{content.audienceIntro}</p>

@@ -63,7 +63,7 @@ function bmiInterpretation(ctx: InterpretationContext): string {
         : diff < 0
           ? `표준체중(BMI 22 기준 약 ${idealWeight}kg)보다 약 ${Math.abs(diff)}kg 정도 적은 편이에요.`
           : `표준체중(BMI 22 기준 약 ${idealWeight}kg)과 거의 같은 수준이에요.`;
-    return `키 ${height}cm, 몸무게 ${weight}kg일 때 BMI는 약 ${bmi.toFixed(1)}로 대한비만학회 기준 "${category}" 범위에 들어가요. ${direction} BMI는 빠른 참고용이라 근육량·체지방률·허리둘레까지 함께 보시는 게 더 정확합니다.`;
+    return `키 ${height}cm, 몸무게 ${weight}kg일 때 BMI는 약 ${bmi.toFixed(1)}로 대한비만학회 기준 "${category}" 범위에 들어가요. ${direction} BMI는 대략적인 확인용 지표라 근육량·체지방률·허리둘레까지 함께 보는 게 더 정확합니다.`;
   }
   const category = bmiCategoryEn(bmi);
   const idealLbs = Math.round(22 * (height / 100) ** 2 * 2.20462);
@@ -86,7 +86,7 @@ function loanInterpretation(ctx: InterpretationContext): string {
   const totalPaid = monthly * years * 12;
   const totalInterest = totalPaid - amount;
   if (ctx.locale === "ko") {
-    return `${fmtKrwApprox(amount)} 원금을 연 ${rate}% 금리로 ${years}년 동안 원리금균등 상환하시면 매달 약 ${fmtKrwApprox(Math.round(monthly))}을 내시게 돼요. ${years}년 동안 갚으시는 총금액은 약 ${fmtKrwApprox(Math.round(totalPaid))}이고 이 중 이자만 ${fmtKrwApprox(Math.round(totalInterest))} 수준입니다. 실제 은행 한도와 우대금리는 DSR·신용등급에 따라 달라지니 참고용으로 활용하세요.`;
+    return `${fmtKrwApprox(amount)} 원금을 연 ${rate}% 금리로 ${years}년 동안 원리금균등 상환하시면 매달 약 ${fmtKrwApprox(Math.round(monthly))}을 내시게 돼요. ${years}년 동안 갚으시는 총금액은 약 ${fmtKrwApprox(Math.round(totalPaid))}이고 이 중 이자만 ${fmtKrwApprox(Math.round(totalInterest))} 수준입니다. 실제 은행 한도와 우대금리는 DSR·신용등급에 따라 달라지니 대략적인 비교에만 참고하세요.`;
   }
   return `Borrowing ${fmtUsd(amount)} at ${rate}% over ${years} year${years === 1 ? "" : "s"} produces a monthly payment of about ${fmtUsd(Math.round(monthly))}. Across the full term you'll pay roughly ${fmtUsd(Math.round(totalPaid))} total, with ${fmtUsd(Math.round(totalInterest))} of that going to interest. Your actual lender quote will reflect your credit score, fees, and any prepayment penalties.`;
 }

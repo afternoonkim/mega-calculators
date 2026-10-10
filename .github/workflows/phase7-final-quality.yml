@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/phase7-final-quality.yml
       - scripts/phase7_quality_finish.py
+      - scripts/phase7_fix_datediff.py
 
 permissions:
   contents: write
@@ -28,6 +29,9 @@ jobs:
       - name: Apply final quality fixes
         run: python scripts/phase7_quality_finish.py
 
+      - name: Guard invalid date differences
+        run: python scripts/phase7_fix_datediff.py
+
       - name: Use ESM Vitest config
         run: |
           if [ -f vitest.config.ts ]; then mv vitest.config.ts vitest.config.mts; fi
@@ -38,10 +42,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Security audit
-        id: audit
+      - name: Full dependency audit report
         continue-on-error: true
         run: npm audit --audit-level=high
+
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Test
         run: npm test

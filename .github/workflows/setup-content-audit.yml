@@ -4,7 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - "scripts/setup-content-audit.py"
+      - "scripts/audit-content.mjs"
+      - "package.json"
       - ".github/workflows/setup-content-audit.yml"
 
 permissions:
@@ -25,21 +26,8 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Prepare persistent content audit
-        run: |
-          set +e
-          python scripts/setup-content-audit.py > /tmp/setup-content-audit.log 2>&1
-          status=$?
-          cat /tmp/setup-content-audit.log
-          if [ "$status" -ne 0 ]; then
-            cp /tmp/setup-content-audit.log scripts/setup-content-audit-error.log
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add scripts/setup-content-audit-error.log
-            git commit -m "chore: capture content audit setup error"
-            git push origin HEAD:main
-            exit "$status"
-          fi
+      - name: Create reviewed legacy baseline
+        run: npm run audit:content:baseline
 
       - name: Install dependencies
         run: npm ci
@@ -62,14 +50,14 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Commit content audit foundation
+      - name: Commit reviewed baseline
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json scripts/audit-content.mjs scripts/content-audit-baseline.json
+          git add scripts/content-audit-baseline.json
           if git diff --cached --quiet; then
-            echo "No functional changes to commit"
+            echo "No baseline changes to commit"
             exit 0
           fi
-          git commit -m "chore: add baseline-aware content audit gate"
+          git commit -m "chore: record legacy content audit baseline"
           git push origin HEAD:main

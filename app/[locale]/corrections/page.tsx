@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const page = getTrustPage(locale, PAGE_SLUG);
   const canonical = `${SITE_URL}/${locale}/${PAGE_SLUG}`;
   return {
-    title: `${page.title} | Mega Calculators`, description: page.description,
+    title: page.title, description: page.description,
     alternates: { canonical, languages: { en: `${SITE_URL}/en/${PAGE_SLUG}`, ko: `${SITE_URL}/ko/${PAGE_SLUG}`, "x-default": `${SITE_URL}/en/${PAGE_SLUG}` } },
     openGraph: { title: page.title, description: page.description, url: canonical, siteName: "Mega Calculators", locale: locale === "ko" ? "ko_KR" : "en_US", alternateLocale: locale === "ko" ? ["en_US"] : ["ko_KR"], type: "website", images: [{ url: `/opengraph-image?locale=${locale}`, width: 1200, height: 630 }] },
     twitter: { card: "summary_large_image", title: page.title, description: page.description, images: [`/opengraph-image?locale=${locale}`] },

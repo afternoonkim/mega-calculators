@@ -346,6 +346,33 @@ function computeCalculatorRaw(definition: CalculatorDefinition, values: Values, 
       };
     }
     case "expression": {
+      if (definition.slug === "paycheck-calculator" || definition.slug === "biweekly-paycheck-calculator") {
+        const grossAnnual = Math.max(num(values.grossAnnual), 0);
+        const preTax = Math.min(Math.max(num(values.annualPreTaxDeductions), 0), grossAnnual);
+        const taxableAnnual = Math.max(grossAnnual - preTax, 0);
+        const estimatedTax = taxableAnnual * Math.min(Math.max(num(values.taxRate), 0), 100) / 100;
+        const postTax = Math.max(num(values.annualPostTaxDeductions), 0);
+        const payPeriods = definition.slug === "biweekly-paycheck-calculator"
+          ? 26
+          : Math.max(Math.round(num(values.payPeriods)), 1);
+        const annualTakeHome = Math.max(grossAnnual - preTax - estimatedTax - postTax, 0);
+        const takeHomePerPaycheck = annualTakeHome / payPeriods;
+        const grossPerPaycheck = grossAnnual / payPeriods;
+        const deductionsPct = grossAnnual > 0 ? ((grossAnnual - annualTakeHome) / grossAnnual) * 100 : 0;
+        return {
+          primary: { label: "Estimated take-home pay per paycheck", value: currency(takeHomePerPaycheck, locale) },
+          secondary: [
+            { label: "Gross pay per paycheck", value: currency(grossPerPaycheck, locale) },
+            { label: "Pre-tax deductions per paycheck", value: currency(preTax / payPeriods, locale) },
+            { label: "Estimated tax per paycheck", value: currency(estimatedTax / payPeriods, locale) },
+            { label: "Post-tax deductions per paycheck", value: currency(postTax / payPeriods, locale) },
+            { label: "Estimated annual take-home pay", value: currency(annualTakeHome, locale) },
+            { label: "Estimated total deduction rate", value: percent(deductionsPct, 2, locale) },
+          ],
+          note: "This uses an effective tax-rate estimate, not federal/state withholding tables. Compare the result with your pay stub or payroll provider for exact withholding.",
+        };
+      }
+
       const result = evaluateNumericExpression(definition.expr || "0", values);
 
       if (definition.slug === "dividend-yield-calculator") {
@@ -508,22 +535,35 @@ function computeCalculatorRaw(definition: CalculatorDefinition, values: Values, 
       };
     }
     case "mortgagePayment": {
-      const homePrice = num(values.homePrice);
-      const downPayment = num(values.downPayment);
+      const homePrice = Math.max(num(values.homePrice), 0);
+      const downPayment = Math.min(Math.max(num(values.downPayment), 0), homePrice);
       const amount = Math.max(homePrice - downPayment, 0);
-      const annualRate = num(values.annualRate) / 100;
+      const annualRate = Math.max(num(values.annualRate), 0) / 100;
       const months = positiveMonths(num(values.years));
       const monthlyRate = annualRate / 12;
-      const monthlyPayment = monthlyRate === 0 ? amount / months : (amount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
-      const totalPaid = monthlyPayment * months;
+      const principalAndInterest = monthlyRate === 0
+        ? amount / months
+        : amount * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+      const downPct = homePrice > 0 ? (downPayment / homePrice) * 100 : 0;
+      const propertyTax = homePrice * Math.max(num(values.propertyTaxRate), 0) / 100 / 12;
+      const homeownersInsurance = Math.max(num(values.annualInsurance), 0) / 12;
+      const hoa = Math.max(num(values.monthlyHoa), 0);
+      const pmi = downPct < 20 ? amount * Math.max(num(values.annualPmiRate), 0) / 100 / 12 : 0;
+      const monthlyHousingCost = principalAndInterest + propertyTax + homeownersInsurance + hoa + pmi;
+      const totalInterest = principalAndInterest * months - amount;
       return {
-        primary: { label: "Estimated monthly mortgage", value: currency(monthlyPayment, locale) },
+        primary: { label: "Estimated monthly housing cost", value: currency(monthlyHousingCost, locale) },
         secondary: [
+          { label: "Principal & interest", value: currency(principalAndInterest, locale) },
+          { label: "Property tax", value: currency(propertyTax, locale) },
+          { label: "Homeowners insurance", value: currency(homeownersInsurance, locale) },
+          { label: "PMI", value: currency(pmi, locale) },
+          { label: "HOA dues", value: currency(hoa, locale) },
           { label: "Loan amount", value: currency(amount, locale) },
-          { label: "Down payment", value: percentOrZero(homePrice > 0 ? (downPayment / homePrice) * 100 : 0, 2, locale) },
-          { label: "Total interest", value: currency(totalPaid - amount, locale) },
+          { label: "Down payment", value: percent(downPct, 2, locale) },
+          { label: "Total mortgage interest", value: currency(totalInterest, locale) },
         ],
-        note: "This estimate includes principal and interest only. Property taxes, homeowners insurance, HOA fees, and PMI can increase the real payment.",
+        note: "Taxes, insurance, HOA dues, and PMI can change over time. Use this as a planning estimate and compare it with your lender's Loan Estimate.",
       };
     }
     case "retirement": {

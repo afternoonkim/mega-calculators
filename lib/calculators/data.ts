@@ -175,20 +175,21 @@ const baseCalculators: CalculatorDefinition[] = [
     "slug": "mortgage-calculator",
     "name": "Mortgage Calculator",
     "kind": "mortgagePayment",
-    "description": "Free mortgage calculator for monthly payment, total loan amount, and estimated repayment cost. Designed for US home buyers comparing home price, down payment, rate, and loan term.",
-    "intro": "This mortgage calculator gives you a quick estimate of your monthly principal and interest payment based on a home price, down payment, interest rate, and mortgage term. It is a useful first-pass tool for buyers comparing affordability before talking to a lender.",
-    "formulaText": "The calculator first subtracts the down payment from the home price to estimate the mortgage principal. It then applies the standard fixed-rate mortgage payment formula using a monthly interest rate and the total number of monthly payments in the loan term.",
+    "description": "Estimate a more realistic monthly housing payment with principal, interest, property tax, homeowners insurance, PMI, and HOA costs.",
+    "intro": "Use this mortgage calculator to estimate the monthly cost of owning a home, not just principal and interest. Add property tax, homeowners insurance, HOA dues, and an estimated PMI rate so you can compare homes using a closer approximation of the payment that affects your monthly budget.",
+    "formulaText": "The calculator computes fixed-rate principal and interest from the financed amount, then adds monthly property tax, homeowners insurance, HOA dues, and estimated PMI when the down payment is below 20%. PMI is only a planning estimate and actual lender requirements can differ.",
     "howToUse": [
       "Enter the home purchase price.",
       "Add your expected down payment amount.",
-      "Enter the mortgage interest rate and choose the loan term.",
-      "Use the monthly payment estimate to compare homes and down payment scenarios."
+      "Enter the mortgage rate, term, property tax rate, annual homeowners insurance, and any HOA dues.",
+      "If your down payment is below 20%, enter an estimated annual PMI rate or set it to 0 if it does not apply.",
+      "Compare the all-in monthly housing estimate with your budget and lender quote."
     ],
     "example": "A $400,000 home with a $80,000 down payment, a 6.75% mortgage rate, and a 30-year term can produce a very different monthly payment than the same home with a larger down payment or shorter loan.",
     "faq": [
       {
         "q": "Does this mortgage calculator include taxes and insurance?",
-        "a": "No. This version focuses on principal and interest. Property taxes, homeowners insurance, HOA fees, and mortgage insurance can raise the real monthly payment."
+        "a": "Yes. The estimate can include property tax, homeowners insurance, HOA dues, and PMI in addition to principal and interest. These inputs are estimates, so compare the result with an actual lender disclosure before making a decision."
       },
       {
         "q": "Is this good for comparing down payments?",
@@ -230,6 +231,38 @@ const baseCalculators: CalculatorDefinition[] = [
         "defaultValue": "30",
         "min": "1",
         "step": "1"
+      },
+      {
+        "name": "propertyTaxRate",
+        "label": "Annual property tax rate (%)",
+        "type": "number",
+        "defaultValue": "1.1",
+        "min": "0",
+        "step": "0.01"
+      },
+      {
+        "name": "annualInsurance",
+        "label": "Annual homeowners insurance (USD)",
+        "type": "number",
+        "defaultValue": "1800",
+        "min": "0",
+        "step": "1"
+      },
+      {
+        "name": "monthlyHoa",
+        "label": "Monthly HOA dues (USD)",
+        "type": "number",
+        "defaultValue": "0",
+        "min": "0",
+        "step": "1"
+      },
+      {
+        "name": "annualPmiRate",
+        "label": "Estimated annual PMI rate (%)",
+        "type": "number",
+        "defaultValue": "0.5",
+        "min": "0",
+        "step": "0.01"
       }
     ],
     "relatedSlugs": [

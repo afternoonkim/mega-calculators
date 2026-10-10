@@ -651,9 +651,9 @@ export const additionalCalculators: CalculatorDefinition[] = [
     "slug": "paycheck-calculator",
     "name": "Paycheck Calculator",
     "kind": "expression",
-    "description": "Estimate net pay per paycheck using gross annual salary, pay periods, and an estimated tax rate.",
-    "intro": "Use this paycheck calculator to get a quick estimate with simple inputs and an instant result.",
-    "formulaText": "This calculator applies a direct formula to the values you enter and returns the result instantly.",
+    "description": "Estimate take-home pay per paycheck with gross salary, pay frequency, pre-tax deductions, estimated taxes, and post-tax deductions.",
+    "intro": "Estimate how gross annual pay turns into a paycheck by separating pre-tax deductions, estimated taxes, post-tax deductions, and take-home pay. Use your own effective tax assumption and compare the result with your actual pay stub.",
+    "formulaText": "The calculator subtracts annual pre-tax deductions from gross salary to estimate taxable pay, applies your effective tax rate, subtracts post-tax deductions, and divides the remaining annual take-home amount by the selected number of pay periods.",
     "howToUse": [
       "Enter your gross annual salary (usd).",
       "Enter your estimated total tax rate (%).",
@@ -699,6 +699,22 @@ export const additionalCalculators: CalculatorDefinition[] = [
         "defaultValue": "26",
         "min": "1",
         "step": "1"
+      },
+      {
+        "name": "annualPreTaxDeductions",
+        "label": "Annual pre-tax deductions (USD)",
+        "type": "number",
+        "defaultValue": "6000",
+        "min": "0",
+        "step": "1"
+      },
+      {
+        "name": "annualPostTaxDeductions",
+        "label": "Annual post-tax deductions (USD)",
+        "type": "number",
+        "defaultValue": "1200",
+        "min": "0",
+        "step": "1"
       }
     ],
     "expr": "(grossAnnual*(1-taxRate/100))/payPeriods",
@@ -718,9 +734,9 @@ export const additionalCalculators: CalculatorDefinition[] = [
     "slug": "biweekly-paycheck-calculator",
     "name": "Biweekly Paycheck Calculator",
     "kind": "expression",
-    "description": "Estimate take-home pay for a biweekly payroll schedule with a simple effective tax assumption.",
-    "intro": "Use this biweekly paycheck calculator to get a quick estimate with simple inputs and an instant result.",
-    "formulaText": "This calculator applies a direct formula to the values you enter and returns the result instantly.",
+    "description": "Estimate biweekly take-home pay with pre-tax deductions, an effective tax assumption, and post-tax deductions.",
+    "intro": "Estimate a biweekly paycheck by separating gross pay, pre-tax deductions, estimated taxes, post-tax deductions, and final take-home pay. This is a planning tool rather than a payroll withholding engine.",
+    "formulaText": "The calculator subtracts annual pre-tax deductions from gross salary to estimate taxable pay, applies your effective tax rate, subtracts post-tax deductions, and divides the remaining annual take-home amount by the selected number of pay periods.",
     "howToUse": [
       "Enter your gross annual salary (usd).",
       "Enter your estimated total tax rate (%).",
@@ -757,6 +773,22 @@ export const additionalCalculators: CalculatorDefinition[] = [
         "defaultValue": "24",
         "min": "0",
         "step": "0.01"
+      },
+      {
+        "name": "annualPreTaxDeductions",
+        "label": "Annual pre-tax deductions (USD)",
+        "type": "number",
+        "defaultValue": "6000",
+        "min": "0",
+        "step": "1"
+      },
+      {
+        "name": "annualPostTaxDeductions",
+        "label": "Annual post-tax deductions (USD)",
+        "type": "number",
+        "defaultValue": "1200",
+        "min": "0",
+        "step": "1"
       }
     ],
     "expr": "(grossAnnual*(1-taxRate/100))/26",

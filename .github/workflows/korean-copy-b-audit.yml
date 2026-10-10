@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - scripts/korean_naturalization_b.py
+      - scripts/run_korean_naturalization_b.py
       - .github/workflows/korean-copy-b-audit.yml
 
 permissions:
@@ -24,7 +25,7 @@ jobs:
           cache: npm
 
       - name: Apply Korean naturalization B
-        run: python scripts/korean_naturalization_b.py
+        run: python scripts/run_korean_naturalization_b.py
 
       - name: Assert B cleanup
         run: |
@@ -32,6 +33,7 @@ jobs:
           grep -q '주제별로 계산기를 둘러보고' app/'[locale]'/calculators/page.tsx
           grep -q '무료 온라인 계산기' app/'[locale]'/page.tsx
           grep -q '결과가 왜 그렇게 나오는지 궁금할 때' lib/calculators/localization.ts
+          grep -q '입력값에 따라 어떤 결과가 나오는지 빠르게 확인하고 싶을 때 유용해요.' app/'[locale]'/calculators/'[category]'/'[slug]'/use-cases/page.tsx
 
       - name: Install dependencies
         run: npm ci

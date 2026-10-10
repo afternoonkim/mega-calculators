@@ -36,7 +36,7 @@ function guideLinks(locale: Locale, slug: string, category: string): EnhancedCal
       { title: isKo ? "칼로리 결과 읽는 법" : "How to read calorie results", description: isKo ? "칼로리, 체중, 활동량 결과를 생활 계획으로 연결할 때 확인할 점입니다." : "Connect calorie estimates with realistic activity and nutrition planning.", href: "/guides/how-to-read-calorie-results", cta: isKo ? "가이드 보기 →" : "Open guide →" },
     ];
   }
-  if (category === "time") {
+  if (category === "time-date") {
     return [
       { title: isKo ? "날짜와 시간 계산 방법" : "Use date and time calculators for schedules", description: isKo ? "나이, 기간, 근무시간, 마감일을 헷갈리지 않게 계산하는 방법입니다." : "A guide for turning dates, ages, and work hours into clearer schedule decisions.", href: "/guides/date-calculator-for-schedules", cta: isKo ? "일정 계산 가이드 보기 →" : "Plan schedules →" },
       { title: isKo ? "일상 속 퍼센트와 날짜 계산" : "Everyday percent and date calculators", description: isKo ? "할인율, 날짜 차이, 근무 시간처럼 자주 쓰는 계산 상황을 모았습니다." : "Common everyday situations where quick percentage and date math helps.", href: "/blog/everyday-percent-and-date-calculators", cta: isKo ? "사용 예시 보기 →" : "See examples →" },

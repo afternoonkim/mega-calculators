@@ -1,4 +1,4 @@
-import type { Locale } from "@/lib/i18n";
+import { stripLocaleFromPathname, type Locale } from "@/lib/i18n";
 import type { CalculatorDefinition } from "@/lib/calculators/data";
 
 export type CalculatorSeoContent = {
@@ -614,7 +614,7 @@ function buildFallbackCalculatorSeoContent(
         description: isKo
           ? `${item.name} 페이지에서 관련 계산 흐름을 이어서 확인해보세요.`
           : `Continue with ${item.name} to compare a related calculation workflow.`,
-        href: item.href,
+        href: stripLocaleFromPathname(item.href),
         cta: isKo ? "계산기 보기 →" : "Open calculator →",
       }))
     : [categoryContent.blog[locale], categoryContent.guide[locale]].map((item) => ({

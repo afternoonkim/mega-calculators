@@ -60,6 +60,82 @@ function positiveMonths(years: number) {
   return Math.max(Math.round(years * 12), 1);
 }
 
+type FilingStatus2026 = "single" | "marriedJoint" | "marriedSeparate" | "headOfHousehold";
+
+const STANDARD_DEDUCTION_2026: Record<FilingStatus2026, number> = {
+  single: 16100,
+  marriedJoint: 32200,
+  marriedSeparate: 16100,
+  headOfHousehold: 24150,
+};
+
+const FEDERAL_BRACKETS_2026: Record<FilingStatus2026, { cap: number; rate: number }[]> = {
+  single: [
+    { cap: 12400, rate: 0.10 },
+    { cap: 50400, rate: 0.12 },
+    { cap: 105700, rate: 0.22 },
+    { cap: 201775, rate: 0.24 },
+    { cap: 256225, rate: 0.32 },
+    { cap: 640600, rate: 0.35 },
+    { cap: Number.POSITIVE_INFINITY, rate: 0.37 },
+  ],
+  marriedJoint: [
+    { cap: 24800, rate: 0.10 },
+    { cap: 100800, rate: 0.12 },
+    { cap: 211400, rate: 0.22 },
+    { cap: 403550, rate: 0.24 },
+    { cap: 512450, rate: 0.32 },
+    { cap: 768700, rate: 0.35 },
+    { cap: Number.POSITIVE_INFINITY, rate: 0.37 },
+  ],
+  marriedSeparate: [
+    { cap: 12400, rate: 0.10 },
+    { cap: 50400, rate: 0.12 },
+    { cap: 105700, rate: 0.22 },
+    { cap: 201775, rate: 0.24 },
+    { cap: 256225, rate: 0.32 },
+    { cap: 384350, rate: 0.35 },
+    { cap: Number.POSITIVE_INFINITY, rate: 0.37 },
+  ],
+  headOfHousehold: [
+    { cap: 17700, rate: 0.10 },
+    { cap: 67450, rate: 0.12 },
+    { cap: 105700, rate: 0.22 },
+    { cap: 201750, rate: 0.24 },
+    { cap: 256200, rate: 0.32 },
+    { cap: 640600, rate: 0.35 },
+    { cap: Number.POSITIVE_INFINITY, rate: 0.37 },
+  ],
+};
+
+function normalizeFilingStatus(value: string | undefined): FilingStatus2026 {
+  if (value === "marriedJoint" || value === "marriedSeparate" || value === "headOfHousehold") return value;
+  return "single";
+}
+
+function progressiveFederalTax2026(taxableIncome: number, filingStatus: FilingStatus2026) {
+  const income = Math.max(taxableIncome, 0);
+  let tax = 0;
+  let lower = 0;
+  for (const bracket of FEDERAL_BRACKETS_2026[filingStatus]) {
+    const amountInBracket = Math.max(Math.min(income, bracket.cap) - lower, 0);
+    tax += amountInBracket * bracket.rate;
+    if (income <= bracket.cap) break;
+    lower = bracket.cap;
+  }
+  return tax;
+}
+
+function payPeriodsFromFrequency(value: string | undefined, fallback: number) {
+  const periods: Record<string, number> = {
+    weekly: 52,
+    biweekly: 26,
+    semimonthly: 24,
+    monthly: 12,
+  };
+  return periods[String(value ?? "")] ?? Math.max(Math.round(fallback), 1);
+}
+
 function parseList(input: string | undefined) {
   return String(input ?? "")
     .split(",")
@@ -355,28 +431,51 @@ function computeCalculatorRaw(definition: CalculatorDefinition, values: Values, 
     case "expression": {
       if (definition.slug === "paycheck-calculator" || definition.slug === "biweekly-paycheck-calculator") {
         const grossAnnual = Math.max(num(values.grossAnnual), 0);
-        const preTax = Math.min(Math.max(num(values.annualPreTaxDeductions), 0), grossAnnual);
-        const taxableAnnual = Math.max(grossAnnual - preTax, 0);
-        const estimatedTax = taxableAnnual * Math.min(Math.max(num(values.taxRate), 0), 100) / 100;
-        const postTax = Math.max(num(values.annualPostTaxDeductions), 0);
+        const filingStatus = normalizeFilingStatus(values.filingStatus);
+        const annual401k = Math.max(num(values.annual401k), 0);
+        const annualHsaFsa = Math.max(num(values.annualHsaFsa), 0);
+        const annualOtherPreTax = Math.max(num(values.annualOtherPreTax), 0);
+        const requestedPreTax = annual401k + annualHsaFsa + annualOtherPreTax;
+        const totalPreTax = Math.min(requestedPreTax, grossAnnual);
+        const incomeTaxBaseBeforeDeduction = Math.max(grossAnnual - totalPreTax, 0);
+        const federalTaxableIncome = Math.max(
+          incomeTaxBaseBeforeDeduction - STANDARD_DEDUCTION_2026[filingStatus],
+          0,
+        );
+        const federalIncomeTax = progressiveFederalTax2026(federalTaxableIncome, filingStatus);
+        const stateLocalRate = Math.min(Math.max(num(values.stateLocalTaxRate), 0), 100) / 100;
+        const stateLocalTax = incomeTaxBaseBeforeDeduction * stateLocalRate;
+
+        // Traditional 401(k) deferrals generally remain subject to FICA. HSA/FSA payroll deductions
+        // may reduce FICA wages when made through an eligible cafeteria/payroll arrangement, so this
+        // planning estimate reduces FICA wages by the entered HSA/FSA amount only.
+        const ficaWages = Math.max(grossAnnual - Math.min(annualHsaFsa, grossAnnual), 0);
+        const socialSecurity = Math.min(ficaWages, 184500) * 0.062;
+        const medicare = (ficaWages * 0.0145) + (Math.max(ficaWages - 200000, 0) * 0.009);
+        const annualPostTax = Math.max(num(values.annualPostTaxDeductions), 0);
+        const totalTaxes = federalIncomeTax + stateLocalTax + socialSecurity + medicare;
+        const annualTakeHome = Math.max(grossAnnual - totalPreTax - totalTaxes - annualPostTax, 0);
         const payPeriods = definition.slug === "biweekly-paycheck-calculator"
           ? 26
-          : Math.max(Math.round(num(values.payPeriods)), 1);
-        const annualTakeHome = Math.max(grossAnnual - preTax - estimatedTax - postTax, 0);
+          : payPeriodsFromFrequency(values.payFrequency, num(values.payPeriods));
         const takeHomePerPaycheck = annualTakeHome / payPeriods;
         const grossPerPaycheck = grossAnnual / payPeriods;
         const deductionsPct = grossAnnual > 0 ? ((grossAnnual - annualTakeHome) / grossAnnual) * 100 : 0;
+
         return {
           primary: { label: "Estimated take-home pay per paycheck", value: currency(takeHomePerPaycheck, locale) },
           secondary: [
             { label: "Gross pay per paycheck", value: currency(grossPerPaycheck, locale) },
-            { label: "Pre-tax deductions per paycheck", value: currency(preTax / payPeriods, locale) },
-            { label: "Estimated tax per paycheck", value: currency(estimatedTax / payPeriods, locale) },
-            { label: "Post-tax deductions per paycheck", value: currency(postTax / payPeriods, locale) },
+            { label: "Federal income tax per paycheck", value: currency(federalIncomeTax / payPeriods, locale) },
+            { label: "State/local tax per paycheck", value: currency(stateLocalTax / payPeriods, locale) },
+            { label: "Social Security per paycheck", value: currency(socialSecurity / payPeriods, locale) },
+            { label: "Medicare per paycheck", value: currency(medicare / payPeriods, locale) },
+            { label: "Pre-tax deductions per paycheck", value: currency(totalPreTax / payPeriods, locale) },
+            { label: "Post-tax deductions per paycheck", value: currency(annualPostTax / payPeriods, locale) },
             { label: "Estimated annual take-home pay", value: currency(annualTakeHome, locale) },
             { label: "Estimated total deduction rate", value: percent(deductionsPct, 2, locale) },
           ],
-          note: "This uses an effective tax-rate estimate, not federal/state withholding tables. Compare the result with your pay stub or payroll provider for exact withholding.",
+          note: "This is a 2026 planning estimate using federal tax brackets, the standard deduction, Social Security, Medicare, and the state/local rate you enter. It is not an exact W-4 withholding calculation and does not model tax credits, itemized deductions, bonuses, every payroll benefit, or every state/local rule.",
         };
       }
 
@@ -551,26 +650,46 @@ function computeCalculatorRaw(definition: CalculatorDefinition, values: Values, 
       const principalAndInterest = monthlyRate === 0
         ? amount / months
         : amount * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+      const extraMonthlyPrincipal = Math.max(num(values.extraMonthlyPrincipal), 0);
       const downPct = homePrice > 0 ? (downPayment / homePrice) * 100 : 0;
       const propertyTax = homePrice * Math.max(num(values.propertyTaxRate), 0) / 100 / 12;
       const homeownersInsurance = Math.max(num(values.annualInsurance), 0) / 12;
       const hoa = Math.max(num(values.monthlyHoa), 0);
       const pmi = downPct < 20 ? amount * Math.max(num(values.annualPmiRate), 0) / 100 / 12 : 0;
-      const monthlyHousingCost = principalAndInterest + propertyTax + homeownersInsurance + hoa + pmi;
-      const totalInterest = principalAndInterest * months - amount;
+      const monthlyHousingOutflow = principalAndInterest + extraMonthlyPrincipal + propertyTax + homeownersInsurance + hoa + pmi;
+      const scheduledTotalInterest = Math.max((principalAndInterest * months) - amount, 0);
+
+      let balance = amount;
+      let acceleratedInterest = 0;
+      let acceleratedMonths = 0;
+      const maxSimulationMonths = Math.max(months * 2, 1200);
+      while (balance > 0.005 && acceleratedMonths < maxSimulationMonths) {
+        const interest = balance * monthlyRate;
+        const payment = Math.min(principalAndInterest + extraMonthlyPrincipal, balance + interest);
+        const principalPaid = payment - interest;
+        if (principalPaid <= 0) break;
+        acceleratedInterest += interest;
+        balance = Math.max(balance - principalPaid, 0);
+        acceleratedMonths += 1;
+      }
+
+      const estimatedInterestSavings = Math.max(scheduledTotalInterest - acceleratedInterest, 0);
       return {
-        primary: { label: "Estimated monthly housing cost", value: currency(monthlyHousingCost, locale) },
+        primary: { label: "Estimated monthly housing outflow", value: currency(monthlyHousingOutflow, locale) },
         secondary: [
-          { label: "Principal & interest", value: currency(principalAndInterest, locale) },
+          { label: "Scheduled principal & interest", value: currency(principalAndInterest, locale) },
+          { label: "Extra principal payment", value: currency(extraMonthlyPrincipal, locale) },
           { label: "Property tax", value: currency(propertyTax, locale) },
           { label: "Homeowners insurance", value: currency(homeownersInsurance, locale) },
           { label: "PMI", value: currency(pmi, locale) },
           { label: "HOA dues", value: currency(hoa, locale) },
           { label: "Loan amount", value: currency(amount, locale) },
           { label: "Down payment", value: percent(downPct, 2, locale) },
-          { label: "Total mortgage interest", value: currency(totalInterest, locale) },
+          { label: "Estimated payoff time", value: monthsToText(acceleratedMonths, locale) },
+          { label: "Estimated interest with extra payments", value: currency(acceleratedInterest, locale) },
+          { label: "Estimated interest savings", value: currency(estimatedInterestSavings, locale) },
         ],
-        note: "Taxes, insurance, HOA dues, and PMI can change over time. Use this as a planning estimate and compare it with your lender's Loan Estimate.",
+        note: "Taxes, insurance, HOA dues, and PMI can change over time. Extra principal is modeled as a monthly payment from the start of the loan; actual lender application rules and payoff timing can differ.",
       };
     }
     case "retirement": {

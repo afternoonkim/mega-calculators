@@ -651,28 +651,29 @@ export const additionalCalculators: CalculatorDefinition[] = [
     "slug": "paycheck-calculator",
     "name": "Paycheck Calculator",
     "kind": "expression",
-    "description": "Estimate take-home pay per paycheck with gross salary, pay frequency, pre-tax deductions, estimated taxes, and post-tax deductions.",
-    "intro": "Estimate how gross annual pay turns into a paycheck by separating pre-tax deductions, estimated taxes, post-tax deductions, and take-home pay. Use your own effective tax assumption and compare the result with your actual pay stub.",
-    "formulaText": "The calculator subtracts annual pre-tax deductions from gross salary to estimate taxable pay, applies your effective tax rate, subtracts post-tax deductions, and divides the remaining annual take-home amount by the selected number of pay periods.",
+    "description": "Estimate 2026 take-home pay with federal income tax, Social Security, Medicare, an optional state/local rate, and common payroll deductions.",
+    "intro": "Estimate how annual salary turns into each paycheck using 2026 federal brackets and the standard deduction, plus Social Security, Medicare, your filing status, pay frequency, 401(k), HSA/FSA payroll deductions, other pre-tax deductions, and post-tax deductions.",
+    "formulaText": "The calculator annualizes your inputs, estimates 2026 federal income tax with progressive brackets and the standard deduction, adds employee Social Security and Medicare, applies the state/local effective tax rate you enter, subtracts payroll deductions, and divides estimated annual take-home pay by your pay frequency.",
     "howToUse": [
-      "Enter your gross annual salary (usd).",
-      "Enter your estimated total tax rate (%).",
-      "Enter your pay periods per year.",
-      "Review the result and change the inputs to compare different scenarios."
+      "Enter your gross annual salary and filing status.",
+      "Choose how often you are paid.",
+      "Add annual 401(k), HSA/FSA, other pre-tax, and post-tax deductions that apply to you.",
+      "Enter an estimated state/local effective income-tax rate, or 0 if you do not want to include one.",
+      "Compare the estimate with your real pay stub or the IRS Tax Withholding Estimator before changing withholding."
     ],
-    "example": "For example, try the paycheck calculator using Gross annual salary (USD) 85000, Estimated total tax rate (%) 24, Pay periods per year 26 to see how the estimate works before entering your own numbers.",
+    "example": "For an $85,000 salary paid biweekly, compare different filing statuses, retirement contributions, health-account deductions, and state/local tax assumptions to see how estimated take-home pay changes.",
     "faq": [
       {
-        "q": "What does the paycheck calculator show?",
-        "a": "The paycheck calculator gives you a quick estimate based on the values you enter. It is useful for planning, comparison, and everyday decisions."
+        "q": "Does this use 2026 federal tax brackets?",
+        "a": "Yes. It uses 2026 federal income-tax brackets and standard deduction amounts for Single, Married Filing Jointly, Married Filing Separately, and Head of Household. It does not calculate every credit or W-4 adjustment."
       },
       {
-        "q": "Is the paycheck calculator exact?",
-        "a": "The result follows the formula described on the page, but it should still be treated as an estimate. Fees, local rules, taxes, rounding, or professional guidance can change the final outcome."
+        "q": "Does this include Social Security and Medicare?",
+        "a": "Yes. It estimates the employee share of Social Security and Medicare, including the 2026 Social Security wage base and Additional Medicare withholding above the employer withholding threshold."
       },
       {
-        "q": "Who is this tool for?",
-        "a": "This tool is designed for people who want a fast finance calculator estimate without using a spreadsheet."
+        "q": "Is the result the exact amount my employer will withhold?",
+        "a": "No. This is an annualized planning estimate. W-4 settings, tax credits, bonuses, benefit tax treatment, multiple jobs, and state or local withholding rules can change an actual paycheck."
       }
     ],
     "inputs": [
@@ -685,28 +686,61 @@ export const additionalCalculators: CalculatorDefinition[] = [
         "step": "0.01"
       },
       {
-        "name": "taxRate",
-        "label": "Estimated total tax rate (%)",
-        "type": "number",
-        "defaultValue": "24",
-        "min": "0",
-        "step": "0.01"
+        "name": "filingStatus",
+        "label": "Filing status",
+        "type": "select",
+        "defaultValue": "single",
+        "options": [
+          { "label": "Single", "value": "single" },
+          { "label": "Married filing jointly", "value": "marriedJoint" },
+          { "label": "Married filing separately", "value": "marriedSeparate" },
+          { "label": "Head of household", "value": "headOfHousehold" }
+        ]
       },
       {
-        "name": "payPeriods",
-        "label": "Pay periods per year",
-        "type": "number",
-        "defaultValue": "26",
-        "min": "1",
-        "step": "1"
+        "name": "payFrequency",
+        "label": "Pay frequency",
+        "type": "select",
+        "defaultValue": "biweekly",
+        "options": [
+          { "label": "Weekly", "value": "weekly" },
+          { "label": "Biweekly (26/year)", "value": "biweekly" },
+          { "label": "Semimonthly (24/year)", "value": "semimonthly" },
+          { "label": "Monthly", "value": "monthly" }
+        ]
       },
       {
-        "name": "annualPreTaxDeductions",
-        "label": "Annual pre-tax deductions (USD)",
+        "name": "annual401k",
+        "label": "Annual 401(k) contribution (USD)",
         "type": "number",
         "defaultValue": "6000",
         "min": "0",
         "step": "1"
+      },
+      {
+        "name": "annualHsaFsa",
+        "label": "Annual HSA/FSA payroll deductions (USD)",
+        "type": "number",
+        "defaultValue": "0",
+        "min": "0",
+        "step": "1"
+      },
+      {
+        "name": "annualOtherPreTax",
+        "label": "Other annual pre-tax deductions (USD)",
+        "type": "number",
+        "defaultValue": "0",
+        "min": "0",
+        "step": "1"
+      },
+      {
+        "name": "stateLocalTaxRate",
+        "label": "State/local effective tax rate (%)",
+        "type": "number",
+        "defaultValue": "0",
+        "min": "0",
+        "max": "100",
+        "step": "0.01"
       },
       {
         "name": "annualPostTaxDeductions",
@@ -717,7 +751,7 @@ export const additionalCalculators: CalculatorDefinition[] = [
         "step": "1"
       }
     ],
-    "expr": "(grossAnnual*(1-taxRate/100))/payPeriods",
+    "expr": "grossAnnual/26",
     "primary": "Estimated take-home pay per paycheck",
     "prefix": "$",
     "suffix": "",
@@ -734,27 +768,28 @@ export const additionalCalculators: CalculatorDefinition[] = [
     "slug": "biweekly-paycheck-calculator",
     "name": "Biweekly Paycheck Calculator",
     "kind": "expression",
-    "description": "Estimate biweekly take-home pay with pre-tax deductions, an effective tax assumption, and post-tax deductions.",
-    "intro": "Estimate a biweekly paycheck by separating gross pay, pre-tax deductions, estimated taxes, post-tax deductions, and final take-home pay. This is a planning tool rather than a payroll withholding engine.",
-    "formulaText": "The calculator subtracts annual pre-tax deductions from gross salary to estimate taxable pay, applies your effective tax rate, subtracts post-tax deductions, and divides the remaining annual take-home amount by the selected number of pay periods.",
+    "description": "Estimate a 2026 biweekly paycheck with federal income tax, Social Security, Medicare, an optional state/local rate, and common payroll deductions.",
+    "intro": "Estimate a 26-pay-period paycheck using 2026 federal brackets and the standard deduction, plus Social Security, Medicare, filing status, 401(k), HSA/FSA payroll deductions, other pre-tax deductions, and post-tax deductions.",
+    "formulaText": "The calculator estimates annual federal income tax using 2026 progressive brackets and the standard deduction, adds employee Social Security and Medicare, applies your state/local effective rate, subtracts payroll deductions, and divides annual take-home pay by 26.",
     "howToUse": [
-      "Enter your gross annual salary (usd).",
-      "Enter your estimated total tax rate (%).",
-      "Review the result and change the inputs to compare different scenarios."
+      "Enter your gross annual salary and filing status.",
+      "Add annual 401(k), HSA/FSA, other pre-tax, and post-tax deductions that apply to you.",
+      "Enter an estimated state/local effective income-tax rate, or 0 if you do not want to include one.",
+      "Compare the estimate with your actual biweekly pay stub before changing withholding."
     ],
-    "example": "For example, try the biweekly paycheck calculator using Gross annual salary (USD) 85000, Estimated total tax rate (%) 24 to see how the estimate works before entering your own numbers.",
+    "example": "For an $85,000 salary paid every two weeks, change retirement contributions or the state/local tax assumption to see how the estimated 26 paychecks change.",
     "faq": [
       {
-        "q": "What does the biweekly paycheck calculator show?",
-        "a": "The biweekly paycheck calculator gives you a quick estimate based on the values you enter. It is useful for planning, comparison, and everyday decisions."
+        "q": "How many paychecks does this calculator assume?",
+        "a": "It assumes 26 paychecks per year, which is the common biweekly schedule."
       },
       {
-        "q": "Is the biweekly paycheck calculator exact?",
-        "a": "The result follows the formula described on the page, but it should still be treated as an estimate. Fees, local rules, taxes, rounding, or professional guidance can change the final outcome."
+        "q": "Does it include federal payroll taxes?",
+        "a": "Yes. It estimates 2026 federal income tax plus employee Social Security and Medicare. It is still a planning estimate rather than an exact payroll withholding calculation."
       },
       {
-        "q": "Who is this tool for?",
-        "a": "This tool is designed for people who want a fast finance calculator estimate without using a spreadsheet."
+        "q": "Why might my real biweekly paycheck be different?",
+        "a": "Your W-4 elections, credits, multiple jobs, bonuses, benefit tax treatment, and state or local rules can all change actual withholding."
       }
     ],
     "inputs": [
@@ -767,20 +802,49 @@ export const additionalCalculators: CalculatorDefinition[] = [
         "step": "0.01"
       },
       {
-        "name": "taxRate",
-        "label": "Estimated total tax rate (%)",
-        "type": "number",
-        "defaultValue": "24",
-        "min": "0",
-        "step": "0.01"
+        "name": "filingStatus",
+        "label": "Filing status",
+        "type": "select",
+        "defaultValue": "single",
+        "options": [
+          { "label": "Single", "value": "single" },
+          { "label": "Married filing jointly", "value": "marriedJoint" },
+          { "label": "Married filing separately", "value": "marriedSeparate" },
+          { "label": "Head of household", "value": "headOfHousehold" }
+        ]
       },
       {
-        "name": "annualPreTaxDeductions",
-        "label": "Annual pre-tax deductions (USD)",
+        "name": "annual401k",
+        "label": "Annual 401(k) contribution (USD)",
         "type": "number",
         "defaultValue": "6000",
         "min": "0",
         "step": "1"
+      },
+      {
+        "name": "annualHsaFsa",
+        "label": "Annual HSA/FSA payroll deductions (USD)",
+        "type": "number",
+        "defaultValue": "0",
+        "min": "0",
+        "step": "1"
+      },
+      {
+        "name": "annualOtherPreTax",
+        "label": "Other annual pre-tax deductions (USD)",
+        "type": "number",
+        "defaultValue": "0",
+        "min": "0",
+        "step": "1"
+      },
+      {
+        "name": "stateLocalTaxRate",
+        "label": "State/local effective tax rate (%)",
+        "type": "number",
+        "defaultValue": "0",
+        "min": "0",
+        "max": "100",
+        "step": "0.01"
       },
       {
         "name": "annualPostTaxDeductions",
@@ -791,7 +855,7 @@ export const additionalCalculators: CalculatorDefinition[] = [
         "step": "1"
       }
     ],
-    "expr": "(grossAnnual*(1-taxRate/100))/26",
+    "expr": "grossAnnual/26",
     "primary": "Estimated biweekly take-home pay",
     "prefix": "$",
     "suffix": "",

@@ -175,29 +175,29 @@ const baseCalculators: CalculatorDefinition[] = [
     "slug": "mortgage-calculator",
     "name": "Mortgage Calculator",
     "kind": "mortgagePayment",
-    "description": "Estimate a more realistic monthly housing payment with principal, interest, property tax, homeowners insurance, PMI, and HOA costs.",
-    "intro": "Use this mortgage calculator to estimate the monthly cost of owning a home, not just principal and interest. Add property tax, homeowners insurance, HOA dues, and an estimated PMI rate so you can compare homes using a closer approximation of the payment that affects your monthly budget.",
-    "formulaText": "The calculator computes fixed-rate principal and interest from the financed amount, then adds monthly property tax, homeowners insurance, HOA dues, and estimated PMI when the down payment is below 20%. PMI is only a planning estimate and actual lender requirements can differ.",
+    "description": "Estimate monthly housing cost with principal, interest, property tax, homeowners insurance, PMI, HOA dues, and optional extra principal payments.",
+    "intro": "Use this mortgage calculator to estimate the monthly cost of owning a home and see how an extra monthly principal payment may change payoff time and total interest. Add property tax, homeowners insurance, HOA dues, and an estimated PMI rate for a fuller budget view.",
+    "formulaText": "The calculator computes fixed-rate principal and interest from the financed amount, adds monthly property tax, homeowners insurance, HOA dues, and estimated PMI when the down payment is below 20%, then simulates the balance month by month when you add extra principal.",
     "howToUse": [
-      "Enter the home purchase price.",
-      "Add your expected down payment amount.",
+      "Enter the home purchase price and expected down payment.",
       "Enter the mortgage rate, term, property tax rate, annual homeowners insurance, and any HOA dues.",
       "If your down payment is below 20%, enter an estimated annual PMI rate or set it to 0 if it does not apply.",
-      "Compare the all-in monthly housing estimate with your budget and lender quote."
+      "Add an optional extra monthly principal payment to compare payoff time and interest savings.",
+      "Compare the monthly housing outflow with your budget and lender quote."
     ],
-    "example": "A $400,000 home with a $80,000 down payment, a 6.75% mortgage rate, and a 30-year term can produce a very different monthly payment than the same home with a larger down payment or shorter loan.",
+    "example": "A $400,000 home with an $80,000 down payment and a 30-year mortgage can have very different lifetime interest depending on the rate and whether you add extra principal each month.",
     "faq": [
       {
         "q": "Does this mortgage calculator include taxes and insurance?",
         "a": "Yes. The estimate can include property tax, homeowners insurance, HOA dues, and PMI in addition to principal and interest. These inputs are estimates, so compare the result with an actual lender disclosure before making a decision."
       },
       {
-        "q": "Is this good for comparing down payments?",
-        "a": "Yes. Changing the down payment is one of the fastest ways to see how loan size and monthly cost move together."
+        "q": "What does the extra monthly principal field show?",
+        "a": "It estimates how a recurring extra payment applied to principal could shorten the payoff period and reduce mortgage interest. Your lender may apply or schedule extra payments differently, so confirm the actual process before sending extra money."
       },
       {
         "q": "Can I use this for refinance estimates?",
-        "a": "Yes. If you know your refinance loan balance, rate, and term, the formula works the same way for a basic monthly payment estimate."
+        "a": "Yes. If you know the refinance balance, rate, term, and recurring housing costs, the same fixed-rate math can provide a planning estimate."
       }
     ],
     "inputs": [
@@ -222,6 +222,7 @@ const baseCalculators: CalculatorDefinition[] = [
         "label": "Annual interest rate (%)",
         "type": "number",
         "defaultValue": "6.25",
+        "min": "0",
         "step": "0.01"
       },
       {
@@ -230,6 +231,14 @@ const baseCalculators: CalculatorDefinition[] = [
         "type": "number",
         "defaultValue": "30",
         "min": "1",
+        "step": "1"
+      },
+      {
+        "name": "extraMonthlyPrincipal",
+        "label": "Extra monthly principal (USD)",
+        "type": "number",
+        "defaultValue": "0",
+        "min": "0",
         "step": "1"
       },
       {

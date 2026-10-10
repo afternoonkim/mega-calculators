@@ -54,6 +54,7 @@ describe("calculator engine reference values", () => {
         downPayment: "80000",
         annualRate: "6.25",
         years: "30",
+        extraMonthlyPrincipal: "0",
         propertyTaxRate: "1.1",
         annualInsurance: "1800",
         monthlyHoa: "100",
@@ -62,12 +63,35 @@ describe("calculator engine reference values", () => {
     );
 
     expect(result.primary.value).toBe("$2,586.96");
-    expect(secondaryValue(result, "Principal & interest")).toBe("$1,970.30");
+    expect(secondaryValue(result, "Scheduled principal & interest")).toBe("$1,970.30");
     expect(secondaryValue(result, "Property tax")).toBe("$366.67");
     expect(secondaryValue(result, "Homeowners insurance")).toBe("$150.00");
     expect(secondaryValue(result, "PMI")).toBe("$0.00");
     expect(secondaryValue(result, "HOA dues")).toBe("$100.00");
     expect(secondaryValue(result, "Loan amount")).toBe("$320,000.00");
+    expect(secondaryValue(result, "Estimated payoff time")).toBe("30 years 0 months");
+  });
+
+  it("shows how extra mortgage principal can shorten payoff and reduce interest", () => {
+    const result = computeCalculator(
+      definition("mortgagePayment", "mortgage-calculator", "finance"),
+      {
+        homePrice: "400000",
+        downPayment: "80000",
+        annualRate: "6.25",
+        years: "30",
+        extraMonthlyPrincipal: "300",
+        propertyTaxRate: "1.1",
+        annualInsurance: "1800",
+        monthlyHoa: "100",
+        annualPmiRate: "0.5",
+      },
+    );
+
+    expect(result.primary.value).toBe("$2,886.96");
+    expect(secondaryValue(result, "Estimated payoff time")).toBe("21 years 4 months");
+    expect(secondaryValue(result, "Estimated interest with extra payments")).toBe("$258,937.52");
+    expect(secondaryValue(result, "Estimated interest savings")).toBe("$130,368.69");
   });
 
   it("adds estimated PMI when the down payment is below 20 percent", () => {
@@ -78,6 +102,7 @@ describe("calculator engine reference values", () => {
         downPayment: "40000",
         annualRate: "6.25",
         years: "30",
+        extraMonthlyPrincipal: "0",
         propertyTaxRate: "0",
         annualInsurance: "0",
         monthlyHoa: "0",
@@ -88,21 +113,47 @@ describe("calculator engine reference values", () => {
     expect(secondaryValue(result, "PMI")).toBe("$150.00");
   });
 
-  it("shows a paycheck deduction breakdown instead of a single net-pay number", () => {
+  it("uses 2026 federal brackets, FICA, payroll deductions, and pay frequency for paycheck estimates", () => {
     const result = computeCalculator(
       definition("expression", "paycheck-calculator", "finance"),
       {
         grossAnnual: "85000",
-        annualPreTaxDeductions: "6000",
-        taxRate: "24",
+        filingStatus: "single",
+        payFrequency: "biweekly",
+        annual401k: "6000",
+        annualHsaFsa: "0",
+        annualOtherPreTax: "0",
+        stateLocalTaxRate: "5",
         annualPostTaxDeductions: "1200",
-        payPeriods: "26",
       },
     );
 
-    expect(result.primary.value).toBe("$2,263.08");
+    expect(result.primary.value).toBe("$2,261.44");
     expect(secondaryValue(result, "Gross pay per paycheck")).toBe("$3,269.23");
-    expect(secondaryValue(result, "Estimated annual take-home pay")).toBe("$58,840.00");
+    expect(secondaryValue(result, "Federal income tax per paycheck")).toBe("$328.85");
+    expect(secondaryValue(result, "State/local tax per paycheck")).toBe("$151.92");
+    expect(secondaryValue(result, "Social Security per paycheck")).toBe("$202.69");
+    expect(secondaryValue(result, "Medicare per paycheck")).toBe("$47.40");
+    expect(secondaryValue(result, "Estimated annual take-home pay")).toBe("$58,797.50");
+  });
+
+  it("caps 2026 Social Security wages and adds Medicare withholding above $200,000", () => {
+    const result = computeCalculator(
+      definition("expression", "paycheck-calculator", "finance"),
+      {
+        grossAnnual: "250000",
+        filingStatus: "single",
+        payFrequency: "biweekly",
+        annual401k: "0",
+        annualHsaFsa: "0",
+        annualOtherPreTax: "0",
+        stateLocalTaxRate: "0",
+        annualPostTaxDeductions: "0",
+      },
+    );
+
+    expect(secondaryValue(result, "Social Security per paycheck")).toBe("$439.96");
+    expect(secondaryValue(result, "Medicare per paycheck")).toBe("$156.73");
   });
 
   it("calculates compound growth with recurring monthly contributions", () => {

@@ -350,7 +350,7 @@ const koContent: Record<string, CalculatorSeoContent> = {
       "수십 년 동안 적립액이 똑같을 것이라고 가정하는 것.",
       "최종 금액만 비교하고 총 납입액을 함께 보지 않는 것.",
     ],
-    scenariosTitle: "직접 비교해보기 좋은 시나리오",
+    scenariosTitle: "이렇게 비교해보세요",
     scenarios: [
       { title: "월 적립식 ETF 투자", description: "수익률을 높이는 것보다 매달 적립액을 조금 올리는 편이 결과에 얼마나 큰 차이를 주는지 비교해볼 수 있습니다." },
       { title: "은퇴 준비 속도 점검", description: "남은 기간이 짧을 때 적립액을 높이면 목표에 얼마나 가까워지는지 가늠할 수 있습니다." },
@@ -390,7 +390,7 @@ const koContent: Record<string, CalculatorSeoContent> = {
       "금리를 한 가지 값으로만 보는 것.",
       "계약금을 조금만 바꿔도 결과가 크게 달라질 수 있는데 이를 비교하지 않는 것.",
     ],
-    scenariosTitle: "직접 비교해보기 좋은 시나리오",
+    scenariosTitle: "이렇게 비교해보세요",
     scenarios: [
       { title: "첫 주택 예산 점검", description: "집값은 유지하고 계약금만 바꿔서 월 납입액이 얼마나 달라지는지 볼 수 있습니다." },
       { title: "계약금 확대 효과 비교", description: "초기 자금을 더 넣는 것이 월 부담과 총이자에 얼마나 도움이 되는지 확인할 수 있습니다." },
@@ -430,7 +430,7 @@ const koContent: Record<string, CalculatorSeoContent> = {
       "허리둘레, 체지방률, 생활 습관 같은 맥락을 함께 보지 않는 것.",
       "너무 자주 확인하면서 작은 변화에 과하게 반응하는 것.",
     ],
-    scenariosTitle: "직접 비교해보기 좋은 시나리오",
+    scenariosTitle: "이렇게 비교해보세요",
     scenarios: [
       { title: "체중 관리 시작 전 기준점", description: "현재 BMI를 기준으로 두고 몇 주 뒤 다시 비교해 생활 습관 변화가 어떤 흐름을 만드는지 확인할 수 있습니다." },
       { title: "건강검진 이후 보조 확인", description: "혈압, 허리둘레 같은 수치와 함께 보면 BMI 결과를 더 현실적으로 해석할 수 있습니다." },
@@ -470,7 +470,7 @@ const koContent: Record<string, CalculatorSeoContent> = {
       "실제 기준일이 있는데도 오늘 날짜로 계산하는 것.",
       "나이 계산 문제를 날짜 차이 계산 문제와 혼동하는 것.",
     ],
-    scenariosTitle: "직접 비교해보기 좋은 시나리오",
+    scenariosTitle: "이렇게 비교해보세요",
     scenarios: [
       { title: "지원 자격 확인", description: "특정 마감일 기준으로 나이를 계산해서 신청 가능 여부를 확인할 수 있습니다." },
       { title: "생일 전후 일정 확인", description: "다음 생일까지 얼마나 남았는지, 특정 나이가 되는 시점을 가늠할 수 있습니다." },
@@ -510,7 +510,7 @@ const koContent: Record<string, CalculatorSeoContent> = {
       "퍼센트만 비교하고 실제 차이를 보지 않는 것.",
       "여러 할인이나 인상 조건이 순차 적용된다는 점을 놓치는 것.",
     ],
-    scenariosTitle: "직접 비교해보기 좋은 시나리오",
+    scenariosTitle: "이렇게 비교해보세요",
     scenarios: [
       { title: "할인 행사 비교", description: "할인율이 커 보여도 실제 절약 금액이 얼마나 되는지 확인할 수 있습니다." },
       { title: "예산 비중 점검", description: "전체 지출 중 특정 항목이 차지하는 비율이 목표 범위 안에 있는지 확인할 수 있습니다." },
@@ -673,7 +673,7 @@ function buildFallbackCalculatorSeoContent(
           `Relying on one scenario instead of comparing a realistic range.`,
           `Treating the calculator result as final without confirming the real-world rules or official terms.`,
         ],
-    scenariosTitle: isKo ? "직접 비교해보기 좋은 시나리오" : "Practical scenarios to test",
+    scenariosTitle: isKo ? "이렇게 비교해보세요" : "Practical scenarios to test",
     scenarios: isKo
       ? [
           { title: "기본값과 보수적 값 비교", description: `현재 생각한 조건보다 조금 더 보수적인 값을 넣어 결과 차이를 확인해보세요.` },

@@ -164,7 +164,7 @@ export default async function CategoryPage({
         <p className="mt-4 max-w-4xl text-base leading-8 text-slate-600">{intro}</p>
         <p className="mt-3 max-w-4xl text-base leading-8 text-slate-600">
           {isKo
-            ? `${items.length}개 도구를 한 페이지에 모았어요. 자주 찾으시는 항목부터 시작하시거나, 아래 키워드로 원하시는 계산기를 빠르게 찾아보세요.`
+            ? "필요한 계산기를 한곳에서 찾아보세요. 자주 쓰는 계산부터 살펴보거나, 관심 있는 항목을 골라 바로 시작할 수 있습니다."
             : `Browse ${items.length} tools curated in this category. Start with what you need, or jump straight to a specific calculator below.`}
         </p>
         {keywords.length ? (
@@ -212,7 +212,7 @@ export default async function CategoryPage({
             </li>
             <li className="rounded-2xl bg-slate-50 px-4 py-3">
               {isKo
-                ? "예시와 가이드 페이지까지 연결해 결과를 더 쉽게 이해하실 수 있어요."
+                ? "계산 예시와 사용 방법을 함께 보면 결과를 더 쉽게 이해할 수 있어요."
                 : "Move between similar calculators and check examples when you need more context."}
             </li>
           </ul>

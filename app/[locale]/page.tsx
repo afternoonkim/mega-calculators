@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: isKo ? "무료 온라인 계산기 모음" : "Free Online Calculators and Converters",
     description: isKo
-      ? "대출, 복리, BMI, 나이, 퍼센트, 단위 변환까지 한국어로 바로 계산하실 수 있는 무료 온라인 계산기 모음입니다."
+      ? "대출, 복리, BMI, 나이, 퍼센트, 단위 변환까지 바로 계산할 수 있는 무료 온라인 계산기 모음입니다."
       : "Find free online calculators for finance, business, health, fitness, math, unit conversion, time, construction, cooking, science, education, and everyday life — all in one place.",
     alternates: {
       canonical: `/${locale}`,
@@ -140,7 +140,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           {categoryCards.map((category) => (
             <Link key={category.slug} href={withLocale(locale, `/calculators/${category.slug}`)} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200">
               <h3 className="text-2xl font-bold text-slate-950">{category.name}</h3>
-              <p className="mt-3 text-sm leading-7 text-slate-600">{isKo ? `${category.name} 관련 계산기를 한 곳에서 빠르게 찾아보시고, 한국어 설명과 함께 바로 계산을 시작해보실 수 있어요.` : `Browse calculators in ${category.name.toLowerCase()} for quick answers, easy comparisons, and everyday planning.`}</p>
+              <p className="mt-3 text-sm leading-7 text-slate-600">{isKo ? `${category.name} 관련 계산기를 빠르게 찾고, 결과를 이해하는 데 필요한 설명도 함께 확인해보세요.` : `Browse calculators in ${category.name.toLowerCase()} for quick answers, easy comparisons, and everyday planning.`}</p>
             </Link>
           ))}
         </div>

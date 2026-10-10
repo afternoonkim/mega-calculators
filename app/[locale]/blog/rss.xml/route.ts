@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getBlogPosts } from "@/lib/editorial";
+import { getBlogPosts } from "@/lib/editorialCurrent";
 import { normalizeLocale } from "@/lib/i18n";
 
 const SITE_URL = "https://mega-calculators.com";

@@ -1,0 +1,17 @@
+file:///home/runner/work/mega-calculators/mega-calculators/scripts/audit-content.mjs:320
+if (!entries.length) throw new Error("No EditorialEntry arrays were found; audit parser needs attention.");
+                           ^
+
+Error: No EditorialEntry arrays were found; audit parser needs attention.
+    at file:///home/runner/work/mega-calculators/mega-calculators/scripts/audit-content.mjs:320:28
+    at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v20.20.2
+Traceback (most recent call last):
+  File "/home/runner/work/mega-calculators/mega-calculators/scripts/setup-content-audit.py", line 390, in <module>
+    subprocess.run(["node", "scripts/audit-content.mjs", "--write-baseline"], cwd=ROOT, check=True)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['node', 'scripts/audit-content.mjs', '--write-baseline']' returned non-zero exit status 1.

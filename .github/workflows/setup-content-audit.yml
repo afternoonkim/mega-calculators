@@ -1,0 +1,62 @@
+name: Setup content audit gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/setup-content-audit.py"
+      - ".github/workflows/setup-content-audit.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  setup-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Prepare persistent content audit
+        run: python scripts/setup-content-audit.py
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Content audit
+        run: npm run audit:content:batch
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Test
+        run: npm test
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit content audit foundation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json scripts/audit-content.mjs scripts/content-audit-baseline.json
+          if git diff --cached --quiet; then
+            echo "No functional changes to commit"
+            exit 0
+          fi
+          git commit -m "chore: add baseline-aware content audit gate"
+          git push origin HEAD:main

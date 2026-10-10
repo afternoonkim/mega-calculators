@@ -1,0 +1,806 @@
+name: Phase 6 core calculator upgrade
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/phase6-core-calculators.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  upgrade-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Upgrade mortgage and paycheck calculators
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_between(path, start_marker, end_marker, replacement):
+              text = path.read_text(encoding="utf-8")
+              start = text.index(start_marker)
+              end = text.index(end_marker, start)
+              path.write_text(text[:start] + replacement + text[end:], encoding="utf-8")
+
+          def replace_once(path, old, new):
+              text = path.read_text(encoding="utf-8")
+              if text.count(old) != 1:
+                  raise SystemExit(f"Expected exactly one match in {path}: {old[:80]!r}, found {text.count(old)}")
+              path.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          engine = Path("lib/calculators/engine.ts")
+          data = Path("lib/calculators/data.ts")
+          additional = Path("lib/calculators/additional.ts")
+          tests = Path("lib/calculators/engine.test.ts")
+          localization = Path("lib/calculators/localization.ts")
+
+          helper_marker = '''function positiveMonths(years: number) {
+            return Math.max(Math.round(years * 12), 1);
+          }
+'''
+          helpers = helper_marker + '''
+          type FilingStatus2026 = "single" | "marriedJoint" | "marriedSeparate" | "headOfHousehold";
+
+          const STANDARD_DEDUCTION_2026: Record<FilingStatus2026, number> = {
+            single: 16100,
+            marriedJoint: 32200,
+            marriedSeparate: 16100,
+            headOfHousehold: 24150,
+          };
+
+          const FEDERAL_BRACKETS_2026: Record<FilingStatus2026, { cap: number; rate: number }[]> = {
+            single: [
+              { cap: 12400, rate: 0.10 },
+              { cap: 50400, rate: 0.12 },
+              { cap: 105700, rate: 0.22 },
+              { cap: 201775, rate: 0.24 },
+              { cap: 256225, rate: 0.32 },
+              { cap: 640600, rate: 0.35 },
+              { cap: Number.POSITIVE_INFINITY, rate: 0.37 },
+            ],
+            marriedJoint: [
+              { cap: 24800, rate: 0.10 },
+              { cap: 100800, rate: 0.12 },
+              { cap: 211400, rate: 0.22 },
+              { cap: 403550, rate: 0.24 },
+              { cap: 512450, rate: 0.32 },
+              { cap: 768700, rate: 0.35 },
+              { cap: Number.POSITIVE_INFINITY, rate: 0.37 },
+            ],
+            marriedSeparate: [
+              { cap: 12400, rate: 0.10 },
+              { cap: 50400, rate: 0.12 },
+              { cap: 105700, rate: 0.22 },
+              { cap: 201775, rate: 0.24 },
+              { cap: 256225, rate: 0.32 },
+              { cap: 384350, rate: 0.35 },
+              { cap: Number.POSITIVE_INFINITY, rate: 0.37 },
+            ],
+            headOfHousehold: [
+              { cap: 17700, rate: 0.10 },
+              { cap: 67450, rate: 0.12 },
+              { cap: 105700, rate: 0.22 },
+              { cap: 201750, rate: 0.24 },
+              { cap: 256200, rate: 0.32 },
+              { cap: 640600, rate: 0.35 },
+              { cap: Number.POSITIVE_INFINITY, rate: 0.37 },
+            ],
+          };
+
+          function normalizeFilingStatus(value: string | undefined): FilingStatus2026 {
+            if (value === "marriedJoint" || value === "marriedSeparate" || value === "headOfHousehold") return value;
+            return "single";
+          }
+
+          function progressiveFederalTax2026(taxableIncome: number, filingStatus: FilingStatus2026) {
+            const income = Math.max(taxableIncome, 0);
+            let tax = 0;
+            let lower = 0;
+            for (const bracket of FEDERAL_BRACKETS_2026[filingStatus]) {
+              const amountInBracket = Math.max(Math.min(income, bracket.cap) - lower, 0);
+              tax += amountInBracket * bracket.rate;
+              if (income <= bracket.cap) break;
+              lower = bracket.cap;
+            }
+            return tax;
+          }
+
+          function payPeriodsFromFrequency(value: string | undefined, fallback: number) {
+            const periods: Record<string, number> = {
+              weekly: 52,
+              biweekly: 26,
+              semimonthly: 24,
+              monthly: 12,
+            };
+            return periods[String(value ?? "")] ?? Math.max(Math.round(fallback), 1);
+          }
+'''
+          replace_once(engine, helper_marker, helpers)
+
+          paycheck_start = '''      if (definition.slug === "paycheck-calculator" || definition.slug === "biweekly-paycheck-calculator") {'''
+          paycheck_end = '''      const result = evaluateNumericExpression(definition.expr || "0", values);'''
+          paycheck_block = '''      if (definition.slug === "paycheck-calculator" || definition.slug === "biweekly-paycheck-calculator") {
+            const grossAnnual = Math.max(num(values.grossAnnual), 0);
+            const filingStatus = normalizeFilingStatus(values.filingStatus);
+            const annual401k = Math.max(num(values.annual401k), 0);
+            const annualHsaFsa = Math.max(num(values.annualHsaFsa), 0);
+            const annualOtherPreTax = Math.max(num(values.annualOtherPreTax), 0);
+            const requestedPreTax = annual401k + annualHsaFsa + annualOtherPreTax;
+            const totalPreTax = Math.min(requestedPreTax, grossAnnual);
+            const incomeTaxBaseBeforeDeduction = Math.max(grossAnnual - totalPreTax, 0);
+            const federalTaxableIncome = Math.max(
+              incomeTaxBaseBeforeDeduction - STANDARD_DEDUCTION_2026[filingStatus],
+              0,
+            );
+            const federalIncomeTax = progressiveFederalTax2026(federalTaxableIncome, filingStatus);
+            const stateLocalRate = Math.min(Math.max(num(values.stateLocalTaxRate), 0), 100) / 100;
+            const stateLocalTax = incomeTaxBaseBeforeDeduction * stateLocalRate;
+
+            // Traditional 401(k) deferrals generally remain subject to FICA. HSA/FSA payroll deductions
+            // may reduce FICA wages when made through an eligible cafeteria/payroll arrangement, so this
+            // planning estimate reduces FICA wages by the entered HSA/FSA amount only.
+            const ficaWages = Math.max(grossAnnual - Math.min(annualHsaFsa, grossAnnual), 0);
+            const socialSecurity = Math.min(ficaWages, 184500) * 0.062;
+            const medicare = (ficaWages * 0.0145) + (Math.max(ficaWages - 200000, 0) * 0.009);
+            const annualPostTax = Math.max(num(values.annualPostTaxDeductions), 0);
+            const totalTaxes = federalIncomeTax + stateLocalTax + socialSecurity + medicare;
+            const annualTakeHome = Math.max(grossAnnual - totalPreTax - totalTaxes - annualPostTax, 0);
+            const payPeriods = definition.slug === "biweekly-paycheck-calculator"
+              ? 26
+              : payPeriodsFromFrequency(values.payFrequency, num(values.payPeriods));
+            const takeHomePerPaycheck = annualTakeHome / payPeriods;
+            const grossPerPaycheck = grossAnnual / payPeriods;
+            const deductionsPct = grossAnnual > 0 ? ((grossAnnual - annualTakeHome) / grossAnnual) * 100 : 0;
+
+            return {
+              primary: { label: "Estimated take-home pay per paycheck", value: currency(takeHomePerPaycheck, locale) },
+              secondary: [
+                { label: "Gross pay per paycheck", value: currency(grossPerPaycheck, locale) },
+                { label: "Federal income tax per paycheck", value: currency(federalIncomeTax / payPeriods, locale) },
+                { label: "State/local tax per paycheck", value: currency(stateLocalTax / payPeriods, locale) },
+                { label: "Social Security per paycheck", value: currency(socialSecurity / payPeriods, locale) },
+                { label: "Medicare per paycheck", value: currency(medicare / payPeriods, locale) },
+                { label: "Pre-tax deductions per paycheck", value: currency(totalPreTax / payPeriods, locale) },
+                { label: "Post-tax deductions per paycheck", value: currency(annualPostTax / payPeriods, locale) },
+                { label: "Estimated annual take-home pay", value: currency(annualTakeHome, locale) },
+                { label: "Estimated total deduction rate", value: percent(deductionsPct, 2, locale) },
+              ],
+              note: "This is a 2026 planning estimate using federal tax brackets, the standard deduction, Social Security, Medicare, and the state/local rate you enter. It is not an exact W-4 withholding calculation and does not model tax credits, itemized deductions, bonuses, every payroll benefit, or every state/local rule.",
+            };
+          }
+
+'''
+          replace_between(engine, paycheck_start, paycheck_end, paycheck_block)
+
+          mortgage_start = '''    case "mortgagePayment": {'''
+          mortgage_end = '''    case "retirement": {'''
+          mortgage_block = '''    case "mortgagePayment": {
+            const homePrice = Math.max(num(values.homePrice), 0);
+            const downPayment = Math.min(Math.max(num(values.downPayment), 0), homePrice);
+            const amount = Math.max(homePrice - downPayment, 0);
+            const annualRate = Math.max(num(values.annualRate), 0) / 100;
+            const months = positiveMonths(num(values.years));
+            const monthlyRate = annualRate / 12;
+            const principalAndInterest = monthlyRate === 0
+              ? amount / months
+              : amount * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+            const extraMonthlyPrincipal = Math.max(num(values.extraMonthlyPrincipal), 0);
+            const downPct = homePrice > 0 ? (downPayment / homePrice) * 100 : 0;
+            const propertyTax = homePrice * Math.max(num(values.propertyTaxRate), 0) / 100 / 12;
+            const homeownersInsurance = Math.max(num(values.annualInsurance), 0) / 12;
+            const hoa = Math.max(num(values.monthlyHoa), 0);
+            const pmi = downPct < 20 ? amount * Math.max(num(values.annualPmiRate), 0) / 100 / 12 : 0;
+            const monthlyHousingOutflow = principalAndInterest + extraMonthlyPrincipal + propertyTax + homeownersInsurance + hoa + pmi;
+            const scheduledTotalInterest = Math.max((principalAndInterest * months) - amount, 0);
+
+            let balance = amount;
+            let acceleratedInterest = 0;
+            let acceleratedMonths = 0;
+            const maxSimulationMonths = Math.max(months * 2, 1200);
+            while (balance > 0.005 && acceleratedMonths < maxSimulationMonths) {
+              const interest = balance * monthlyRate;
+              const payment = Math.min(principalAndInterest + extraMonthlyPrincipal, balance + interest);
+              const principalPaid = payment - interest;
+              if (principalPaid <= 0) break;
+              acceleratedInterest += interest;
+              balance = Math.max(balance - principalPaid, 0);
+              acceleratedMonths += 1;
+            }
+
+            const estimatedInterestSavings = Math.max(scheduledTotalInterest - acceleratedInterest, 0);
+            return {
+              primary: { label: "Estimated monthly housing outflow", value: currency(monthlyHousingOutflow, locale) },
+              secondary: [
+                { label: "Scheduled principal & interest", value: currency(principalAndInterest, locale) },
+                { label: "Extra principal payment", value: currency(extraMonthlyPrincipal, locale) },
+                { label: "Property tax", value: currency(propertyTax, locale) },
+                { label: "Homeowners insurance", value: currency(homeownersInsurance, locale) },
+                { label: "PMI", value: currency(pmi, locale) },
+                { label: "HOA dues", value: currency(hoa, locale) },
+                { label: "Loan amount", value: currency(amount, locale) },
+                { label: "Down payment", value: percent(downPct, 2, locale) },
+                { label: "Estimated payoff time", value: monthsToText(acceleratedMonths, locale) },
+                { label: "Estimated interest with extra payments", value: currency(acceleratedInterest, locale) },
+                { label: "Estimated interest savings", value: currency(estimatedInterestSavings, locale) },
+              ],
+              note: "Taxes, insurance, HOA dues, and PMI can change over time. Extra principal is modeled as a monthly payment from the start of the loan; actual lender application rules and payoff timing can differ.",
+            };
+          }
+'''
+          replace_between(engine, mortgage_start, mortgage_end, mortgage_block)
+
+          mortgage_definition_start = '''  {
+            "category": "finance",
+            "categoryName": "Finance Calculators",
+            "slug": "mortgage-calculator",'''
+          mortgage_definition_end = '''  {
+            "category": "finance",
+            "categoryName": "Finance Calculators",
+            "slug": "investment-calculator",'''
+          mortgage_definition = '''  {
+            "category": "finance",
+            "categoryName": "Finance Calculators",
+            "slug": "mortgage-calculator",
+            "name": "Mortgage Calculator",
+            "kind": "mortgagePayment",
+            "description": "Estimate monthly housing cost with principal, interest, property tax, homeowners insurance, PMI, HOA dues, and optional extra principal payments.",
+            "intro": "Use this mortgage calculator to estimate the monthly cost of owning a home and see how an extra monthly principal payment may change payoff time and total interest. Add property tax, homeowners insurance, HOA dues, and an estimated PMI rate for a fuller budget view.",
+            "formulaText": "The calculator computes fixed-rate principal and interest from the financed amount, adds monthly property tax, homeowners insurance, HOA dues, and estimated PMI when the down payment is below 20%, then simulates the balance month by month when you add extra principal.",
+            "howToUse": [
+              "Enter the home purchase price and expected down payment.",
+              "Enter the mortgage rate, term, property tax rate, annual homeowners insurance, and any HOA dues.",
+              "If your down payment is below 20%, enter an estimated annual PMI rate or set it to 0 if it does not apply.",
+              "Add an optional extra monthly principal payment to compare payoff time and interest savings.",
+              "Compare the monthly housing outflow with your budget and lender quote."
+            ],
+            "example": "A $400,000 home with an $80,000 down payment and a 30-year mortgage can have very different lifetime interest depending on the rate and whether you add extra principal each month.",
+            "faq": [
+              {
+                "q": "Does this mortgage calculator include taxes and insurance?",
+                "a": "Yes. The estimate can include property tax, homeowners insurance, HOA dues, and PMI in addition to principal and interest. These inputs are estimates, so compare the result with an actual lender disclosure before making a decision."
+              },
+              {
+                "q": "What does the extra monthly principal field show?",
+                "a": "It estimates how a recurring extra payment applied to principal could shorten the payoff period and reduce mortgage interest. Your lender may apply or schedule extra payments differently, so confirm the actual process before sending extra money."
+              },
+              {
+                "q": "Can I use this for refinance estimates?",
+                "a": "Yes. If you know the refinance balance, rate, term, and recurring housing costs, the same fixed-rate math can provide a planning estimate."
+              }
+            ],
+            "inputs": [
+              {
+                "name": "homePrice",
+                "label": "Home price (USD)",
+                "type": "number",
+                "defaultValue": "400000",
+                "min": "0",
+                "step": "0.01"
+              },
+              {
+                "name": "downPayment",
+                "label": "Down payment (USD)",
+                "type": "number",
+                "defaultValue": "80000",
+                "min": "0",
+                "step": "0.01"
+              },
+              {
+                "name": "annualRate",
+                "label": "Annual interest rate (%)",
+                "type": "number",
+                "defaultValue": "6.25",
+                "min": "0",
+                "step": "0.01"
+              },
+              {
+                "name": "years",
+                "label": "Mortgage term (years)",
+                "type": "number",
+                "defaultValue": "30",
+                "min": "1",
+                "step": "1"
+              },
+              {
+                "name": "extraMonthlyPrincipal",
+                "label": "Extra monthly principal (USD)",
+                "type": "number",
+                "defaultValue": "0",
+                "min": "0",
+                "step": "1"
+              },
+              {
+                "name": "propertyTaxRate",
+                "label": "Annual property tax rate (%)",
+                "type": "number",
+                "defaultValue": "1.1",
+                "min": "0",
+                "step": "0.01"
+              },
+              {
+                "name": "annualInsurance",
+                "label": "Annual homeowners insurance (USD)",
+                "type": "number",
+                "defaultValue": "1800",
+                "min": "0",
+                "step": "1"
+              },
+              {
+                "name": "monthlyHoa",
+                "label": "Monthly HOA dues (USD)",
+                "type": "number",
+                "defaultValue": "0",
+                "min": "0",
+                "step": "1"
+              },
+              {
+                "name": "annualPmiRate",
+                "label": "Estimated annual PMI rate (%)",
+                "type": "number",
+                "defaultValue": "0.5",
+                "min": "0",
+                "step": "0.01"
+              }
+            ],
+            "relatedSlugs": [
+              "compound-interest-calculator",
+              "loan-calculator",
+              "investment-calculator",
+              "dividend-yield-calculator"
+            ]
+          },
+'''
+          replace_between(data, mortgage_definition_start, mortgage_definition_end, mortgage_definition)
+
+          paycheck_definition_start = '''  {
+            "category": "finance",
+            "categoryName": "Finance Calculators",
+            "slug": "paycheck-calculator",'''
+          paycheck_definition_end = '''  {
+            "category": "finance",
+            "categoryName": "Finance Calculators",
+            "slug": "biweekly-paycheck-calculator",'''
+          paycheck_definition = '''  {
+            "category": "finance",
+            "categoryName": "Finance Calculators",
+            "slug": "paycheck-calculator",
+            "name": "Paycheck Calculator",
+            "kind": "expression",
+            "description": "Estimate 2026 take-home pay with federal income tax, Social Security, Medicare, an optional state/local rate, and common payroll deductions.",
+            "intro": "Estimate how annual salary turns into each paycheck using 2026 federal brackets and the standard deduction, plus Social Security, Medicare, your filing status, pay frequency, 401(k), HSA/FSA payroll deductions, other pre-tax deductions, and post-tax deductions.",
+            "formulaText": "The calculator annualizes your inputs, estimates 2026 federal income tax with progressive brackets and the standard deduction, adds employee Social Security and Medicare, applies the state/local effective tax rate you enter, subtracts payroll deductions, and divides estimated annual take-home pay by your pay frequency.",
+            "howToUse": [
+              "Enter your gross annual salary and filing status.",
+              "Choose how often you are paid.",
+              "Add annual 401(k), HSA/FSA, other pre-tax, and post-tax deductions that apply to you.",
+              "Enter an estimated state/local effective income-tax rate, or 0 if you do not want to include one.",
+              "Compare the estimate with your real pay stub or the IRS Tax Withholding Estimator before changing withholding."
+            ],
+            "example": "For an $85,000 salary paid biweekly, compare different filing statuses, retirement contributions, health-account deductions, and state/local tax assumptions to see how estimated take-home pay changes.",
+            "faq": [
+              {
+                "q": "Does this use 2026 federal tax brackets?",
+                "a": "Yes. It uses 2026 federal income-tax brackets and standard deduction amounts for Single, Married Filing Jointly, Married Filing Separately, and Head of Household. It does not calculate every credit or W-4 adjustment."
+              },
+              {
+                "q": "Does this include Social Security and Medicare?",
+                "a": "Yes. It estimates the employee share of Social Security and Medicare, including the 2026 Social Security wage base and Additional Medicare withholding above the employer withholding threshold."
+              },
+              {
+                "q": "Is the result the exact amount my employer will withhold?",
+                "a": "No. This is an annualized planning estimate. W-4 settings, tax credits, bonuses, benefit tax treatment, multiple jobs, and state or local withholding rules can change an actual paycheck."
+              }
+            ],
+            "inputs": [
+              {
+                "name": "grossAnnual",
+                "label": "Gross annual salary (USD)",
+                "type": "number",
+                "defaultValue": "85000",
+                "min": "0",
+                "step": "0.01"
+              },
+              {
+                "name": "filingStatus",
+                "label": "Filing status",
+                "type": "select",
+                "defaultValue": "single",
+                "options": [
+                  { "label": "Single", "value": "single" },
+                  { "label": "Married filing jointly", "value": "marriedJoint" },
+                  { "label": "Married filing separately", "value": "marriedSeparate" },
+                  { "label": "Head of household", "value": "headOfHousehold" }
+                ]
+              },
+              {
+                "name": "payFrequency",
+                "label": "Pay frequency",
+                "type": "select",
+                "defaultValue": "biweekly",
+                "options": [
+                  { "label": "Weekly", "value": "weekly" },
+                  { "label": "Biweekly (26/year)", "value": "biweekly" },
+                  { "label": "Semimonthly (24/year)", "value": "semimonthly" },
+                  { "label": "Monthly", "value": "monthly" }
+                ]
+              },
+              {
+                "name": "annual401k",
+                "label": "Annual 401(k) contribution (USD)",
+                "type": "number",
+                "defaultValue": "6000",
+                "min": "0",
+                "step": "1"
+              },
+              {
+                "name": "annualHsaFsa",
+                "label": "Annual HSA/FSA payroll deductions (USD)",
+                "type": "number",
+                "defaultValue": "0",
+                "min": "0",
+                "step": "1"
+              },
+              {
+                "name": "annualOtherPreTax",
+                "label": "Other annual pre-tax deductions (USD)",
+                "type": "number",
+                "defaultValue": "0",
+                "min": "0",
+                "step": "1"
+              },
+              {
+                "name": "stateLocalTaxRate",
+                "label": "State/local effective tax rate (%)",
+                "type": "number",
+                "defaultValue": "0",
+                "min": "0",
+                "max": "100",
+                "step": "0.01"
+              },
+              {
+                "name": "annualPostTaxDeductions",
+                "label": "Annual post-tax deductions (USD)",
+                "type": "number",
+                "defaultValue": "1200",
+                "min": "0",
+                "step": "1"
+              }
+            ],
+            "expr": "grossAnnual/26",
+            "primary": "Estimated take-home pay per paycheck",
+            "prefix": "$",
+            "suffix": "",
+            "relatedSlugs": [
+              "loan-calculator",
+              "mortgage-calculator",
+              "compound-interest-calculator",
+              "budget-calculator"
+            ]
+          },
+'''
+          replace_between(additional, paycheck_definition_start, paycheck_definition_end, paycheck_definition)
+
+          biweekly_definition_start = paycheck_definition_end
+          biweekly_definition_end = '''  {
+            "category": "finance",
+            "categoryName": "Finance Calculators",
+            "slug": "annual-income-calculator",'''
+          biweekly_definition = '''  {
+            "category": "finance",
+            "categoryName": "Finance Calculators",
+            "slug": "biweekly-paycheck-calculator",
+            "name": "Biweekly Paycheck Calculator",
+            "kind": "expression",
+            "description": "Estimate a 2026 biweekly paycheck with federal income tax, Social Security, Medicare, an optional state/local rate, and common payroll deductions.",
+            "intro": "Estimate a 26-pay-period paycheck using 2026 federal brackets and the standard deduction, plus Social Security, Medicare, filing status, 401(k), HSA/FSA payroll deductions, other pre-tax deductions, and post-tax deductions.",
+            "formulaText": "The calculator estimates annual federal income tax using 2026 progressive brackets and the standard deduction, adds employee Social Security and Medicare, applies your state/local effective rate, subtracts payroll deductions, and divides annual take-home pay by 26.",
+            "howToUse": [
+              "Enter your gross annual salary and filing status.",
+              "Add annual 401(k), HSA/FSA, other pre-tax, and post-tax deductions that apply to you.",
+              "Enter an estimated state/local effective income-tax rate, or 0 if you do not want to include one.",
+              "Compare the estimate with your actual biweekly pay stub before changing withholding."
+            ],
+            "example": "For an $85,000 salary paid every two weeks, change retirement contributions or the state/local tax assumption to see how the estimated 26 paychecks change.",
+            "faq": [
+              {
+                "q": "How many paychecks does this calculator assume?",
+                "a": "It assumes 26 paychecks per year, which is the common biweekly schedule."
+              },
+              {
+                "q": "Does it include federal payroll taxes?",
+                "a": "Yes. It estimates 2026 federal income tax plus employee Social Security and Medicare. It is still a planning estimate rather than an exact payroll withholding calculation."
+              },
+              {
+                "q": "Why might my real biweekly paycheck be different?",
+                "a": "Your W-4 elections, credits, multiple jobs, bonuses, benefit tax treatment, and state or local rules can all change actual withholding."
+              }
+            ],
+            "inputs": [
+              {
+                "name": "grossAnnual",
+                "label": "Gross annual salary (USD)",
+                "type": "number",
+                "defaultValue": "85000",
+                "min": "0",
+                "step": "0.01"
+              },
+              {
+                "name": "filingStatus",
+                "label": "Filing status",
+                "type": "select",
+                "defaultValue": "single",
+                "options": [
+                  { "label": "Single", "value": "single" },
+                  { "label": "Married filing jointly", "value": "marriedJoint" },
+                  { "label": "Married filing separately", "value": "marriedSeparate" },
+                  { "label": "Head of household", "value": "headOfHousehold" }
+                ]
+              },
+              {
+                "name": "annual401k",
+                "label": "Annual 401(k) contribution (USD)",
+                "type": "number",
+                "defaultValue": "6000",
+                "min": "0",
+                "step": "1"
+              },
+              {
+                "name": "annualHsaFsa",
+                "label": "Annual HSA/FSA payroll deductions (USD)",
+                "type": "number",
+                "defaultValue": "0",
+                "min": "0",
+                "step": "1"
+              },
+              {
+                "name": "annualOtherPreTax",
+                "label": "Other annual pre-tax deductions (USD)",
+                "type": "number",
+                "defaultValue": "0",
+                "min": "0",
+                "step": "1"
+              },
+              {
+                "name": "stateLocalTaxRate",
+                "label": "State/local effective tax rate (%)",
+                "type": "number",
+                "defaultValue": "0",
+                "min": "0",
+                "max": "100",
+                "step": "0.01"
+              },
+              {
+                "name": "annualPostTaxDeductions",
+                "label": "Annual post-tax deductions (USD)",
+                "type": "number",
+                "defaultValue": "1200",
+                "min": "0",
+                "step": "1"
+              }
+            ],
+            "expr": "grossAnnual/26",
+            "primary": "Estimated biweekly take-home pay",
+            "prefix": "$",
+            "suffix": "",
+            "relatedSlugs": [
+              "loan-calculator",
+              "mortgage-calculator",
+              "compound-interest-calculator",
+              "budget-calculator"
+            ]
+          },
+'''
+          replace_between(additional, biweekly_definition_start, biweekly_definition_end, biweekly_definition)
+
+          test_start = '''  it("calculates an all-in monthly mortgage estimate with PITI and HOA", () => {'''
+          test_end = '''  it("calculates compound growth with recurring monthly contributions", () => {'''
+          test_block = '''  it("calculates an all-in monthly mortgage estimate with PITI and HOA", () => {
+            const result = computeCalculator(
+              definition("mortgagePayment", "mortgage-calculator", "finance"),
+              {
+                homePrice: "400000",
+                downPayment: "80000",
+                annualRate: "6.25",
+                years: "30",
+                extraMonthlyPrincipal: "0",
+                propertyTaxRate: "1.1",
+                annualInsurance: "1800",
+                monthlyHoa: "100",
+                annualPmiRate: "0.5",
+              },
+            );
+
+            expect(result.primary.value).toBe("$2,586.96");
+            expect(secondaryValue(result, "Scheduled principal & interest")).toBe("$1,970.30");
+            expect(secondaryValue(result, "Property tax")).toBe("$366.67");
+            expect(secondaryValue(result, "Homeowners insurance")).toBe("$150.00");
+            expect(secondaryValue(result, "PMI")).toBe("$0.00");
+            expect(secondaryValue(result, "HOA dues")).toBe("$100.00");
+            expect(secondaryValue(result, "Loan amount")).toBe("$320,000.00");
+            expect(secondaryValue(result, "Estimated payoff time")).toBe("30 years 0 months");
+          });
+
+          it("shows how extra mortgage principal can shorten payoff and reduce interest", () => {
+            const result = computeCalculator(
+              definition("mortgagePayment", "mortgage-calculator", "finance"),
+              {
+                homePrice: "400000",
+                downPayment: "80000",
+                annualRate: "6.25",
+                years: "30",
+                extraMonthlyPrincipal: "300",
+                propertyTaxRate: "1.1",
+                annualInsurance: "1800",
+                monthlyHoa: "100",
+                annualPmiRate: "0.5",
+              },
+            );
+
+            expect(result.primary.value).toBe("$2,886.96");
+            expect(secondaryValue(result, "Estimated payoff time")).toBe("21 years 4 months");
+            expect(secondaryValue(result, "Estimated interest with extra payments")).toBe("$258,937.52");
+            expect(secondaryValue(result, "Estimated interest savings")).toBe("$130,368.69");
+          });
+
+          it("adds estimated PMI when the down payment is below 20 percent", () => {
+            const result = computeCalculator(
+              definition("mortgagePayment", "mortgage-calculator", "finance"),
+              {
+                homePrice: "400000",
+                downPayment: "40000",
+                annualRate: "6.25",
+                years: "30",
+                extraMonthlyPrincipal: "0",
+                propertyTaxRate: "0",
+                annualInsurance: "0",
+                monthlyHoa: "0",
+                annualPmiRate: "0.5",
+              },
+            );
+
+            expect(secondaryValue(result, "PMI")).toBe("$150.00");
+          });
+
+          it("uses 2026 federal brackets, FICA, payroll deductions, and pay frequency for paycheck estimates", () => {
+            const result = computeCalculator(
+              definition("expression", "paycheck-calculator", "finance"),
+              {
+                grossAnnual: "85000",
+                filingStatus: "single",
+                payFrequency: "biweekly",
+                annual401k: "6000",
+                annualHsaFsa: "0",
+                annualOtherPreTax: "0",
+                stateLocalTaxRate: "5",
+                annualPostTaxDeductions: "1200",
+              },
+            );
+
+            expect(result.primary.value).toBe("$2,261.44");
+            expect(secondaryValue(result, "Gross pay per paycheck")).toBe("$3,269.23");
+            expect(secondaryValue(result, "Federal income tax per paycheck")).toBe("$328.85");
+            expect(secondaryValue(result, "State/local tax per paycheck")).toBe("$151.92");
+            expect(secondaryValue(result, "Social Security per paycheck")).toBe("$202.69");
+            expect(secondaryValue(result, "Medicare per paycheck")).toBe("$47.40");
+            expect(secondaryValue(result, "Estimated annual take-home pay")).toBe("$58,797.50");
+          });
+
+          it("caps 2026 Social Security wages and adds Medicare withholding above $200,000", () => {
+            const result = computeCalculator(
+              definition("expression", "paycheck-calculator", "finance"),
+              {
+                grossAnnual: "250000",
+                filingStatus: "single",
+                payFrequency: "biweekly",
+                annual401k: "0",
+                annualHsaFsa: "0",
+                annualOtherPreTax: "0",
+                stateLocalTaxRate: "0",
+                annualPostTaxDeductions: "0",
+              },
+            );
+
+            expect(secondaryValue(result, "Social Security per paycheck")).toBe("$439.96");
+            expect(secondaryValue(result, "Medicare per paycheck")).toBe("$156.73");
+          });
+
+'''
+          replace_between(tests, test_start, test_end, test_block)
+
+          input_anchor = '''  "Annual salary (USD)": "연봉 (원)",'''
+          input_entries = input_anchor + '''
+            "Annual 401(k) contribution (USD)": "연간 401(k) 납입액 (원)",
+            "Annual HSA/FSA payroll deductions (USD)": "연간 HSA/FSA 급여 공제액 (원)",
+            "Annual homeowners insurance (USD)": "연간 주택 보험료 (원)",
+            "Annual post-tax deductions (USD)": "연간 세후 공제액 (원)",
+            "Annual property tax rate (%)": "연간 재산세율 (%)",
+            "Estimated annual PMI rate (%)": "예상 연간 PMI 비율 (%)",
+            "Extra monthly principal (USD)": "월 추가 원금 상환액 (원)",
+            "Filing status": "세금 신고 유형",
+            "Gross annual salary (USD)": "연간 총급여 (원)",
+            "Head of household": "세대주",
+            "Married filing jointly": "부부 공동 신고",
+            "Married filing separately": "부부 개별 신고",
+            "Monthly HOA dues (USD)": "월 HOA 관리비 (원)",
+            "Other annual pre-tax deductions (USD)": "기타 연간 세전 공제액 (원)",
+            "Pay frequency": "급여 지급 주기",
+            "Single": "미혼",
+            "State/local effective tax rate (%)": "주·지방세 예상 실효세율 (%)",
+            "Weekly": "매주",
+            "Biweekly (26/year)": "격주 (연 26회)",
+            "Semimonthly (24/year)": "월 2회 (연 24회)",
+            "Monthly": "매월",'''
+          replace_once(localization, input_anchor, input_entries)
+
+          result_anchor = '''  "Estimated monthly mortgage": "예상 월 주택담보대출 상환액",'''
+          result_entries = result_anchor + '''
+            "Estimated monthly housing outflow": "예상 월 주거비 지출",
+            "Scheduled principal & interest": "기본 원리금 상환액",
+            "Extra principal payment": "추가 원금 상환액",
+            "Property tax": "재산세",
+            "Homeowners insurance": "주택 보험료",
+            "PMI": "PMI",
+            "HOA dues": "HOA 관리비",
+            "Estimated interest with extra payments": "추가 상환 반영 예상 이자",
+            "Estimated interest savings": "예상 이자 절감액",
+            "Estimated take-home pay per paycheck": "회당 예상 실수령액",
+            "Gross pay per paycheck": "회당 세전 급여",
+            "Federal income tax per paycheck": "회당 연방소득세",
+            "State/local tax per paycheck": "회당 주·지방세",
+            "Social Security per paycheck": "회당 사회보장세",
+            "Medicare per paycheck": "회당 메디케어세",
+            "Pre-tax deductions per paycheck": "회당 세전 공제액",
+            "Post-tax deductions per paycheck": "회당 세후 공제액",
+            "Estimated annual take-home pay": "예상 연간 실수령액",
+            "Estimated total deduction rate": "예상 총 공제 비율",'''
+          replace_once(localization, result_anchor, result_entries)
+
+          long_anchor = '''  "Your payment does not cover the monthly interest, so the balance will not go down.": "현재 상환액이 월 이자보다 적어서 대출 잔액이 줄어들지 않습니다.",'''
+          long_entries = long_anchor + '''
+            "Taxes, insurance, HOA dues, and PMI can change over time. Extra principal is modeled as a monthly payment from the start of the loan; actual lender application rules and payoff timing can differ.": "재산세, 보험료, HOA 관리비, PMI는 달라질 수 있습니다. 추가 원금은 대출 시작부터 매달 납부하는 것으로 계산하며, 실제 금융기관의 처리 방식과 상환 시점은 다를 수 있습니다.",
+            "This is a 2026 planning estimate using federal tax brackets, the standard deduction, Social Security, Medicare, and the state/local rate you enter. It is not an exact W-4 withholding calculation and does not model tax credits, itemized deductions, bonuses, every payroll benefit, or every state/local rule.": "2026년 연방세 구간과 표준공제, 사회보장세, 메디케어세, 입력한 주·지방세율을 이용한 예상값입니다. 실제 W-4 원천징수액과는 다를 수 있으며 세액공제, 항목별 공제, 보너스, 모든 복리후생과 지역별 규정을 모두 반영하지는 않습니다.",'''
+          replace_once(localization, long_anchor, long_entries)
+          PY
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Content audit
+        run: npm run audit:content:batch
+
+      - name: Test
+        run: npm test
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit phase 6 atomically
+        run: |
+          rm .github/workflows/phase6-core-calculators.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/calculators/engine.ts lib/calculators/data.ts lib/calculators/additional.ts lib/calculators/engine.test.ts lib/calculators/localization.ts .github/workflows/phase6-core-calculators.yml
+          git commit -m "feat: complete core mortgage and paycheck upgrades"
+          git push origin HEAD:main

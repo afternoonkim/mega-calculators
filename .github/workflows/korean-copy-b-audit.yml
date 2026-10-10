@@ -1,17 +1,73 @@
-name: Korean Copy B Audit
+name: Korean Naturalization B
 
 on:
   push:
     branches: [main]
     paths:
+      - scripts/korean_naturalization_b.py
       - .github/workflows/korean-copy-b-audit.yml
 
+permissions:
+  contents: write
+
 jobs:
-  audit:
+  apply-and-validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Find mechanical Korean copy
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Apply Korean naturalization B
+        run: python scripts/korean_naturalization_b.py
+
+      - name: Assert B cleanup
         run: |
-          echo '=== 하실 수 / 활용하시 / 참고용 / 도구 / 세분화 / 시뮬레이션 / 가늠 ==='
-          grep -R -n --include='*.ts' --include='*.tsx' -E '하실 수|활용하시|참고용|도구|세분화|시뮬레이션|가늠' app components lib || true
+          if grep -R -n --include='*.ts' --include='*.tsx' -E '세분화된 카테고리|무료 온라인 도구|한국어로 무료 계산|한국어 금융 계산기|한국어 도구|참고용 기준값|참고용 시뮬레이션값|여러 일정 시나리오' app components lib; then exit 1; fi
+          grep -q '주제별로 계산기를 둘러보고' app/'[locale]'/calculators/page.tsx
+          grep -q '무료 온라인 계산기' app/'[locale]'/page.tsx
+          grep -q '결과가 왜 그렇게 나오는지 궁금할 때' lib/calculators/localization.ts
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Test
+        run: npm test
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit B cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/'[locale]'/calculators/page.tsx \
+                  app/'[locale]'/calculators/'[category]'/page.tsx \
+                  app/'[locale]'/calculators/'[category]'/'[slug]'/formula/page.tsx \
+                  app/'[locale]'/calculators/'[category]'/'[slug]'/use-cases/page.tsx \
+                  app/'[locale]'/page.tsx \
+                  app/'[locale]'/about/page.tsx \
+                  app/'[locale]'/blog/page.tsx \
+                  app/'[locale]'/blog/rss.xml/route.ts \
+                  app/'[locale]'/guides/page.tsx \
+                  app/'[locale]'/layout.tsx \
+                  app/'[locale]'/terms/page.tsx \
+                  app/not-found.tsx \
+                  lib/calculators/localization.ts \
+                  lib/calculators/programmatic.ts
+          git commit -m "ux: naturalize Korean interface copy"
+          git push

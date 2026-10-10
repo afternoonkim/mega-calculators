@@ -7,6 +7,7 @@ on:
       - .github/workflows/phase6-core-calculators.yml
       - scripts/phase6_core_calculators.py
       - scripts/phase6_fix_inputs.py
+      - scripts/phase6_fix_expected.py
 
 permissions:
   contents: write
@@ -28,6 +29,9 @@ jobs:
 
       - name: Patch migration helper
         run: python scripts/phase6_fix_inputs.py
+
+      - name: Patch mortgage test rounding
+        run: python scripts/phase6_fix_expected.py
 
       - name: Apply core calculator upgrades
         run: python scripts/phase6_core_calculators.py

@@ -93,6 +93,16 @@ replace(
 )
 
 replace(
+    "lib/calculators/localization.ts",
+    [
+        (
+            '"직접 공식을 계산하지 않아도 계산기는 바로 사용할 수 있습니다. 이 페이지는 공식이 궁금한 사용자를 위해 개념과 해석 기준을 정리한 안내 페이지입니다."',
+            '"직접 공식을 계산하지 않아도 계산기는 바로 사용할 수 있습니다. 결과가 왜 그렇게 나오는지 궁금할 때 핵심 개념과 해석 기준을 확인해보세요."',
+        ),
+    ],
+)
+
+replace(
     "app/[locale]/calculators/[category]/[slug]/use-cases/page.tsx",
     [
         (

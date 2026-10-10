@@ -68,13 +68,13 @@ export default async function CalculatorFormulaPage({ params }: { params: Promis
           <h2 className="text-2xl font-bold text-slate-900">How to read the formula</h2>
           <div className="mt-4 space-y-4 text-sm leading-7 text-slate-600 md:text-base">
             <p>
-              The formula section explains the math logic behind the calculator result. On Mega Calculators, the formula is written in plain English so users can understand the relationship between the main inputs, not just copy numbers into a form.
+              See how the main inputs work together to produce the result. This can help when you want to check the math by hand or compare the result with a spreadsheet.
             </p>
             <p>
               For {calculator.name.toLowerCase()}, the most important step is understanding how each input changes the output. Small changes in time, rate, quantity, or conversion values can materially change the final result.
             </p>
             <p>
-              This page is meant to help with learning and comparison. For professional or regulated calculations, always confirm the result with an official document, lender, employer, school, or medical professional when relevant.
+              Use the result for learning and comparison. For professional or regulated decisions, confirm the final number with the relevant official source or qualified professional.
             </p>
           </div>
         </article>
@@ -98,7 +98,7 @@ export default async function CalculatorFormulaPage({ params }: { params: Promis
       <AdSlot slotKey="contentMid" label="Formula page ad" minHeightClass="min-h-[140px]" />
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-        <h2 className="text-2xl font-bold text-slate-900">Example pages related to this formula</h2>
+        <h2 className="text-2xl font-bold text-slate-900">More calculation examples</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {examples.map((example) => (
             <Link key={example.slug} href={`/calculators/${calculator.category}/${calculator.slug}/examples/${example.slug}`} className="rounded-2xl border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50">

@@ -110,27 +110,27 @@ export default async function CalculatorExamplePage({ params }: { params: Promis
         <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
           <h2 className="text-2xl font-bold text-slate-900">Why this example matters</h2>
           <p className="mt-4 text-sm leading-7 text-slate-600 md:text-base">
-            Example pages help you understand a calculator faster because they remove the blank-screen problem. Instead of guessing which numbers to enter, you can review a practical scenario and then adjust the values to match your own needs.
+            If this calculator is new to you, use these values as a starting point. See how the result is produced, then adjust the numbers to match your own situation.
           </p>
           <p className="mt-4 text-sm leading-7 text-slate-600 md:text-base">
-            This is especially useful for users who searched for a very specific long-tail question and want a quick answer before opening the full interactive tool.
+            If these numbers are close to your situation, use the result as a reference and then open the calculator to compare your own values.
           </p>
         </article>
 
         <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-          <h2 className="text-2xl font-bold text-slate-900">Next step</h2>
+          <h2 className="text-2xl font-bold text-slate-900">What to check next</h2>
           <p className="mt-4 text-sm leading-7 text-slate-600 md:text-base">
-            Use this example as a reference, then open the main calculator to test your own assumptions. You can also review the formula page and step-by-step guide if you want a deeper explanation.
+            Use this example as a reference, then open the calculator with your own values. You can also check how the result is calculated or review the input steps if you need more context.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href={`/calculators/${calculator.category}/${calculator.slug}`} className="rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-500">
               Open live calculator
             </Link>
             <Link href={hubLinks.formula} className="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50">
-              View formula
+              Understand the calculation
             </Link>
             <Link href={hubLinks.guide} className="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50">
-              Read guide
+              See how to use it
             </Link>
           </div>
         </article>

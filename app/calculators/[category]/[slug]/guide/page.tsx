@@ -71,20 +71,20 @@ export default async function CalculatorGuidePage({ params }: { params: Promise<
       <AdSlot slotKey="contentMid" label="Guide page ad" minHeightClass="min-h-[140px]" />
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-        <h2 className="text-2xl font-bold text-slate-900">Continue exploring this calculator cluster</h2>
+        <h2 className="text-2xl font-bold text-slate-900">What to check next</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <Link href={hubLinks.formula} className="rounded-2xl border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50">
-            <div className="text-sm font-semibold text-slate-900">{calculator.name} formula</div>
-            <div className="mt-2 text-sm text-slate-600">Read the math explanation behind the result.</div>
+            <div className="text-sm font-semibold text-slate-900">How the calculation works</div>
+            <div className="mt-2 text-sm text-slate-600">See how the result is calculated.</div>
           </Link>
           <Link href={hubLinks.useCases} className="rounded-2xl border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50">
-            <div className="text-sm font-semibold text-slate-900">{calculator.name} use cases</div>
+            <div className="text-sm font-semibold text-slate-900">When this calculator is useful</div>
             <div className="mt-2 text-sm text-slate-600">See where this calculator is useful in real scenarios.</div>
           </Link>
           {examples.map((example) => (
             <Link key={example.slug} href={`/calculators/${calculator.category}/${calculator.slug}/examples/${example.slug}`} className="rounded-2xl border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50">
               <div className="text-sm font-semibold text-slate-900">{example.title}</div>
-              <div className="mt-2 text-sm text-slate-600">Open example page</div>
+              <div className="mt-2 text-sm text-slate-600">See calculation example</div>
             </Link>
           ))}
         </div>

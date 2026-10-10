@@ -40,15 +40,15 @@ export default async function CalculatorUseCasesPage({ params }: { params: Promi
       </nav>
 
       <section className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-        <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">Practical scenarios</div>
+        <div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">When this calculator is useful</div>
         <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">When to use the {calculator.name.toLowerCase()}</h1>
         <p className="mt-4 max-w-4xl text-base leading-8 text-slate-600">
-          This page highlights common situations where the {calculator.name.toLowerCase()} can save time, reduce mistakes, and help you make faster decisions.
+          See common situations where the {calculator.name.toLowerCase()} can save time, reduce mistakes, and help you compare your options.
         </p>
       </section>
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-        <h2 className="text-2xl font-bold text-slate-900">Common use cases</h2>
+        <h2 className="text-2xl font-bold text-slate-900">Try it in situations like these</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {useCases.map((item) => (
             <article key={item} className="rounded-2xl bg-slate-50 p-5">
@@ -66,11 +66,11 @@ export default async function CalculatorUseCasesPage({ params }: { params: Promi
           <div className="mt-2 text-sm text-slate-600">Run your own numbers instantly.</div>
         </Link>
         <Link href={hubLinks.formula} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-300 hover:bg-blue-50">
-          <div className="text-sm font-semibold text-slate-900">Read the formula</div>
-          <div className="mt-2 text-sm text-slate-600">Understand the math behind the result.</div>
+          <div className="text-sm font-semibold text-slate-900">Understand the calculation</div>
+          <div className="mt-2 text-sm text-slate-600">See how the result is calculated.</div>
         </Link>
         <Link href={hubLinks.guide} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-300 hover:bg-blue-50">
-          <div className="text-sm font-semibold text-slate-900">Read the guide</div>
+          <div className="text-sm font-semibold text-slate-900">See how to use it</div>
           <div className="mt-2 text-sm text-slate-600">See the step-by-step instructions.</div>
         </Link>
       </section>

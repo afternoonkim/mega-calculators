@@ -1,4 +1,4 @@
-import { getAdvisoryFor } from "@/lib/calculators/advisories";
+import { getAdvisoryFor } from "@/lib/calculators/currentAdvisories";
 import type { CalculatorDefinition } from "@/lib/calculators/data";
 import type { Locale } from "@/lib/i18n";
 

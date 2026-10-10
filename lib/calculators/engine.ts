@@ -69,8 +69,15 @@ function parseList(input: string | undefined) {
 
 
 function parseDateSafe(dateString: string | undefined) {
-  const date = new Date(String(dateString || ""));
-  return Number.isNaN(date.getTime()) ? null : date;
+  const raw = String(dateString || "");
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
+  return date;
 }
 
 function diffYMD(start: Date, end: Date) {
@@ -784,6 +791,11 @@ function computeCalculatorRaw(definition: CalculatorDefinition, values: Values, 
       };
     }
     case "dateDiff": {
+      const strictStart = parseDateSafe(values.startDate);
+      const strictEnd = parseDateSafe(values.endDate);
+      if (!strictStart || !strictEnd) {
+        return { primary: { label: "Date difference", value: "Invalid date" }, note: "Enter valid calendar dates." };
+      }
       const start = new Date(`${values.startDate}T00:00:00Z`);
       const end = new Date(`${values.endDate}T00:00:00Z`);
       const diff = daysBetween(start, end);

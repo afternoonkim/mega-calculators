@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { CalculatorDefinition } from "@/lib/calculators/data";
 import { computeCalculator, getDefaultValues } from "@/lib/calculators/engine";
+import { validateCalculatorInputs } from "@/lib/calculators/validation";
 import CalculatorSeoContent from "@/components/calculators/CalculatorSeoContent";
 import { getEnhancedCalculatorContent } from "@/lib/calculators/enhancedContent";
 import ResultActions from "@/components/calculators/ResultActions";
@@ -20,7 +21,20 @@ type CalculatorEngineProps = { definition: CalculatorDefinition; relatedLinks: R
 export default function CalculatorEngine({ definition, relatedLinks, hubLinks, locale, embedMode = false }: CalculatorEngineProps) {
   const [values, setValues] = useState<Record<string, string>>(getDefaultValues(definition));
   const [copied, setCopied] = useState(false);
-  const result = useMemo(() => computeCalculator(definition, values, locale), [definition, values, locale]);
+  const validationErrors = useMemo(() => validateCalculatorInputs(definition, values), [definition, values]);
+  const hasValidationErrors = Object.keys(validationErrors).length > 0;
+  const result = useMemo(
+    () => hasValidationErrors
+      ? {
+          primary: {
+            label: locale === "ko" ? "입력값 확인" : "Check your inputs",
+            value: locale === "ko" ? "표시된 항목을 수정해주세요." : "Fix the highlighted fields.",
+          },
+          note: locale === "ko" ? "잘못된 입력값으로 계산하지 않습니다." : "No calculation is shown until the inputs are valid.",
+        }
+      : computeCalculator(definition, values, locale),
+    [definition, values, locale, hasValidationErrors],
+  );
   const enhanced = getEnhancedCalculatorContent(definition, locale);
   const t = (text: string) => localizeUiText(text, locale);
   const canonicalUrl = `https://mega-calculators.com/${locale}/calculators/${definition.category}/${definition.slug}`;
@@ -35,12 +49,31 @@ export default function CalculatorEngine({ definition, relatedLinks, hubLinks, l
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
           <div className="mb-6"><div className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">{locale === "ko" ? "무료 계산기" : "Free calculator"}</div><h1 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">{definition.name}</h1><p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600 md:text-base">{definition.description}</p></div>
           <div className="grid gap-5 md:grid-cols-2">
-            {definition.inputs.map((input) => (
-              <label key={input.name} className={`block ${input.type === "textarea" ? "md:col-span-2" : ""}`}><span className="mb-2 block text-sm font-semibold text-slate-700">{localizeInputLabel(input.label, locale)}</span>{input.type === "select" ? (<select value={values[input.name] ?? ""} onChange={(event) => setValues((current) => ({ ...current, [input.name]: event.target.value }))} className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500">{input.options?.map((option) => (<option key={option.value} value={option.value}>{localizeInputLabel(option.label, locale)}</option>))}</select>) : input.type === "textarea" ? (<textarea value={values[input.name] ?? ""} onChange={(event) => setValues((current) => ({ ...current, [input.name]: event.target.value }))} className="min-h-28 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500" />) : (<input type={input.type} min={input.min} max={input.max} step={input.step} value={values[input.name] ?? ""} onChange={(event) => setValues((current) => ({ ...current, [input.name]: event.target.value }))} className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500" />)}</label>
-            ))}
+            {definition.inputs.map((input) => {
+              const inputId = `calculator-input-${input.name}`;
+              const errorId = `${inputId}-error`;
+              const error = validationErrors[input.name];
+              const sharedClass = `w-full rounded-2xl border bg-white px-4 py-3 text-slate-900 outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${error ? "border-red-400" : "border-slate-300"}`;
+              const updateValue = (value: string) => setValues((current) => ({ ...current, [input.name]: value }));
+              return (
+                <div key={input.name} className={input.type === "textarea" ? "md:col-span-2" : ""}>
+                  <label htmlFor={inputId} className="mb-2 block text-sm font-semibold text-slate-700">{localizeInputLabel(input.label, locale)}</label>
+                  {input.type === "select" ? (
+                    <select id={inputId} value={values[input.name] ?? ""} onChange={(event) => updateValue(event.target.value)} aria-invalid={Boolean(error)} aria-describedby={error ? errorId : undefined} className={sharedClass}>
+                      {input.options?.map((option) => <option key={option.value} value={option.value}>{localizeInputLabel(option.label, locale)}</option>)}
+                    </select>
+                  ) : input.type === "textarea" ? (
+                    <textarea id={inputId} value={values[input.name] ?? ""} onChange={(event) => updateValue(event.target.value)} aria-invalid={Boolean(error)} aria-describedby={error ? errorId : undefined} className={`min-h-28 ${sharedClass}`} />
+                  ) : (
+                    <input id={inputId} type={input.type} min={input.min} max={input.max} step={input.step} value={values[input.name] ?? ""} onChange={(event) => updateValue(event.target.value)} aria-invalid={Boolean(error)} aria-describedby={error ? errorId : undefined} className={sharedClass} />
+                  )}
+                  {error ? <p id={errorId} role="alert" className="mt-2 text-sm font-medium text-red-700">{locale === "ko" ? "입력값을 확인해주세요." : error}</p> : null}
+                </div>
+              );
+            })}
           </div>
         </div>
-        <div className="space-y-6"><div className="rounded-3xl border border-slate-200 bg-slate-950 p-6 text-white shadow-sm md:p-8"><div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-300">{t("Instant result")}</div><div className="mt-5 rounded-3xl bg-white/5 p-6"><div className="text-sm text-slate-300">{localizeResultText(result.primary.label, locale)}</div><div className="mt-3 break-words text-3xl font-extrabold tracking-tight text-white md:text-4xl">{localizeResultText(result.primary.value, locale)}</div></div>{result.secondary?.length ? (<div className="mt-6 space-y-3">{result.secondary.map((item, index) => (<div key={`${item.label}-${index}`} className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"><span className="text-sm text-slate-300">{localizeResultText(item.label, locale)}</span><span className="break-words text-right text-sm font-semibold text-white">{localizeResultText(item.value, locale)}</span></div>))}</div>) : null}{result.note ? <p className="mt-5 text-sm leading-7 text-amber-200">{localizeResultText(result.note, locale)}</p> : null}<ResultActions locale={locale} title={definition.name} resultText={`${localizeResultText(result.primary.label, locale)}: ${localizeResultText(result.primary.value, locale)}`} secondaryLines={result.secondary?.map((item) => `${localizeResultText(item.label, locale)}: ${localizeResultText(item.value, locale)}`) ?? []} /><div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm leading-7 text-slate-300"><h2 className="text-base font-bold text-white">{enhanced?.interpretationTitle ?? (locale === "ko" ? "결과를 읽는 방법" : "How to read this result")}</h2><div className="mt-3 space-y-3">{(enhanced?.interpretation ?? [t("Calculator results are provided for planning and educational purposes. For taxes, legal decisions, lending, or medical advice, verify the numbers with an official source or qualified professional.")]).map((item) => (<p key={item}>{item}</p>))}</div></div></div></div>
+        <div className="space-y-6"><div role="status" aria-live="polite" aria-atomic="true" className="rounded-3xl border border-slate-200 bg-slate-950 p-6 text-white shadow-sm md:p-8"><div className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-300">{t("Instant result")}</div><div className="mt-5 rounded-3xl bg-white/5 p-6"><div className="text-sm text-slate-300">{localizeResultText(result.primary.label, locale)}</div><div className="mt-3 break-words text-3xl font-extrabold tracking-tight text-white md:text-4xl">{localizeResultText(result.primary.value, locale)}</div></div>{result.secondary?.length ? (<div className="mt-6 space-y-3">{result.secondary.map((item, index) => (<div key={`${item.label}-${index}`} className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"><span className="text-sm text-slate-300">{localizeResultText(item.label, locale)}</span><span className="break-words text-right text-sm font-semibold text-white">{localizeResultText(item.value, locale)}</span></div>))}</div>) : null}{result.note ? <p className="mt-5 text-sm leading-7 text-amber-200">{localizeResultText(result.note, locale)}</p> : null}<ResultActions locale={locale} title={definition.name} resultText={`${localizeResultText(result.primary.label, locale)}: ${localizeResultText(result.primary.value, locale)}`} secondaryLines={result.secondary?.map((item) => `${localizeResultText(item.label, locale)}: ${localizeResultText(item.value, locale)}`) ?? []} /><div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm leading-7 text-slate-300"><h2 className="text-base font-bold text-white">{enhanced?.interpretationTitle ?? (locale === "ko" ? "결과를 읽는 방법" : "How to read this result")}</h2><div className="mt-3 space-y-3">{(enhanced?.interpretation ?? [t("Calculator results are provided for planning and educational purposes. For taxes, legal decisions, lending, or medical advice, verify the numbers with an official source or qualified professional.")]).map((item) => (<p key={item}>{item}</p>))}</div></div></div></div>
       </section>
       {!embedMode ? (
         <AdSlot

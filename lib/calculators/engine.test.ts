@@ -116,6 +116,15 @@ describe("calculator engine reference values", () => {
     expect(secondaryValue(result, "Estimated growth")).toBe("$43,669.42");
   });
 
+  it("rejects impossible calendar dates instead of normalizing them", () => {
+    const result = computeCalculator(
+      definition("dateDiff", "date-difference-calculator", "time-date"),
+      { startDate: "2026-02-30", endDate: "2026-03-02" },
+    );
+
+    expect(result.primary.value).toBe("Invalid date");
+  });
+
   it("counts leap day in date differences", () => {
     const result = computeCalculator(
       definition("dateDiff", "date-difference-calculator", "time-date"),

@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "npm run test && npm run typecheck && npm run lint && npm run build"
+    "audit:content": "node scripts/audit-content.mjs",
+    "audit:content:batch": "node scripts/audit-content.mjs --batch-size 10",
+    "audit:content:baseline": "node scripts/audit-content.mjs --write-baseline",
+    "check": "npm run audit:content:batch && npm run test && npm run typecheck && npm run lint && npm run build"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { calculatorCategories, calculators, getCalculator } from "@/lib/calculators/data";
 import { normalizeLocale, withLocale } from "@/lib/i18n";
-import { localizeCalculatorDefinition, localizeCategoryName } from "@/lib/calculators/localization";
+import { localizeCalculatorDefinition, localizeCalculatorName, localizeCategoryName } from "@/lib/calculators/localization";
 import { getBlogPosts, getGuides } from "@/lib/editorial";
 import { RecentCalculatorsList } from "@/components/calculators/RecentCalculators";
 
@@ -42,6 +42,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   }));
   const blogPosts = getBlogPosts(locale).slice(0, 3);
   const guides = getGuides(locale).slice(0, 3);
+  const recentCalculatorNames = Object.fromEntries(
+    calculators.map((item) => [
+      `${item.category}/${item.slug}`,
+      localizeCalculatorName(item.name, locale, item.slug),
+    ]),
+  );
 
   // WebSite + SearchAction (Sitelinks Search Box eligibility).
   //
@@ -102,7 +108,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </div>
       </section>
 
-      <RecentCalculatorsList locale={locale} />
+      <RecentCalculatorsList locale={locale} calculatorNames={recentCalculatorNames} />
 
       <section>
         <div className="flex items-end justify-between gap-4">

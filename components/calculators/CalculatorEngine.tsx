@@ -44,7 +44,7 @@ export default function CalculatorEngine({ definition, relatedLinks, hubLinks, l
 
   return (
     <div className={embedMode ? "mx-auto max-w-3xl space-y-6 p-4" : "space-y-8"}>
-      {embedMode ? null : <RecentTracker category={definition.category} slug={definition.slug} name={definition.name} />}
+      {embedMode ? null : <RecentTracker category={definition.category} slug={definition.slug} />}
       <section className={embedMode ? "grid gap-6" : "grid gap-6 lg:grid-cols-[1.1fr_0.9fr]"}>
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
           <div className="mb-6"><div className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">{locale === "ko" ? "무료 계산기" : "Free calculator"}</div><h1 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">{definition.name}</h1><p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600 md:text-base">{definition.description}</p></div>

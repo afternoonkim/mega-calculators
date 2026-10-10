@@ -4,35 +4,15 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import { withLocale } from "@/lib/i18n";
+import { MAX_RECENT_CALCULATORS, normalizeRecentCalculators, type RecentCalculator } from "@/lib/calculators/recent";
 
 const STORAGE_KEY = "mc:recent-calculators";
-const MAX_RECENT = 6;
 
-export type RecentCalculator = {
-  category: string;
-  slug: string;
-  name: string;
-  visitedAt: number;
-};
-
-// Utility — call from a calculator page to record a visit.
-// Used by the RecentTracker component below.
 function readRecents(): RecentCalculator[] {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .filter(
-        (item) =>
-          item &&
-          typeof item.category === "string" &&
-          typeof item.slug === "string" &&
-          typeof item.name === "string" &&
-          typeof item.visitedAt === "number",
-      )
-      .slice(0, MAX_RECENT);
+    return normalizeRecentCalculators(JSON.parse(raw));
   } catch {
     return [];
   }
@@ -40,49 +20,51 @@ function readRecents(): RecentCalculator[] {
 
 function writeRecents(items: RecentCalculator[]) {
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items.slice(0, MAX_RECENT)));
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(items.slice(0, MAX_RECENT_CALCULATORS)),
+    );
   } catch {
     // Quota exceeded or storage disabled — silently ignore.
   }
 }
 
-/**
- * Drop this component on a calculator detail page; on mount it records
- * the visit so the homepage's `RecentCalculatorsList` can show it later.
- */
+/** Records a calculator visit without storing locale-dependent display text. */
 export function RecentTracker({
   category,
   slug,
-  name,
 }: {
   category: string;
   slug: string;
-  name: string;
 }) {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const current = readRecents();
     const next: RecentCalculator[] = [
-      { category, slug, name, visitedAt: Date.now() },
+      { category, slug, visitedAt: Date.now() },
       ...current.filter((item) => !(item.category === category && item.slug === slug)),
     ];
     writeRecents(next);
-  }, [category, slug, name]);
+  }, [category, slug]);
   return null;
 }
 
-/**
- * Renders a "최근에 사용하신 계산기" / "Recently used" list.
- * Returns nothing on first render until hydration completes —
- * keeps the homepage SSR snapshot identical for SEO bots.
- */
-export function RecentCalculatorsList({ locale }: { locale: Locale }) {
+export function RecentCalculatorsList({
+  locale,
+  calculatorNames,
+}: {
+  locale: Locale;
+  calculatorNames: Record<string, string>;
+}) {
   const [items, setItems] = useState<RecentCalculator[] | null>(() => {
     if (typeof window === "undefined") return null;
     return readRecents();
   });
 
   if (!items || items.length === 0) return null;
+
+  const visibleItems = items.filter((item) => Boolean(calculatorNames[`${item.category}/${item.slug}`]));
+  if (visibleItems.length === 0) return null;
 
   const isKo = locale === "ko";
 
@@ -116,15 +98,18 @@ export function RecentCalculatorsList({ locale }: { locale: Locale }) {
         </button>
       </div>
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {items.map((item) => (
-          <Link
-            key={`${item.category}-${item.slug}`}
-            href={withLocale(locale, `/calculators/${item.category}/${item.slug}`)}
-            className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
-          >
-            {item.name}
-          </Link>
-        ))}
+        {visibleItems.map((item) => {
+          const key = `${item.category}/${item.slug}`;
+          return (
+            <Link
+              key={key}
+              href={withLocale(locale, `/calculators/${item.category}/${item.slug}`)}
+              className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+            >
+              {calculatorNames[key]}
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

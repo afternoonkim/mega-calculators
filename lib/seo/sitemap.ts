@@ -7,7 +7,6 @@ import type { Locale } from "@/lib/i18n";
 export const SITEMAP_BASE_URL = "https://mega-calculators.com";
 export const SITEMAP_LOCALES = ["en", "ko"] as const satisfies readonly Locale[];
 
-const BUILD_LASTMOD = new Date().toISOString();
 const STATIC_ROUTES = ["", "/about", "/blog", "/calculators", "/contact", "/faq", "/guides", "/privacy", "/terms", "/editorial-standards", "/methodology", "/corrections"] as const;
 
 const RESOURCE_SUBPATHS = ["/formula", "/guide"] as const;
@@ -22,11 +21,11 @@ export type SitemapEntry = {
   priority: string;
 };
 
-export const sitemapIndexItems = [
-  { loc: `${SITEMAP_BASE_URL}/sitemap-static.xml`, lastmod: BUILD_LASTMOD },
-  { loc: `${SITEMAP_BASE_URL}/sitemap-calculators.xml`, lastmod: BUILD_LASTMOD },
-  { loc: `${SITEMAP_BASE_URL}/sitemap-examples.xml`, lastmod: BUILD_LASTMOD },
-] as const;
+export const sitemapIndexItems: readonly { loc: string; lastmod?: string }[] = [
+  { loc: `${SITEMAP_BASE_URL}/sitemap-static.xml` },
+  { loc: `${SITEMAP_BASE_URL}/sitemap-calculators.xml` },
+  { loc: `${SITEMAP_BASE_URL}/sitemap-examples.xml` },
+];
 
 export const sitemapResponseHeaders: HeadersInit = {
   "Content-Type": "application/xml; charset=utf-8",
@@ -60,10 +59,10 @@ function absoluteUrl(locale: Locale, pathSuffix: string): string {
   return new URL(pathname, SITEMAP_BASE_URL).toString();
 }
 
-function normalizeLastmod(value?: string): string {
-  if (!value) return BUILD_LASTMOD;
+function normalizeLastmod(value?: string): string | undefined {
+  if (!value) return undefined;
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return BUILD_LASTMOD;
+  if (Number.isNaN(parsed.getTime())) return undefined;
   return parsed.toISOString();
 }
 
@@ -87,7 +86,8 @@ function addUrl(xmlParts: string[], entry: SitemapEntry) {
 
   xmlParts.push("  <url>");
   xmlParts.push(`    <loc>${escapeXml(loc)}</loc>`);
-  xmlParts.push(`    <lastmod>${escapeXml(normalizeLastmod(entry.lastmod))}</lastmod>`);
+  const lastmod = normalizeLastmod(entry.lastmod);
+  if (lastmod) xmlParts.push(`    <lastmod>${escapeXml(lastmod)}</lastmod>`);
   xmlParts.push(`    <changefreq>${entry.changefreq}</changefreq>`);
   xmlParts.push(`    <priority>${entry.priority}</priority>`);
   xmlParts.push("  </url>");
@@ -116,7 +116,8 @@ export function buildSitemapIndexXml(): string {
   for (const item of sitemapIndexItems) {
     xmlParts.push("  <sitemap>");
     xmlParts.push(`    <loc>${escapeXml(item.loc)}</loc>`);
-    xmlParts.push(`    <lastmod>${escapeXml(normalizeLastmod(item.lastmod))}</lastmod>`);
+    const lastmod = normalizeLastmod(item.lastmod);
+    if (lastmod) xmlParts.push(`    <lastmod>${escapeXml(lastmod)}</lastmod>`);
     xmlParts.push("  </sitemap>");
   }
 
@@ -132,7 +133,6 @@ export function getStaticSitemapEntries(): SitemapEntry[] {
       entries.push({
         locale,
         pathSuffix: route,
-        lastmod: BUILD_LASTMOD,
         changefreq: route === "" ? "daily" : "weekly",
         priority: route === "" ? "1.0" : "0.8",
       });
@@ -170,7 +170,6 @@ export function getCoreCalculatorSitemapEntries(): SitemapEntry[] {
       entries.push({
         locale,
         pathSuffix: `/calculators/${category.slug}`,
-        lastmod: BUILD_LASTMOD,
         changefreq: "weekly",
         priority: "0.8",
       });
@@ -180,7 +179,6 @@ export function getCoreCalculatorSitemapEntries(): SitemapEntry[] {
       entries.push({
         locale,
         pathSuffix: `/calculators/${calculator.category}/${calculator.slug}`,
-        lastmod: BUILD_LASTMOD,
         changefreq: "weekly",
         priority: "0.9",
       });
@@ -202,8 +200,7 @@ export function getCalculatorResourceSitemapEntries(): SitemapEntry[] {
         entries.push({
           locale,
           pathSuffix: `${path}${subPath}`,
-          lastmod: BUILD_LASTMOD,
-          changefreq: "monthly",
+            changefreq: "monthly",
           priority: "0.6",
         });
       }
@@ -248,8 +245,7 @@ export function getExampleSitemapEntries(): SitemapEntry[] {
         entries.push({
           locale,
           pathSuffix: examplePath,
-          lastmod: BUILD_LASTMOD,
-          changefreq: "monthly",
+            changefreq: "monthly",
           priority: "0.4",
         });
       }

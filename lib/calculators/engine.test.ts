@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { calculators, type CalculatorDefinition } from "@/lib/calculators/data";
 import { computeCalculator, getDefaultValues } from "@/lib/calculators/engine";
 
+// Reference-value tests protect calculator formulas from silent regressions.
 function definition(kind: string, slug = `${kind}-test`, category = "math"): CalculatorDefinition {
   return {
     category,

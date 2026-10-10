@@ -1,5 +1,6 @@
 import { CalculatorDefinition } from "@/lib/calculators/data";
 import { localizeResultText } from "@/lib/calculators/localization";
+import { evaluateNumericExpression } from "@/lib/calculators/expression";
 
 export type CalculatorResult = {
   primary: { label: string; value: string };
@@ -127,14 +128,6 @@ function isoWeekNumber(dateString: string) {
 function timeToMinutes(time: string) {
   const [hours, minutes] = String(time || "0:0").split(":").map(Number);
   return (hours || 0) * 60 + (minutes || 0);
-}
-
-function safeEvalExpression(expr: string, values: Values) {
-  const keys = Object.keys(values);
-  const vars = keys.map((key) => num(values[key]));
-  const fn = new Function(...keys, `return ${expr};`);
-  const result = fn(...vars);
-  return Number.isFinite(result) ? Number(result) : 0;
 }
 
 function gcdTwo(a: number, b: number): number {
@@ -353,7 +346,7 @@ function computeCalculatorRaw(definition: CalculatorDefinition, values: Values, 
       };
     }
     case "expression": {
-      const result = safeEvalExpression(definition.expr || "0", values);
+      const result = evaluateNumericExpression(definition.expr || "0", values);
 
       if (definition.slug === "dividend-yield-calculator") {
         const annualDividend = num(values.annualDividend);

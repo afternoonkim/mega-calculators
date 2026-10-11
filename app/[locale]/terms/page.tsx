@@ -20,7 +20,7 @@ export default async function TermsPage({ params }: { params: Promise<{ locale: 
   return (
     <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
       <h1 className="text-4xl font-black tracking-tight text-slate-950">{isKo ? "이용약관" : "Terms of Use"}</h1>
-      <p className="mt-4 text-sm leading-7 text-slate-500">{isKo ? "최종 업데이트" : "Last updated"}: April 2, 2026</p>
+      <p className="mt-4 text-sm leading-7 text-slate-500">{isKo ? "최종 업데이트: 2026년 4월 2일" : "Last updated: April 2, 2026"}</p>
       <div className="mt-8 space-y-8 text-sm leading-7 text-slate-600 md:text-base">
         <section>
           <h2 className="text-2xl font-bold text-slate-900">1. {isKo ? "일반 이용" : "General use"}</h2>

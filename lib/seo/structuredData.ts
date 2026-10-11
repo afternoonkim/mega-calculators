@@ -18,3 +18,14 @@ export const organizationSchema = {
     height: 512,
   },
 } as const;
+
+
+export function getEditorialTeamAuthor(locale: "en" | "ko") {
+  return {
+    "@type": "Organization",
+    "@id": `${SITE_URL}/#editorial-team`,
+    name: locale === "ko" ? "Mega Calculators 에디토리얼팀" : "Mega Calculators Editorial Team",
+    url: `${SITE_URL}/${locale}/editorial-standards`,
+    parentOrganization: organizationReference,
+  } as const;
+}

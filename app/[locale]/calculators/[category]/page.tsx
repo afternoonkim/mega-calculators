@@ -34,9 +34,7 @@ export async function generateMetadata({
   const keywords = getCategoryKeywords(category, locale);
   const intro = getCategoryIntro(category, locale);
 
-  const title = isKo
-    ? `${name} 모음 — 무료 온라인 ${name}`
-    : `${match.name} - Free Online Tools`;
+  const title = isKo ? `${name} 모음` : match.name;
 
   const description = isKo
     ? `${intro} 모두 무료이며 별도 가입 없이 바로 사용할 수 있습니다.`
@@ -89,7 +87,6 @@ export default async function CategoryPage({
   if (!match) notFound();
   const items = match.items.map((item) => localizeCalculatorDefinition(item, locale));
   const name = localizeCategoryName(category, locale);
-  const keywords = getCategoryKeywords(category, locale);
   const intro = getCategoryIntro(category, locale);
   const isKo = locale === "ko";
 
@@ -99,7 +96,7 @@ export default async function CategoryPage({
     name,
     description: intro,
     url: `${SITE_URL}/${locale}/calculators/${match.slug}`,
-    inLanguage: locale,
+    inLanguage: locale === "ko" ? "ko-KR" : "en-US",
     isPartOf: {
       "@type": "WebSite",
       name: "Mega Calculators",
@@ -167,18 +164,6 @@ export default async function CategoryPage({
             ? "필요한 계산기를 한곳에서 찾아보세요. 자주 쓰는 계산부터 살펴보거나, 관심 있는 항목을 골라 바로 시작할 수 있습니다."
             : `Browse ${items.length} tools curated in this category. Start with what you need, or jump straight to a specific calculator below.`}
         </p>
-        {keywords.length ? (
-          <div className="mt-5 flex flex-wrap gap-2">
-            {keywords.slice(0, 8).map((kw) => (
-              <span
-                key={kw}
-                className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600"
-              >
-                {kw}
-              </span>
-            ))}
-          </div>
-        ) : null}
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

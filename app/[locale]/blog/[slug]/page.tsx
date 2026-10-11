@@ -6,7 +6,7 @@ import { normalizeLocale, withLocale } from "@/lib/i18n";
 import SisterSiteCard from "@/components/layout/SisterSiteCard";
 import { editorialSlugToSisterTopic } from "@/lib/seo/sister-sites";
 import { getEditorialHreflangUrls } from "@/lib/editorialAlternates";
-import { organizationReference } from "@/lib/seo/structuredData";
+import { getEditorialTeamAuthor, organizationReference } from "@/lib/seo/structuredData";
 
 const SITE_URL = "https://mega-calculators.com";
 
@@ -83,21 +83,8 @@ export default async function BlogDetailPage({
   const publishedAt = post.publishedAt ?? post.updatedAt;
   const url = `${SITE_URL}/${locale}/blog/${post.slug}`;
 
-  // BlogPosting schema. datePublished + dateModified always emitted —
-  // search engines use these for freshness signal even when the date is
-  // hidden from users on evergreen articles.
-  //
-  // Author is typed as Person and points at the Editorial Standards page
-  // so Google's E-E-A-T systems can verify there's a published editorial
-  // policy behind the byline. This is the standard pattern for sites that
-  // don't put individual authors on every post.
-  const author = {
-    "@type": "Person",
-    name: isKo ? "Mega Calculators 에디토리얼팀" : "Mega Calculators Editorial Team",
-    url: `${SITE_URL}/${locale}/editorial-standards`,
-    jobTitle: isKo ? "에디토리얼팀" : "Editorial Team",
-    worksFor: organizationReference,
-  };
+  // BlogPosting uses the visible editorial team as an Organization author.
+  const author = getEditorialTeamAuthor(locale);
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",

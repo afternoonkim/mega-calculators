@@ -20,7 +20,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
   return (
     <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
       <h1 className="text-4xl font-black tracking-tight text-slate-950">{isKo ? "개인정보처리방침" : "Privacy Policy"}</h1>
-      <p className="mt-4 text-sm leading-7 text-slate-500">{isKo ? "최종 업데이트" : "Last updated"}: April 2, 2026</p>
+      <p className="mt-4 text-sm leading-7 text-slate-500">{isKo ? "최종 업데이트: 2026년 4월 2일" : "Last updated: April 2, 2026"}</p>
       <div className="mt-8 space-y-8 text-sm leading-7 text-slate-600 md:text-base">
         <section>
           <h2 className="text-2xl font-bold text-slate-900">1. {isKo ? "개요" : "Overview"}</h2>
@@ -43,7 +43,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
         <section>
           <h2 className="text-2xl font-bold text-slate-900">4. {isKo ? "광고" : "Advertising"}</h2>
           <div className="mt-3 space-y-3">
-            <p>{isKo ? "향후 Google AdSense 같은 광고 파트너를 통해 광고가 표시될 수 있습니다. 광고 제공자는 쿠키 등을 사용해 광고 제공 및 성과 측정을 할 수 있습니다." : "The site may display advertising, including ads served by Google AdSense or similar partners, in the future. Advertising providers may use cookies or similar technologies to deliver ads, measure performance, and personalize content where permitted."}</p>
+            <p>{isKo ? "사이트에는 Google AdSense 같은 광고 파트너를 통한 광고가 표시될 수 있습니다. 광고 제공자는 쿠키 등을 사용해 광고 제공 및 성과 측정을 할 수 있습니다." : "The site may display advertising, including ads served by Google AdSense or similar partners. Advertising providers may use cookies or similar technologies to deliver ads, measure performance, and personalize content where permitted."}</p>
             <p>{isKo ? "구글과 파트너사는 사용자의 방문 기록을 바탕으로 광고를 표시할 수 있으며, 자세한 내용은 구글의 광고 및 개인정보 자료에서 확인할 수 있습니다." : "Google and its partners may use cookies to serve ads based on visits to this site and other websites. Users can learn more about available controls through Google’s advertising and privacy resources."}</p>
           </div>
         </section>

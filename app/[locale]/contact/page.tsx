@@ -9,7 +9,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title: isKo ? "문의" : "Contact",
     description: isKo
       ? "계산기 오류, 내용 수정, 개인정보, 광고·제휴 관련 문의 방법을 안내합니다."
-      : "Reach out about a calculator issue, a correction, a privacy question, or a partnership — all from one page.",
+      : "Contact Mega Calculators about calculator issues, corrections, privacy questions, advertising, or partnerships.",
     alternates: {
       canonical: `/${locale}/contact`,
       languages: { en: "/en/contact", ko: "/ko/contact" },
@@ -25,7 +25,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
     <div className="space-y-6">
       <section className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
         <h1 className="text-4xl font-black tracking-tight text-slate-950">{isKo ? "편하게 연락 주세요" : "Get in touch"}</h1>
-        <p className="mt-6 max-w-3xl text-base leading-8 text-slate-600">{isKo ? "계산기 오류나 내용 수정 제안, 개인정보 관련 질문, 제휴·미디어 문의가 있다면 아래 연락 방법을 이용해주세요." : "Whether you spotted a calculator issue, want a correction, have a privacy question, or are exploring a partnership, you can send everything you need from this page."}</p>
+        <p className="mt-6 max-w-3xl text-base leading-8 text-slate-600">{isKo ? "계산기 오류나 내용 수정 제안, 개인정보 관련 질문, 제휴·미디어 문의가 있다면 아래 연락 방법을 이용해주세요." : "Use the email address below for calculator issues, correction requests, privacy questions, advertising, or partnership inquiries."}</p>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
@@ -42,7 +42,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
           <div className="mt-4 space-y-4 text-sm leading-7 text-slate-600 md:text-base">
             <p>Email: <a className="font-semibold text-blue-700" href="mailto:afternoonkim93@gmail.com">afternoonkim93@gmail.com</a></p>
             <p>{isKo ? "광고 집행, 파트너십 제안, 자료 사용, 데이터 라이선스 관련 문의도 같은 주소로 보내주세요." : "If you'd like to talk about advertising, a partnership idea, content reuse, or data licensing, the same address works."}</p>
-            <p>{isKo ? "메일을 보내셨는데 답이 늦다고 느껴지셔도 걱정하지 않으셔도 됩니다. 문의량에 따라 회신이 며칠 걸릴 수 있어요." : "If you don't hear back right away, no need to worry — replies can take a few days depending on volume."}</p>
+            <p>{isKo ? "문의량에 따라 답변까지 며칠 정도 걸릴 수 있습니다." : "Replies may take a few days depending on inquiry volume."}</p>
           </div>
         </article>
       </section>

@@ -6,7 +6,7 @@ import { normalizeLocale, withLocale } from "@/lib/i18n";
 import SisterSiteCard from "@/components/layout/SisterSiteCard";
 import { editorialSlugToSisterTopic } from "@/lib/seo/sister-sites";
 import { getEditorialHreflangUrls } from "@/lib/editorialAlternates";
-import { organizationReference } from "@/lib/seo/structuredData";
+import { getEditorialTeamAuthor, organizationReference } from "@/lib/seo/structuredData";
 
 const SITE_URL = "https://mega-calculators.com";
 
@@ -83,13 +83,7 @@ export default async function GuideDetailPage({
   const publishedAt = guide.publishedAt ?? guide.updatedAt;
   const url = `${SITE_URL}/${locale}/guides/${guide.slug}`;
 
-  const author = {
-    "@type": "Person",
-    name: isKo ? "Mega Calculators 에디토리얼팀" : "Mega Calculators Editorial Team",
-    url: `${SITE_URL}/${locale}/editorial-standards`,
-    jobTitle: isKo ? "에디토리얼팀" : "Editorial Team",
-    worksFor: organizationReference,
-  };
+  const author = getEditorialTeamAuthor(locale);
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",

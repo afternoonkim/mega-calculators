@@ -6,6 +6,7 @@ import { localizeCalculatorDefinition, localizeCalculatorName, localizeCategoryN
 import { getBlogPosts, getGuides } from "@/lib/editorial";
 import { RecentCalculatorsList } from "@/components/calculators/RecentCalculators";
 import CalculatorSearch from "@/components/search/CalculatorSearch";
+import { organizationReference, organizationSchema, SITE_URL } from "@/lib/seo/structuredData";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const locale = normalizeLocale((await params).locale);
@@ -50,46 +51,19 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     ]),
   );
 
-  // WebSite + SearchAction (Sitelinks Search Box eligibility).
-  //
-  // When Google verifies this schema against a working search endpoint
-  // (/{locale}/calculators?q=...), the SERP can show a search box directly
-  // under the site name. This boosts both branded search CTR and overall
-  // site presence in Google's structured-data ecosystem. Naver doesn't
-  // render the search box but parses the schema cleanly.
-  //
-  // The publisher Organization block here is intentionally rich so the
-  // same name/logo/sameAs is asserted from the homepage — Google reuses
-  // those signals across the rest of the site's pages.
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": `${SITE_URL}/${locale}#website`,
     name: "Mega Calculators",
-    url: `https://mega-calculators.com/${locale}`,
-    inLanguage: locale,
-    publisher: {
-      "@type": "Organization",
-      name: "Mega Calculators",
-      url: "https://mega-calculators.com",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://mega-calculators.com/android-chrome-512x512.png",
-        width: 512,
-        height: 512,
-      },
-    },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `https://mega-calculators.com/${locale}/calculators?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
-    },
+    url: `${SITE_URL}/${locale}`,
+    inLanguage: locale === "ko" ? "ko-KR" : "en-US",
+    publisher: organizationReference,
   };
 
   return (
     <div className="space-y-8 md:space-y-10">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
 
       <section className="rounded-3xl bg-slate-950 px-5 py-8 text-white shadow-sm md:rounded-[2rem] md:px-10 md:py-16">

@@ -6,6 +6,7 @@ import { normalizeLocale, withLocale } from "@/lib/i18n";
 import SisterSiteCard from "@/components/layout/SisterSiteCard";
 import { editorialSlugToSisterTopic } from "@/lib/seo/sister-sites";
 import { getEditorialHreflangUrls } from "@/lib/editorialAlternates";
+import { organizationReference } from "@/lib/seo/structuredData";
 
 const SITE_URL = "https://mega-calculators.com";
 
@@ -82,18 +83,12 @@ export default async function GuideDetailPage({
   const publishedAt = guide.publishedAt ?? guide.updatedAt;
   const url = `${SITE_URL}/${locale}/guides/${guide.slug}`;
 
-  // Article schema with a Person-typed author. Pairing this with the
-  // HowTo schema below gives Google two complementary signals: "this is
-  // a published article from a known editorial team" + "this is also a
-  // step-by-step procedure". HowTo is the Rich Result format that lets
-  // Google display each section as a numbered step in the SERP preview,
-  // and Article carries the E-E-A-T author byline.
   const author = {
     "@type": "Person",
     name: isKo ? "Mega Calculators 에디토리얼팀" : "Mega Calculators Editorial Team",
     url: `${SITE_URL}/${locale}/editorial-standards`,
     jobTitle: isKo ? "에디토리얼팀" : "Editorial Team",
-    worksFor: { "@type": "Organization", name: "Mega Calculators", url: SITE_URL },
+    worksFor: organizationReference,
   };
   const articleSchema = {
     "@context": "https://schema.org",
@@ -106,38 +101,8 @@ export default async function GuideDetailPage({
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     url,
     author,
-    publisher: { "@type": "Organization", name: "Mega Calculators", url: SITE_URL },
+    publisher: organizationReference,
   };
-  // HowTo — gives guide pages the step-by-step rich result. Each section
-  // heading becomes a step name and the joined body paragraphs become
-  // the step text. The schema is only useful when the guide actually
-  // walks through a procedure; for purely informational guides Google
-  // may not render the rich result but the markup doesn't hurt.
-  const howToSchema = {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    name: guide.title,
-    description: guide.description,
-    inLanguage: locale === "ko" ? "ko-KR" : "en-US",
-    step: guide.sections.map((section, idx) => ({
-      "@type": "HowToStep",
-      position: idx + 1,
-      name: section.heading,
-      text: section.body.join(" "),
-      url: `${url}#step-${idx + 1}`,
-    })),
-  };
-
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: guide.faq.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: { "@type": "Answer", text: item.answer },
-    })),
-  };
-
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -153,14 +118,6 @@ export default async function GuideDetailPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <script
         type="application/ld+json"

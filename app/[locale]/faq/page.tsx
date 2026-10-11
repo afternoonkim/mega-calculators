@@ -36,19 +36,8 @@ export default async function FaqPage({ params }: { params: Promise<{ locale: st
   const locale = normalizeLocale((await params).locale);
   const isKo = locale === "ko";
   const faqs = faqItems[locale];
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((item) => ({
-      "@type": "Question",
-      name: item.q,
-      acceptedAnswer: { "@type": "Answer", text: item.a },
-    })),
-  };
-
   return (
     <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <h1 className="text-4xl font-black tracking-tight text-slate-950">{isKo ? "자주 묻는 질문" : "Frequently asked questions"}</h1>
       <p className="mt-6 max-w-3xl text-base leading-8 text-slate-600">
         {isKo

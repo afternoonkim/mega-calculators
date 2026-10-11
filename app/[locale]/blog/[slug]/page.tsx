@@ -6,6 +6,7 @@ import { normalizeLocale, withLocale } from "@/lib/i18n";
 import SisterSiteCard from "@/components/layout/SisterSiteCard";
 import { editorialSlugToSisterTopic } from "@/lib/seo/sister-sites";
 import { getEditorialHreflangUrls } from "@/lib/editorialAlternates";
+import { organizationReference } from "@/lib/seo/structuredData";
 
 const SITE_URL = "https://mega-calculators.com";
 
@@ -95,7 +96,7 @@ export default async function BlogDetailPage({
     name: isKo ? "Mega Calculators 에디토리얼팀" : "Mega Calculators Editorial Team",
     url: `${SITE_URL}/${locale}/editorial-standards`,
     jobTitle: isKo ? "에디토리얼팀" : "Editorial Team",
-    worksFor: { "@type": "Organization", name: "Mega Calculators", url: SITE_URL },
+    worksFor: organizationReference,
   };
   const articleSchema = {
     "@context": "https://schema.org",
@@ -108,21 +109,7 @@ export default async function BlogDetailPage({
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     url,
     author,
-    publisher: {
-      "@type": "Organization",
-      name: "Mega Calculators",
-      url: SITE_URL,
-    },
-  };
-
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: post.faq.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: { "@type": "Answer", text: item.answer },
-    })),
+    publisher: organizationReference,
   };
 
   const breadcrumbSchema = {
@@ -140,10 +127,6 @@ export default async function BlogDetailPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <script
         type="application/ld+json"

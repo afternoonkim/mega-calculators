@@ -580,7 +580,7 @@ function computeCalculatorRaw(definition: CalculatorDefinition, values: Values, 
       const suffixText = getLocalizedText(definition.suffix, locale);
       const primaryLabel = getLocalizedText(definition.primary, locale) || (locale === "ko" ? "결과" : "Result");
       const output = prefixText === "$" || prefixText === "₩" ? currency(result, locale) : `${prefixText ?? ""}${formatNumber(result, 2, locale)}${suffixText ?? ""}`;
-      return finalizeResult({ primary: { label: primaryLabel, value: output } }, locale);
+      return { primary: { label: primaryLabel, value: output } };
     }
     case "compoundInterest": {
       const principal = num(values.principal);

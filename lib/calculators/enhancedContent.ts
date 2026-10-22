@@ -1,6 +1,6 @@
 import type { CalculatorDefinition } from "@/lib/calculators/data";
 import type { Locale } from "@/lib/i18n";
-import { localizeCalculatorName, localizeCategoryName } from "@/lib/calculators/localization";
+import { localizeCalculatorName, localizeCategoryName, localizeInputLabel } from "@/lib/calculators/localization";
 
 export type EnhancedCalculatorContent = {
   whenToUseTitle: string;
@@ -53,7 +53,13 @@ export function getEnhancedCalculatorContent(definition: CalculatorDefinition, l
   const isKo = locale === "ko";
   const name = localizeCalculatorName(definition.name, locale, definition.slug);
   const category = localizeCategoryName(definition.category, locale);
-  const defaults = definition.inputs.slice(0, 4).map((input) => `${input.label}: ${input.defaultValue ?? input.options?.[0]?.label ?? "1"}`).join(", ");
+  const defaults = definition.inputs.slice(0, 4).map((input) => {
+    const label = localizeInputLabel(input.label, locale);
+    const value = input.defaultValue ?? input.options?.[0]?.label ?? "1";
+    const option = input.options?.find((item) => item.value === value);
+    const displayValue = option ? localizeInputLabel(option.label, locale) : value;
+    return `${label}: ${displayValue}`;
+  }).join(", ");
   return {
     whenToUseTitle: isKo ? "이 계산기를 쓰면 좋은 상황" : "When this calculator is useful",
     whenToUse: isKo ? [`${name}는 빠르게 기준값을 확인하고 여러 조건을 비교하고 싶을 때 유용합니다.`, `특히 ${category} 영역에서 숫자를 직접 입력해 결과 변화를 확인하면 감으로 판단하는 것보다 실수를 줄일 수 있습니다.`, "중요한 결정 전에는 기본값 그대로 보지 말고 본인의 실제 조건을 넣어 여러 번 비교해보세요."] : [`${name} is useful when you need a quick baseline and want to compare more than one scenario before making a decision.`, `It works best as a practical ${category.toLowerCase()} tool: change one input at a time and watch how the result moves.`, "Replace the sample values with your own numbers before using the result for planning."],

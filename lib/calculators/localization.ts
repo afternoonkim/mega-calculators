@@ -1104,7 +1104,7 @@ export function localizeResultText(text: string, locale: Locale) {
 export function localizeDescription(definition: CalculatorDefinition, locale: Locale) {
   if (locale === "en") return getLocalizedText(definition.description, locale);
   const localizedName = localizeCalculatorName(getLocalizedText(definition.name, "en"), locale, definition.slug);
-  return buildKoDescription(definition, localizedName);
+  return usOnlyKoreanDescriptions[definition.slug]?.description ?? buildKoDescription(definition, localizedName);
 }
 
 export function localizeDisplayValue(label: string, value: string, locale: Locale) {

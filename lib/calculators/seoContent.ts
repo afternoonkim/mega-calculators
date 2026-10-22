@@ -610,6 +610,16 @@ function buildFallbackCalculatorSeoContent(
   const isKo = locale === "ko";
   const categoryContent = categoryEditorial[definition.category] ?? categoryEditorial["everyday-life"];
   const koreanScenario = isKo ? getKoScenarioCopy(definition.slug) : null;
+  const inputNames = definition.inputs.slice(0, 3).map((input) => input.label).join(", ");
+  const koTopic = definition.category === "finance" || definition.category === "business"
+    ? "금액·이율·기간이 실제 지출 또는 수익에 주는 영향"
+    : definition.category === "health" || definition.category === "fitness"
+      ? "신체 조건과 활동 기준에 따른 추정치 차이"
+      : definition.category === "time-date"
+        ? "기준일과 기간 포함 여부에 따른 차이"
+        : definition.category === "unit-converters"
+          ? "원래 단위와 변환 단위가 일치하는지"
+          : "입력 기준과 연산 순서에 따른 결과 차이";
   const relatedArticles = relatedLinks.length
     ? relatedLinks.slice(0, 3).map((item) => ({
         title: item.name,
@@ -630,13 +640,13 @@ function buildFallbackCalculatorSeoContent(
     audienceIntro: isKo
       ? koreanScenario
         ? `${koreanScenario.situation}? ${koreanScenario.steps} ${koreanScenario.caution}`
-        : `${definition.name} 페이지는 숫자 하나를 빠르게 구하는 용도뿐 아니라, 입력값을 바꿔가며 여러 시나리오를 비교할 때 더 큰 도움이 됩니다. 결과를 보기 전에 어떤 질문을 풀고 싶은지 먼저 정리하면 활용도가 높아집니다.`
+        : `${definition.name}에서는 ${inputNames || "입력값"}을 기준으로 계산합니다. 특히 ${koTopic}를 확인해보세요. 결과를 실제 상황에 적용할 때는 계산기가 반영하지 않는 조건을 따로 점검해야 합니다.`
       : `${definition.name} is most useful when you compare more than one scenario instead of relying on a single quick answer. It works best when you know what decision, estimate, or comparison the result is supposed to support.`,
     audiences: isKo
       ? [
-          `현재 수치를 빠르게 점검하고 결과를 다른 조건과 비교해보고 싶은 사용자.`,
-          `${definition.name} 결과를 예산, 일정, 건강 계획, 학습, 혹은 생활 판단과 연결해보고 싶은 사용자.`,
-          `공식 자료를 보기 전에 대략적인 범위를 먼저 파악하고 싶은 사용자.`,
+          `${inputNames || "주요 입력값"}을 바꾸어 계산 결과를 비교하려는 사용자.`,
+          `${koTopic}를 확인하고 싶은 사용자.`,
+          `계산 결과를 활용하기 전에 누락된 조건이나 추가 비용을 살펴보려는 사용자.`,
         ]
       : [
           `People who want a quick answer and then want to compare it with a second scenario.`,
@@ -658,7 +668,7 @@ function buildFallbackCalculatorSeoContent(
     readingTitle: isKo ? "결과를 읽는 방법" : "How to read the result",
     readingParagraphs: isKo
       ? [
-          `결과 숫자 자체보다, 어떤 입력값이 결과를 가장 크게 바꾸는지 함께 보는 것이 중요합니다. 그러면 단순 계산을 넘어 실제 판단에 더 가까운 비교가 가능합니다.`,
+          `${definition.name}의 결과는 ${inputNames || "입력값"}에 따라 달라집니다. ${koTopic}를 먼저 확인한 다음 한 항목씩 값을 바꿔 차이를 비교해보세요.`,
           `${definition.name} 결과는 확정값이라기보다 빠른 비교 도구에 가깝습니다. 비슷한 수치라도 기준이나 기간, 조건이 다르면 실제 체감은 달라질 수 있습니다.`,
         ]
       : [
@@ -668,7 +678,7 @@ function buildFallbackCalculatorSeoContent(
     mistakesTitle: isKo ? "자주 하는 실수" : "Common mistakes people make",
     mistakes: isKo
       ? [
-          `기준값이나 단위를 확인하지 않고 바로 입력하는 것.`,
+          `${inputNames || "입력값"}의 기준이나 단위를 확인하지 않고 입력하는 것.`,
           `하나의 시나리오만 보고 결과를 확정적으로 받아들이는 것.`,
           `계산기 결과만 보고 실제 조건이나 공식 규정을 다시 확인하지 않는 것.`,
         ]
@@ -680,7 +690,7 @@ function buildFallbackCalculatorSeoContent(
     scenariosTitle: isKo ? "이렇게 비교해보세요" : "Practical scenarios to test",
     scenarios: isKo
       ? [
-          { title: "기본값과 보수적 값 비교", description: `현재 생각한 조건보다 조금 더 보수적인 값을 넣어 결과 차이를 확인해보세요.` },
+          { title: "입력 조건 바꾸기", description: `${inputNames || "입력 조건"} 중 하나를 변경해 ${koTopic}를 비교해보세요.` },
           { title: "시간이나 기간 차이 비교", description: `기간이 들어가는 계산기라면 기간을 바꾸었을 때 결과가 얼마나 달라지는지 확인하면 좋습니다.` },
           { title: "실제 적용 전 최종 점검", description: `결과를 실제 결정을 위한 참고값으로 쓰기 전에 관련 비용, 조건, 기준일을 다시 확인해보세요.` },
         ]

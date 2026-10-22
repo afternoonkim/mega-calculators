@@ -266,13 +266,13 @@ export default async function CalculatorExamplePage({
           </h2>
           <p className="mt-4 text-sm leading-7 text-slate-600 md:text-base">
             {isKo
-              ? "처음 사용하는 계산기라면 이 값을 출발점으로 삼아보세요. 어떤 숫자를 넣으면 결과가 어떻게 달라지는지 확인한 뒤 본인 상황에 맞게 입력값을 바꾸시면 됩니다."
-              : "If this calculator is new to you, use these values as a starting point. See how the result is produced, then adjust the numbers to match your own situation."}
+              ? `${localized.name}의 결과는 위에 표시된 입력 조건을 기준으로 계산한 값입니다. 숫자 하나만 바꾸어 다시 계산하면 어떤 조건이 결과에 영향을 주는지 비교하기 쉽습니다.`
+              : `The result for ${calculator.name.toLowerCase()} uses the inputs shown above. Change one value at a time to see which assumption makes the biggest difference.`}
           </p>
           <p className="mt-4 text-sm leading-7 text-slate-600 md:text-base">
             {isKo
-              ? "지금 조건과 비슷한 상황이라면 결과를 참고한 뒤 본인 숫자로 다시 계산해보세요. 아래 \"계산기 열기\"에서 입력값만 바꾸면 바로 비교할 수 있습니다."
-              : "If these numbers are close to your situation, use the result as a reference and then run the calculator with your own values. Select \"Open calculator\" below to make the comparison."}
+              ? "결과를 실제 결정에 적용할 때는 계산에 포함되지 않은 수수료, 단위, 기간 또는 개인별 조건이 있는지 함께 확인하세요."
+              : "Before using the estimate to make a decision, check whether fees, units, timing, or other real-world conditions fall outside this calculation."}
           </p>
         </article>
         <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">

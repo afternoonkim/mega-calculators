@@ -85,3 +85,20 @@ button {
     overflow-wrap: anywhere;
   }
 }
+
+/* Compact mobile reading density while keeping form fields at 16px to avoid iOS zoom. */
+@media (max-width: 639px) {
+  body { font-size: 14px; line-height: 1.5; }
+  main h1 { font-size: 1.3125rem !important; }
+  main h2 { font-size: 1.125rem !important; }
+  main h3 { font-size: 1rem !important; }
+  main .text-base { font-size: 0.875rem; }
+  main .text-lg { font-size: 1rem; }
+  main .text-sm { font-size: 0.8125rem; }
+  main .text-xs { font-size: 0.75rem; }
+  main input, main select, main textarea { font-size: 16px !important; }
+  main > div, main > section { min-width: 0; }
+  main section, main article { scroll-margin-top: 5rem; }
+  .mobile-reading-details > summary { list-style: none; }
+  .mobile-reading-details > summary::-webkit-details-marker { display: none; }
+}

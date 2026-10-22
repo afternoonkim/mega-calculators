@@ -8,7 +8,7 @@ describe("mobile navigation accessibility", () => {
       expect(source).toContain(`path: "${destination}"`);
     }
     expect(source).toContain("aria-current");
-    expect(source).toContain("safe-area");
+    expect(source).toContain("mobile-bottom-nav");
   });
   it("preserves safe-area spacing and limits headline sizes on phones", () => {
     const source = fs.readFileSync("app/globals.css", "utf8");

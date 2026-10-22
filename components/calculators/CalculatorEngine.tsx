@@ -7,11 +7,12 @@ import { computeCalculator, getDefaultValues } from "@/lib/calculators/engine";
 import { validateCalculatorInputs } from "@/lib/calculators/validation";
 import CalculatorSeoContent from "@/components/calculators/CalculatorSeoContent";
 import { getEnhancedCalculatorContent } from "@/lib/calculators/enhancedContent";
+import { getCalculatorExamples } from "@/lib/calculators/programmatic";
 import ResultActions from "@/components/calculators/ResultActions";
 import { RecentTracker } from "@/components/calculators/RecentCalculators";
 import AdvisoryNotice from "@/components/calculators/AdvisoryNotice";
 import AdSlot from "@/components/ads/AdSlot";
-import { localizeUiText, localizeInputLabel, localizeResultText } from "@/lib/calculators/localization";
+import { localizeUiText, localizeInputLabel, localizeResultText, localizeProgrammaticExample } from "@/lib/calculators/localization";
 import type { Locale } from "@/lib/i18n";
 
 type RelatedLink = { name: string; href: string };
@@ -21,6 +22,33 @@ type CalculatorEngineProps = { definition: CalculatorDefinition; relatedLinks: R
 export default function CalculatorEngine({ definition, relatedLinks, hubLinks, locale, embedMode = false }: CalculatorEngineProps) {
   const [values, setValues] = useState<Record<string, string>>(getDefaultValues(definition));
   const [copied, setCopied] = useState(false);
+  const examplePresets = useMemo(() => {
+    const defaults = getDefaultValues(definition);
+    const seen = new Set<string>();
+    return getCalculatorExamples(definition)
+      .map((example) => {
+        const values = { ...defaults, ...example.overrides };
+        const keys = Object.keys(example.overrides);
+        if (!keys.length || keys.some((key) => !definition.inputs.some((input) => input.name === key))) return null;
+        if (Object.keys(validateCalculatorInputs(definition, values)).length) return null;
+        const signature = definition.inputs.map((input) => values[input.name] ?? "").join("|");
+        if (seen.has(signature)) return null;
+        seen.add(signature);
+        return { slug: example.slug, title: localizeProgrammaticExample(example, definition, locale).title, values };
+      })
+      .filter((item): item is { slug: string; title: string; values: Record<string, string> } => item !== null)
+      .slice(0, 4);
+  }, [definition, locale]);
+  const [selectedExample, setSelectedExample] = useState<string | null>(null);
+  const applyExample = (preset: (typeof examplePresets)[number]) => {
+    setValues({ ...preset.values });
+    setSelectedExample(preset.slug);
+  };
+  const resetExample = () => {
+    setValues(getDefaultValues(definition));
+    setSelectedExample(null);
+  };
+
   const validationErrors = useMemo(() => validateCalculatorInputs(definition, values), [definition, values]);
   const hasValidationErrors = Object.keys(validationErrors).length > 0;
   const result = useMemo(
@@ -48,13 +76,30 @@ export default function CalculatorEngine({ definition, relatedLinks, hubLinks, l
       <section className={embedMode ? "grid gap-6" : "grid gap-4 md:gap-6 lg:grid-cols-[1.1fr_0.9fr]"}>
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:rounded-3xl md:p-8">
           <div className="mb-4 md:mb-6"><div className="hidden rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 md:inline-flex">{locale === "ko" ? "무료 계산기" : "Free calculator"}</div><h1 className="text-2xl font-extrabold leading-tight tracking-tight text-slate-900 md:mt-4 md:text-4xl">{definition.name}</h1><p className="sr-only mt-4 max-w-3xl text-sm leading-7 text-slate-600 md:not-sr-only md:block md:text-base">{definition.description}</p>{!embedMode ? <a href="#calculator-result" className="mt-4 flex items-center justify-between gap-4 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 md:hidden"><span className="min-w-0"><span className="block text-xs font-semibold text-blue-700">{locale === "ko" ? "현재 결과" : "Current result"}</span><span className="mt-1 block break-words text-lg font-extrabold text-slate-950">{localizeResultText(result.primary.value, locale)}</span></span><span className="shrink-0 text-xs font-semibold text-blue-700">{locale === "ko" ? "자세히 ↓" : "Details ↓"}</span></a> : null}</div>
+          {examplePresets.length > 0 ? (
+            <div className="mb-5 rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-sm font-bold text-slate-900">{locale === "ko" ? "예시 값으로 바로 계산" : "Try a calculation example"}</h2>
+                <button type="button" onClick={resetExample} className="text-xs font-semibold text-blue-700 underline underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600">{locale === "ko" ? "기본값으로 초기화" : "Reset defaults"}</button>
+              </div>
+              <p className="mt-1 text-xs leading-5 text-slate-600">{locale === "ko" ? "예시를 누르면 입력값이 적용되고 결과가 자동으로 바뀝니다." : "Select an example to fill the inputs and update the result automatically."}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {examplePresets.map((preset, index) => (
+                  <button key={preset.slug} type="button" onClick={() => applyExample(preset)} aria-pressed={selectedExample === preset.slug} className={`rounded-xl border px-3 py-2 text-left text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 ${selectedExample === preset.slug ? "border-blue-600 bg-blue-600 text-white" : "border-blue-200 bg-white text-blue-800 hover:border-blue-400"}`} title={preset.title}>
+                    {locale === "ko" ? `예시 ${index + 1}` : `Example ${index + 1}`}
+                    <span className="ml-1 font-normal opacity-80">{definition.inputs.filter((input) => preset.values[input.name] !== getDefaultValues(definition)[input.name]).slice(0, 1).map((input) => `${localizeInputLabel(input.label, locale)}: ${preset.values[input.name]}`).join("")}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
           <div className="grid gap-4 md:grid-cols-2 md:gap-5">
             {definition.inputs.map((input) => {
               const inputId = `calculator-input-${input.name}`;
               const errorId = `${inputId}-error`;
               const error = validationErrors[input.name];
               const sharedClass = `w-full rounded-xl border bg-white px-3 py-2.5 text-slate-900 outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 md:rounded-2xl md:px-4 md:py-3 ${error ? "border-red-400" : "border-slate-300"}`;
-              const updateValue = (value: string) => setValues((current) => ({ ...current, [input.name]: value }));
+              const updateValue = (value: string) => { setSelectedExample(null); setValues((current) => ({ ...current, [input.name]: value })); };
               return (
                 <div key={input.name} className={input.type === "textarea" ? "md:col-span-2" : ""}>
                   <label htmlFor={inputId} className="mb-1.5 block text-sm font-semibold text-slate-700 md:mb-2">{localizeInputLabel(input.label, locale)}</label>

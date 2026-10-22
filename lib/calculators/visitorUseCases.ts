@@ -13,10 +13,10 @@ export function getVisitorUseCases(definition: CalculatorDefinition, locale: Loc
     const name = localizeCalculatorName(definition.name, "ko", definition.slug);
     const situation = scenario?.situation ?? `${name}로 필요한 수치를 확인하려면`;
     return [
-      `${situation.replace(/[?？]$/, "")}? ${first}${second ? `와(과) ${second}` : ""}을(를) 입력해 현재 조건의 결과를 확인해보세요.`,
-      `${first} 값을 변경한 뒤 같은 조건에서 다시 계산해보세요. ${second ? `${second}은(는) 그대로 두면` : "나머지 조건은 그대로 두면"} 결과에 미치는 영향을 구분하기 쉽습니다.`,
+      `${situation.replace(/[?？]$/, "")}? ${second ? `${first}·${second}` : first} 항목에 값을 입력해 현재 조건의 결과를 확인해보세요.`,
+      `${first} 값을 변경한 뒤 다시 계산해보세요. ${second ? `${second} 값은 그대로 두면` : "나머지 조건은 그대로 두면"} 결과에 미치는 영향을 구분하기 쉽습니다.`,
       second
-        ? `${second}${third ? `와(과) ${third}` : ""} 조건도 비교해보세요. 두 값을 동시에 바꾸기보다 하나씩 변경하면 차이를 이해하기 쉽습니다.`
+        ? `${third ? `${second}·${third}` : second} 조건도 비교해보세요. 두 값을 동시에 바꾸기보다 하나씩 변경하면 차이를 이해하기 쉽습니다.`
         : `${name} 결과를 확인할 때 입력 단위와 반올림 기준을 먼저 점검하세요.`,
       scenario?.caution ?? "중요한 결정에 활용할 때는 계산에 포함되지 않은 조건이 없는지 확인하세요.",
     ];

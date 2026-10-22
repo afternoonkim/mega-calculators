@@ -1,6 +1,6 @@
 import { stripLocaleFromPathname, type Locale } from "@/lib/i18n";
 import type { CalculatorDefinition } from "@/lib/calculators/data";
-import { getKoScenarioCopy } from "@/lib/calculators/localization";
+import { getKoScenarioCopy, localizeInputLabel } from "@/lib/calculators/localization";
 
 export type CalculatorSeoContent = {
   slug: string;
@@ -610,7 +610,7 @@ function buildFallbackCalculatorSeoContent(
   const isKo = locale === "ko";
   const categoryContent = categoryEditorial[definition.category] ?? categoryEditorial["everyday-life"];
   const koreanScenario = isKo ? getKoScenarioCopy(definition.slug) : null;
-  const inputNames = definition.inputs.slice(0, 3).map((input) => input.label).join(", ");
+  const inputNames = definition.inputs.slice(0, 3).map((input) => localizeInputLabel(input.label, locale)).join(", ");
   const koTopic = definition.category === "finance" || definition.category === "business"
     ? "금액·이율·기간이 실제 지출 또는 수익에 주는 영향"
     : definition.category === "health" || definition.category === "fitness"

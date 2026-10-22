@@ -7,7 +7,7 @@ import { computeCalculator, getDefaultValues } from "@/lib/calculators/engine";
 import { validateCalculatorInputs } from "@/lib/calculators/validation";
 import CalculatorSeoContent from "@/components/calculators/CalculatorSeoContent";
 import { getEnhancedCalculatorContent } from "@/lib/calculators/enhancedContent";
-import { getCalculatorExamples } from "@/lib/calculators/programmatic";
+import { getValidCalculatorPresets } from "@/lib/calculators/examplePresets";
 import ResultActions from "@/components/calculators/ResultActions";
 import { RecentTracker } from "@/components/calculators/RecentCalculators";
 import AdvisoryNotice from "@/components/calculators/AdvisoryNotice";
@@ -22,23 +22,15 @@ type CalculatorEngineProps = { definition: CalculatorDefinition; relatedLinks: R
 export default function CalculatorEngine({ definition, relatedLinks, hubLinks, locale, embedMode = false }: CalculatorEngineProps) {
   const [values, setValues] = useState<Record<string, string>>(getDefaultValues(definition));
   const [copied, setCopied] = useState(false);
-  const examplePresets = useMemo(() => {
-    const defaults = getDefaultValues(definition);
-    const seen = new Set<string>();
-    return getCalculatorExamples(definition)
-      .map((example) => {
-        const values = { ...defaults, ...example.overrides };
-        const keys = Object.keys(example.overrides);
-        if (!keys.length || keys.some((key) => !definition.inputs.some((input) => input.name === key))) return null;
-        if (Object.keys(validateCalculatorInputs(definition, values)).length) return null;
-        const signature = definition.inputs.map((input) => values[input.name] ?? "").join("|");
-        if (seen.has(signature)) return null;
-        seen.add(signature);
-        return { slug: example.slug, title: localizeProgrammaticExample(example, definition, locale).title, values };
-      })
-      .filter((item): item is { slug: string; title: string; values: Record<string, string> } => item !== null)
-      .slice(0, 4);
-  }, [definition, locale]);
+  const examplePresets = useMemo(
+    () => getValidCalculatorPresets(definition).map((preset) => ({
+      ...preset,
+      title: localizeProgrammaticExample({
+        slug: preset.slug, title: preset.title, description: "", intro: "", overrides: {},
+      }, definition, locale).title,
+    })),
+    [definition, locale],
+  );
   const [selectedExample, setSelectedExample] = useState<string | null>(null);
   const applyExample = (preset: (typeof examplePresets)[number]) => {
     setValues({ ...preset.values });

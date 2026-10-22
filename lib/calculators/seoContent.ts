@@ -1,5 +1,6 @@
 import { stripLocaleFromPathname, type Locale } from "@/lib/i18n";
 import type { CalculatorDefinition } from "@/lib/calculators/data";
+import { getKoScenarioCopy } from "@/lib/calculators/localization";
 
 export type CalculatorSeoContent = {
   slug: string;
@@ -608,6 +609,7 @@ function buildFallbackCalculatorSeoContent(
 ): CalculatorSeoContent {
   const isKo = locale === "ko";
   const categoryContent = categoryEditorial[definition.category] ?? categoryEditorial["everyday-life"];
+  const koreanScenario = isKo ? getKoScenarioCopy(definition.slug) : null;
   const relatedArticles = relatedLinks.length
     ? relatedLinks.slice(0, 3).map((item) => ({
         title: item.name,
@@ -626,7 +628,9 @@ function buildFallbackCalculatorSeoContent(
     slug: definition.slug,
     audienceTitle: isKo ? `${definition.name} 계산기가 특히 유용한 상황` : `When this ${definition.name.toLowerCase()} is especially useful`,
     audienceIntro: isKo
-      ? `${definition.name} 페이지는 숫자 하나를 빠르게 구하는 용도뿐 아니라, 입력값을 바꿔가며 여러 시나리오를 비교할 때 더 큰 도움이 됩니다. 결과를 보기 전에 어떤 질문을 풀고 싶은지 먼저 정리하면 활용도가 높아집니다.`
+      ? koreanScenario
+        ? `${koreanScenario.situation}? ${koreanScenario.steps} ${koreanScenario.caution}`
+        : `${definition.name} 페이지는 숫자 하나를 빠르게 구하는 용도뿐 아니라, 입력값을 바꿔가며 여러 시나리오를 비교할 때 더 큰 도움이 됩니다. 결과를 보기 전에 어떤 질문을 풀고 싶은지 먼저 정리하면 활용도가 높아집니다.`
       : `${definition.name} is most useful when you compare more than one scenario instead of relying on a single quick answer. It works best when you know what decision, estimate, or comparison the result is supposed to support.`,
     audiences: isKo
       ? [
@@ -642,7 +646,7 @@ function buildFallbackCalculatorSeoContent(
     checksTitle: isKo ? "입력 전에 먼저 확인할 점" : "What to check before you enter numbers",
     checks: isKo
       ? [
-          `입력값 단위와 기준을 먼저 확인하세요. 같은 숫자라도 기준이 다르면 결과 해석이 달라질 수 있습니다.`,
+          koreanScenario ? koreanScenario.caution : `입력값 단위와 기준을 먼저 확인하세요. 같은 숫자라도 기준이 다르면 결과 해석이 달라질 수 있습니다.`,
           `한 가지 값만 넣지 말고, 조금 낮은 경우와 높은 경우를 함께 비교하면 더 실용적인 판단이 가능합니다.`,
           `중요한 결정에 사용할 때는 계산기 결과를 참고값으로 보고 공식 자료나 전문가 안내와 함께 확인하세요.`,
         ]

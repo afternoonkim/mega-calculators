@@ -83,8 +83,8 @@ function buildGenericExamples(definition: CalculatorDefinition) {
       {
         slug: "basic-example",
         title: `${definition.name} basic example`,
-        description: `See a basic ${definition.name.toLowerCase()} scenario using the default inputs on Mega Calculators.`,
-        intro: `This example uses the default inputs for ${definition.name.toLowerCase()} so you can see how the calculator behaves before entering your own numbers.`,
+        description: `Compare the result for ${definition.name.toLowerCase()} using the starting input values before changing your own figures.`,
+        intro: `Start with the listed values, check the calculated result, and then change the relevant input to compare another ${definition.name.toLowerCase()} scenario.`,
         overrides: {},
       },
     ];
@@ -109,8 +109,8 @@ function buildGenericExamples(definition: CalculatorDefinition) {
     return {
       slug,
       title: `${definition.name} for ${valueText} ${label.toLowerCase()}`,
-      description: `Try a ${definition.name.toLowerCase()} scenario for ${valueText} ${label.toLowerCase()} with a free example page from Mega Calculators.`,
-      intro: `This example page shows how ${definition.name.toLowerCase()} works when the ${label.toLowerCase()} is set to ${valueText}. You can use it as a starting point before testing your own assumptions.`,
+      description: `Estimate the result when ${label.toLowerCase()} is ${valueText}, then compare how changing that input affects the outcome.`,
+      intro: `With ${label.toLowerCase()} set to ${valueText}, review the result alongside the other input values. Adjust one condition at a time to see what changes.`,
       overrides,
     };
   });

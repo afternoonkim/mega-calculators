@@ -37,6 +37,21 @@ describe("calculator language separation", () => {
     expect(localizeResultText("5 kilometers", "en")).toBe("5 kilometers");
   });
 
+
+  it("covers every calculator with a readable Korean description, intro and FAQ", () => {
+    const missing = calculators.flatMap((calculator) => {
+      const ko = localizeCalculatorDefinition(calculator, "ko");
+      return [
+        ["name", ko.name],
+        ["description", ko.description],
+        ["intro", ko.intro],
+        ["example", ko.example],
+        ["first FAQ", ko.faq[0]?.q ?? ""],
+      ].filter(([, value]) => !/[가-힣]/.test(value)).map(([field]) => `${calculator.slug}: ${field}`);
+    });
+    expect(missing).toEqual([]);
+  });
+
   it("localizes UI labels without translating numeric values", () => {
     expect(localizeInputLabel("Annual interest rate (%)", "ko")).toMatch(/[가-힣]/);
     expect(localizeInputLabel("Annual interest rate (%)", "en")).toBe("Annual interest rate (%)");

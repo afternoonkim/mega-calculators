@@ -1041,29 +1041,53 @@ function buildKoHowToUse(definition: CalculatorDefinition) {
   return steps;
 }
 
-function buildKoExample(definition: CalculatorDefinition, localizedName: string) {
-  const labels = localizedInputLabels(definition).slice(0, 3);
-  if (definition.category === "finance" || definition.category === "business") {
-    return `${localizedName}에서는 금액, 이자율, 기간을 넣어 결과가 어떻게 달라지는지 바로 확인할 수 있습니다. 먼저 기본값으로 계산해본 뒤 내 상황에 맞는 숫자로 바꿔보면 실제 비교가 훨씬 쉬워집니다.`;
-  }
-  if (definition.category === "health") {
-    return `${localizedName} 기본값으로 먼저 결과를 확인한 뒤, 내 키·몸무게·나이·활동량에 맞게 값을 바꿔보세요. 작은 입력 차이가 결과에 어떤 영향을 주는지 직관적으로 이해할 수 있습니다.`;
-  }
-  if (isConverter(definition)) {
-    return `${localizedName}는 자주 쓰는 기준값을 넣어보면 단위 차이를 빠르게 이해할 수 있습니다. 예를 들어 ${labels.join(", ")} 같은 입력을 바꿔보며 필요한 단위를 비교해보세요.`;
-  }
-  return `${localizedName}는 기본 입력값으로 먼저 흐름을 확인한 뒤 내 상황에 맞게 숫자를 바꿔보는 방식이 가장 이해하기 쉽습니다. 예시와 함께 보면 어떤 값을 넣어야 할지 감을 빠르게 잡을 수 있습니다.`;
+// Original Korean examples for common search intents. These describe input scenarios,
+// not guaranteed outputs or product-specific rates.
+const koScenarioContent: Record<string, { situation: string; steps: string; caution: string }> = {
+  "compound-interest-calculator": { situation: "매달 20만 원을 10년 동안 적립한다면", steps: "초기금액, 월 납입액, 연 수익률과 기간을 입력하고 수익률을 달리해 최종 금액의 차이를 비교해보세요.", caution: "수익률은 확정되지 않으며 세금과 수수료를 별도로 고려해야 합니다." },
+  "loan-calculator": { situation: "대출금 3,000만 원을 5년 동안 갚는다면", steps: "대출원금과 연이율, 상환기간을 입력해 월 납입액과 총이자를 함께 확인해보세요.", caution: "실제 상환방식과 중도상환수수료 등 계약 조건에 따라 부담이 달라집니다." },
+  "mortgage-calculator": { situation: "3억 원의 주택을 구입하면서 일부 금액을 빌린다면", steps: "주택가격과 계약금, 대출금리와 만기를 바꿔 월 원리금과 총이자를 비교해보세요.", caution: "취득세, 보험료와 부대비용은 계산기 입력 범위에 따라 별도로 확인해야 합니다." },
+  "dividend-yield-calculator": { situation: "주당 5만 원인 종목이 연간 주당 2,000원을 배당한다면", steps: "주가와 주당 연간 배당금을 입력해 배당수익률을 확인하고 다른 종목과 비교해보세요.", caution: "배당금은 변동되거나 지급되지 않을 수 있으며 세후 수익률과는 다릅니다." },
+  "retirement-calculator": { situation: "은퇴까지 20년이 남았고 매달 저축할 수 있다면", steps: "현재 보유자금과 저축액, 은퇴까지의 기간을 넣고 예상 수익률에 따른 차이를 확인해보세요.", caution: "물가상승과 은퇴 후 지출, 수익률 변동을 따로 검토해야 합니다." },
+  "savings-calculator": { situation: "매달 30만 원씩 3년 동안 모으려면", steps: "저축액과 기간, 이율을 입력해 예상 만기금액을 비교해보세요.", caution: "상품별 이자 계산 방식과 이자소득세에 따라 실제 수령액은 달라질 수 있습니다." },
+  "discount-calculator": { situation: "8만 원짜리 상품을 25% 할인한다면", steps: "정가와 할인율을 입력해 할인금액과 최종 결제금액을 나누어 확인해보세요.", caution: "중복 할인, 배송비, 쿠폰 조건은 별도로 계산해야 할 수 있습니다." },
+  "percentage-calculator": { situation: "전체 240개 가운데 36개가 차지하는 비율을 알고 싶다면", steps: "전체값과 부분값을 입력해 퍼센트를 확인하고 분모가 바뀌는 경우도 비교해보세요.", caution: "전체값이 0이거나 기준값이 달라지면 해석할 수 없는 경우가 있습니다." },
+  "bmi-calculator": { situation: "키 170cm, 몸무게 65kg인 성인의 BMI를 확인한다면", steps: "키와 몸무게를 입력해 체질량지수를 구하고 체중 변화에 따른 수치 차이를 확인해보세요.", caution: "BMI는 근육량·체지방 분포와 개인의 건강 상태를 직접 진단하지 않습니다." },
+  "bmr-calculator": { situation: "나이와 체격에 따라 하루 기초대사량을 가늠하려면", steps: "성별, 나이, 키, 몸무게 등 화면에 제시된 조건을 입력해 추정치를 확인해보세요.", caution: "기초대사량은 활동량을 포함한 하루 총소모열량과 다릅니다." },
+  "calorie-calculator": { situation: "운동량이 달라질 때 하루 필요 열량을 비교하려면", steps: "나이와 신체 정보, 활동 수준을 입력하고 활동량을 바꿔 추정치 변화를 살펴보세요.", caution: "열량 추정치는 개인별 건강상태와 실제 활동량을 모두 반영하지 못합니다." },
+  "water-intake-calculator": { situation: "평소 물을 얼마나 마셔야 할지 가늠하려면", steps: "몸무게 등 입력 조건을 넣어 권장량 추정치를 확인하고 활동이나 날씨에 따른 차이를 생각해보세요.", caution: "질환이나 임신 등 개인 조건에 따라 필요한 수분량이 다를 수 있습니다." },
+  "pregnancy-due-date-calculator": { situation: "마지막 생리 시작일로 출산 예정일을 추정하려면", steps: "계산기가 요청하는 날짜나 주기 정보를 입력해 예상 날짜를 확인해보세요.", caution: "예정일은 추정값이며 초음파 검사 등 의료진의 판단에 따라 달라질 수 있습니다." },
+  "age-calculator": { situation: "생년월일 기준으로 현재 만 나이를 확인하려면", steps: "생년월일과 기준일을 입력하고 생일이 지났는지에 따른 차이를 확인해보세요.", caution: "행정·계약용 나이 판단은 해당 제도에서 요구하는 기준일을 확인해야 합니다." },
+  "date-difference-calculator": { situation: "계약일과 만료일 사이의 날짜를 확인하려면", steps: "시작일과 종료일을 입력하고 시작일 포함 여부 등 계산 기준을 확인해보세요.", caution: "영업일과 달력일은 다르며 공휴일 제외 여부는 별도로 확인해야 합니다." },
+  "business-days-calculator": { situation: "접수일로부터 실제 근무일 수를 세려면", steps: "시작일과 종료일을 지정해 주말을 제외한 일수를 확인해보세요.", caution: "국가별 법정공휴일이나 회사별 휴무일이 자동 반영되는지는 별도로 확인해야 합니다." },
+  "gpa-calculator": { situation: "한 학기 과목별 성적과 학점이 정리됐다면", steps: "과목별 학점과 성적을 입력해 가중평균 학점을 계산해보세요.", caution: "대학마다 4.3·4.5 등 만점 기준과 재수강 처리 규정이 다릅니다." },
+  "fuel-cost-calculator": { situation: "왕복 150km를 자동차로 이동할 예정이라면", steps: "주행거리와 연비, 연료 단가를 입력해 예상 연료비를 비교해보세요.", caution: "실제 연비는 정체와 주행환경에 따라 달라지고 주차·통행료는 별도입니다." },
+  "unit-price-calculator": { situation: "900g에 9,900원인 상품과 1.2kg에 12,000원인 상품을 비교한다면", steps: "가격과 용량을 각각 입력해 같은 단위당 가격으로 비교해보세요.", caution: "표기 중량과 실사용량, 배송비가 다르면 체감 가격도 달라질 수 있습니다." },
+  "temperature-converter": { situation: "미국 레시피의 화씨 온도를 섭씨로 읽으려면", steps: "화씨 값을 입력하고 섭씨 단위를 선택해 환산값을 확인해보세요.", caution: "조리기구의 실제 온도 편차는 단위 변환에 포함되지 않습니다." },
+  "length-converter": { situation: "해외 제품의 인치 표기를 센티미터로 비교하려면", steps: "제품 길이와 원래 단위, 변환할 단위를 선택해 수치를 확인해보세요.", caution: "제품 치수는 측정 부위와 제조사 표기 기준에 따라 다를 수 있습니다." },
+};
+function getKoScenario(definition: CalculatorDefinition) {
+  return koScenarioContent[definition.slug];
 }
-
+function buildKoExample(definition: CalculatorDefinition, localizedName: string) {
+  const scenario = getKoScenario(definition);
+  if (scenario) return `${scenario.situation}? ${scenario.steps} ${scenario.caution}`;
+  const labels = localizedInputLabels(definition).slice(0, 3);
+  const inputs = labels.length ? labels.join(", ") : "화면의 입력 항목";
+  return `${localizedName}에서 ${inputs}을 확인한 다음, 실제 비교하려는 상황에 맞게 값을 입력해보세요. 먼저 한 번 계산하고 한 항목만 변경해 결과 차이를 살펴보면 각 입력값이 어떤 역할을 하는지 이해하기 쉽습니다. 계산 결과에 포함되지 않은 비용이나 조건은 별도로 확인해야 합니다.`;
+}
 function buildKoFaq(definition: CalculatorDefinition, localizedName: string) {
+  const scenario = getKoScenario(definition);
   const firstLabel = localizedInputLabels(definition)[0] ?? "입력값";
-  const moneyNote = isMoneyCalculator(definition)
-    ? "한국어 화면에서는 금액 관련 문구와 표시를 원화 기준으로 읽기 쉽게 보여줍니다."
-    : "입력 단위와 조건을 정확히 맞춰 넣는 것이 중요합니다.";
+  if (scenario) return [
+    { q: `${localizedName}는 언제 사용하면 좋나요?`, a: `${scenario.situation}? ${scenario.steps}` },
+    { q: "결과를 해석할 때 무엇을 주의해야 하나요?", a: scenario.caution },
+    { q: "다른 조건도 비교할 수 있나요?", a: `${firstLabel} 등 입력값을 한 번에 하나씩 바꾸면 조건에 따른 결과 차이를 확인하기 쉽습니다. 최종 의사결정 전에는 실제 적용 규칙과 별도 비용을 점검하세요.` },
+  ];
   return [
-    { q: `${localizedName}는 어떤 계산에 쓰나요?`, a: `${localizedName}는 ${firstLabel} 등 필요한 값을 입력하면 핵심 결과를 빠르게 보여주는 온라인 계산기입니다. 복잡한 표나 스프레드시트 없이 바로 결과를 확인하고 비교할 수 있습니다.` },
-    { q: `결과를 그대로 믿어도 되나요?`, a: `${localizedName} 결과는 참고용 계산값입니다. 입력 조건, 반올림 방식, 실제 상품·기관 규정에 따라 차이가 생길 수 있으므로 중요한 결정 전에는 공식 자료를 함께 확인하세요.` },
-    { q: `한국어 버전에서 확인할 때 주의할 점이 있나요?`, a: `${moneyNote} 예시 페이지와 가이드도 함께 보면 입력값과 결과 해석을 더 쉽게 이해할 수 있습니다.` },
+    { q: `${localizedName}에서는 무엇을 입력하나요?`, a: `${firstLabel}을 비롯한 화면의 입력 항목을 사용합니다. 항목의 단위와 선택지를 확인한 뒤 계산해보세요.` },
+    { q: "결과를 그대로 적용해도 되나요?", a: "입력한 조건에 따른 계산 결과이므로 실제 상품, 기관 또는 개인별 기준과 차이가 날 수 있습니다. 중요한 결정 전에는 공식 자료를 함께 확인하세요." },
+    { q: "여러 경우를 어떻게 비교하나요?", a: "기준이 되는 입력값을 먼저 저장하거나 기록하고 한 항목씩 바꾸어 계산하세요. 단위나 기간을 동시에 바꾸면 어떤 요인 때문에 결과가 변했는지 알기 어려울 수 있습니다." },
   ];
 }
 

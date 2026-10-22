@@ -95,13 +95,13 @@ export default function Header({ locale }: { locale: Locale }) {
       </div>
 
       {open ? (
-        <div className="border-t border-slate-200 bg-white lg:hidden">
-          <div className="mx-auto max-w-7xl space-y-6 px-4 py-5 md:px-6">
+        <div className="absolute inset-x-0 top-full z-50 max-h-[calc(100dvh-8rem-env(safe-area-inset-bottom))] overflow-y-auto overscroll-contain border-t border-slate-200 bg-white shadow-xl lg:hidden" role="dialog" aria-label={locale === "ko" ? "전체 메뉴" : "Full menu"}>
+          <div className="mx-auto max-w-7xl space-y-4 px-4 py-4 pb-8 md:px-6">
             <CalculatorSearch locale={locale} compact onNavigate={() => setOpen(false)} />
             <LanguageSwitcher locale={locale} />
             <div className="grid gap-2">
               {primaryLinks.map((link) => (
-                <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className="rounded-2xl px-4 py-3 text-base font-semibold text-slate-900 transition hover:bg-slate-50">
+                <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-50">
                   {link.label}
                 </Link>
               ))}
@@ -114,7 +114,7 @@ export default function Header({ locale }: { locale: Locale }) {
                     key={category.slug}
                     href={withLocale(locale, `/calculators/${category.slug}`)}
                     onClick={() => setOpen(false)}
-                    className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                   >
                     {localizeCategoryName(category.slug, locale)}
                   </Link>

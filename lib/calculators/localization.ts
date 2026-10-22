@@ -1069,6 +1069,10 @@ const koScenarioContent: Record<string, { situation: string; steps: string; caut
 function getKoScenario(definition: CalculatorDefinition) {
   return koScenarioContent[definition.slug];
 }
+
+export function getKoScenarioCopy(slug: string) {
+  return koScenarioContent[slug] ?? null;
+}
 function buildKoExample(definition: CalculatorDefinition, localizedName: string) {
   const scenario = getKoScenario(definition);
   if (scenario) return `${scenario.situation}? ${scenario.steps} ${scenario.caution}`;
@@ -1188,10 +1192,16 @@ export function localizeCalculatorDefinition(definition: CalculatorDefinition, l
     ...definition,
     categoryName: localizeCategoryName(definition.category, locale),
     name: localizedName,
-    description: buildKoDescription(definition, localizedName),
-    intro: buildKoIntro(definition, localizedName),
+    description: getKoScenario(definition)
+      ? `${localizedName}: ${getKoScenario(definition)!.situation}? ${getKoScenario(definition)!.caution}`
+      : buildKoDescription(definition, localizedName),
+    intro: getKoScenario(definition)
+      ? `${getKoScenario(definition)!.situation}? ${getKoScenario(definition)!.steps} ${getKoScenario(definition)!.caution}`
+      : buildKoIntro(definition, localizedName),
     formulaText: buildKoFormulaText(definition, localizedName),
-    howToUse: buildKoHowToUse(definition),
+    howToUse: getKoScenario(definition)
+      ? [getKoScenario(definition)!.steps, ...buildKoHowToUse(definition).slice(1)]
+      : buildKoHowToUse(definition),
     example: buildKoExample(definition, localizedName),
     faq: buildKoFaq(definition, localizedName),
     inputs: definition.inputs.map((input) => ({

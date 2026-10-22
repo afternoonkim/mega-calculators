@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { calculators } from "@/lib/calculators/data";
+import { getCalculatorSeoContent } from "@/lib/calculators/seoContent";
 import {
   localizeCalculatorDefinition,
   localizeInputLabel,
@@ -50,6 +51,20 @@ describe("calculator language separation", () => {
       ].filter(([, value]) => !/[가-힣]/.test(value)).map(([field]) => `${calculator.slug}: ${field}`);
     });
     expect(missing).toEqual([]);
+  });
+
+  it("keeps SEO copy separate for every registered calculator", () => {
+    const problems: string[] = [];
+    for (const calculator of calculators) {
+      const koDefinition = localizeCalculatorDefinition(calculator, "ko");
+      const enDefinition = localizeCalculatorDefinition(calculator, "en");
+      const ko = getCalculatorSeoContent(koDefinition, "ko");
+      const en = getCalculatorSeoContent(enDefinition, "en");
+      if (!/[가-힣]/.test(ko.audienceIntro)) problems.push(`${calculator.slug}: missing Korean SEO intro`);
+      if (/[가-힣]/.test(en.audienceIntro)) problems.push(`${calculator.slug}: Hangul in English SEO intro`);
+      if (ko.audienceIntro === en.audienceIntro) problems.push(`${calculator.slug}: identical language intro`);
+    }
+    expect(problems).toEqual([]);
   });
 
   it("localizes UI labels without translating numeric values", () => {

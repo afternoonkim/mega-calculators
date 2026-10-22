@@ -1,5 +1,6 @@
 import type { CalculatorDefinition } from "@/lib/calculators/data";
 import type { Locale } from "@/lib/i18n";
+import { isUsOnlyCalculator } from "@/lib/calculators/currencyPolicy";
 
 const categoryNames = {
   en: { finance: "Finance Calculators", business: "Business Calculators", health: "Health Calculators", fitness: "Fitness Calculators", math: "Math Calculators", statistics: "Statistics Calculators", "unit-converters": "Unit Converters", "time-date": "Time & Date Calculators", construction: "Construction Calculators", "food-cooking": "Food & Cooking Calculators", "computer-tech": "Computer & Tech Calculators", "physics-science": "Physics & Science Calculators", education: "Education Calculators", "everyday-life": "Everyday Life Calculators", other: "Other Calculators" },
@@ -1129,6 +1130,27 @@ export function localizeInputLabel(label: string | Partial<Record<Locale, string
   return localizeCalculatorName(cleaned, locale);
 }
 
+function localizedCalculatorInputLabel(label: string, locale: Locale, keepUsd: boolean): string {
+  const localized = localizeInputLabel(label, locale);
+  if (locale !== "ko" || !keepUsd || !/\(USD\)/i.test(label)) return localized;
+  return localized.replace(/\(원\)/g, "(USD)").replace(/\(₩\)/g, "(USD)");
+}
+
+const usOnlyKoreanDescriptions: Record<string, { description: string; intro: string }> = {
+  "mortgage-calculator": {
+    description: "미국 주택담보대출의 원리금, 재산세, 보험료, PMI, HOA 관리비와 추가 원금 상환 효과를 달러(USD)로 계산합니다.",
+    intro: "미국 주택 구매 시 월 부담액과 조기 상환 효과를 비교합니다. 모든 금액은 미국 달러(USD) 기준이며 한국 주택담보대출 상품이나 세금 규칙을 적용하지 않습니다.",
+  },
+  "paycheck-calculator": {
+    description: "2026년 미국 연방소득세, Social Security, Medicare와 급여 공제를 반영해 달러(USD) 기준 실수령액을 추정합니다.",
+    intro: "미국에서 받는 급여를 기준으로 2026년 미국 세법에 따른 예상 실수령액을 계산합니다. 한국 소득세·4대 보험 계산기가 아니며 입력 및 결과 금액은 USD입니다.",
+  },
+  "biweekly-paycheck-calculator": {
+    description: "2026년 미국 세금과 급여 공제를 반영해 연 26회 격주 급여의 실수령액을 달러(USD)로 추정합니다.",
+    intro: "미국에서 2주마다 급여를 받는 경우의 예상 실수령액을 계산합니다. 미국 세법과 달러(USD)를 사용하며 한국 소득세·4대 보험은 적용하지 않습니다.",
+  },
+};
+
 export function localizeCalculatorDefinition(definition: CalculatorDefinition, locale: Locale): CalculatorDefinition {
   if (locale === "en") return {
     ...definition,
@@ -1147,15 +1169,15 @@ export function localizeCalculatorDefinition(definition: CalculatorDefinition, l
     ...definition,
     categoryName: localizeCategoryName(definition.category, locale),
     name: localizedName,
-    description: buildKoDescription(definition, localizedName),
-    intro: buildKoIntro(definition, localizedName),
+    description: usOnlyKoreanDescriptions[definition.slug]?.description ?? buildKoDescription(definition, localizedName),
+    intro: usOnlyKoreanDescriptions[definition.slug]?.intro ?? buildKoIntro(definition, localizedName),
     formulaText: buildKoFormulaText(definition, localizedName),
     howToUse: buildKoHowToUse(definition),
     example: buildKoExample(definition, localizedName),
     faq: buildKoFaq(definition, localizedName),
     inputs: definition.inputs.map((input) => ({
       ...input,
-      label: localizeInputLabel(input.label, locale),
+      label: localizedCalculatorInputLabel(input.label, locale, isUsOnlyCalculator(definition)),
       options: input.options?.map((option) => ({ ...option, label: localizeInputLabel(option.label, locale) })),
     })),
   };

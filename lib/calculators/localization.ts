@@ -1272,7 +1272,7 @@ function getKoScenario(definition: CalculatorDefinition) {
 }
 
 export function getKoScenarioCopy(slug: string) {
-  return getKoScenario({ slug } as CalculatorDefinition) ?? null;
+  return koScenarioContent[slug] ?? (remainingKoIntents[slug] ? { situation: remainingKoIntents[slug], steps: "화면의 입력 조건을 확인하고 값을 바꾸어 결과 차이를 비교해보세요.", caution: "계산 결과는 입력 조건과 적용 범위에 따라 달라질 수 있습니다." } : null);
 }
 function buildKoExample(definition: CalculatorDefinition, localizedName: string) {
   const scenario = getKoScenario(definition);

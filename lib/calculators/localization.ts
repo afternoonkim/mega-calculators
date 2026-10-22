@@ -1272,7 +1272,7 @@ function getKoScenario(definition: CalculatorDefinition) {
 }
 
 export function getKoScenarioCopy(slug: string) {
-  return koScenarioContent[slug] ?? null;
+  return getKoScenario({ slug } as CalculatorDefinition) ?? null;
 }
 function buildKoExample(definition: CalculatorDefinition, localizedName: string) {
   const scenario = getKoScenario(definition);

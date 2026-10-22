@@ -922,12 +922,17 @@ export function localizeProgrammaticExample(example: ProgrammaticExampleLike, de
     koIntro?: string;
   };
   const title = withKo.koTitle ?? localizeExampleTitleByPattern(example.title, calculatorName);
+  const overridden = definition.inputs
+    .filter((input) => example.overrides[input.name] !== undefined)
+    .slice(0, 3)
+    .map((input) => `${localizeInputLabel(input.label, "ko")} ${example.overrides[input.name]}`);
+  const condition = overridden.length ? overridden.join(", ") : "기본 입력 조건";
   const description =
     withKo.koDescription ??
-    `${calculatorName}의 대표 입력값과 결과를 한국어로 확인할 수 있는 예시 페이지입니다.`;
+    `${condition}에서 ${calculatorName} 결과가 어떻게 달라지는지 확인하고, 다른 입력 조건과 비교해보세요.`;
   const intro =
     withKo.koIntro ??
-    `${calculatorName}를 처음 사용하는 분도 바로 이해할 수 있도록 대표 입력값을 넣은 예시입니다. 예시 결과를 먼저 확인한 뒤 내 상황에 맞게 숫자만 바꿔보세요.`;
+    `${condition}을 기준으로 계산한 결과입니다. 아래 입력값과 계산 결과를 함께 확인한 뒤, 비교하려는 조건을 하나씩 바꾸어 차이를 살펴보세요.`;
   return { ...example, title, description, intro };
 }
 

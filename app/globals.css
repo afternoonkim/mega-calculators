@@ -48,3 +48,40 @@ button {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Mobile reading rhythm and fixed navigation safe area. */
+@media (max-width: 1023px) {
+  body {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .mobile-bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@media (max-width: 639px) {
+  main h1 {
+    font-size: 1.5rem !important;
+    line-height: 1.35 !important;
+    letter-spacing: -0.025em;
+  }
+
+  main h2 {
+    font-size: 1.25rem !important;
+    line-height: 1.4 !important;
+  }
+
+  main h3 {
+    font-size: 1.0625rem !important;
+    line-height: 1.45 !important;
+  }
+
+  main p, main li {
+    overflow-wrap: anywhere;
+  }
+}

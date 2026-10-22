@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 // Scan text produced by JSX, including conditional strings, on every public TSX route.
 const banned = /\b(?:programmatic SEO|SEO.optimized|crawl budget|indexable page|content pipeline|keyword stuffing|internal linking strategy|admin dashboard|developer mode|this example page|free example page)\b|(?:검색엔진 최적화 작업|검색 노출을 위한 페이지|자동 생성된 콘텐츠|관리자 전용 화면|개발자 모드|키워드 채우기|내부 링크 전략)/i;
 const roots = ["app", "components"];
+const textDataFiles = ["lib/editorial.ts", "lib/editorialCurrent.ts", "lib/trustPages.ts", "lib/calculators/enhancedContent.ts"];
 
 function walkFiles(folder: string): string[] {
   if (!fs.existsSync(folder)) return [];
@@ -43,6 +44,20 @@ describe("public page visitor language", () => {
           problems.push(`${filename}:${line}: ${value.value.slice(0, 80)}`);
         }
       }
+    }
+    for (const filename of textDataFiles) {
+      if (!fs.existsSync(filename)) continue;
+      const parsed = ts.createSourceFile(filename, fs.readFileSync(filename, "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+      const scan = (node: ts.Node) => {
+        if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) {
+          if (banned.test(node.text)) {
+            const line = parsed.getLineAndCharacterOfPosition(node.getStart(parsed)).line + 1;
+            problems.push(`${filename}:${line}: ${node.text.slice(0, 80)}`);
+          }
+        }
+        ts.forEachChild(node, scan);
+      };
+      scan(parsed);
     }
     expect(problems).toEqual([]);
   });

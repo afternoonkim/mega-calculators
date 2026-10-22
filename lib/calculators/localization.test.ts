@@ -5,6 +5,7 @@ import {
   localizeCalculatorDefinition,
   localizeInputLabel,
   localizeResultText,
+  getKoScenarioCopy,
 } from "@/lib/calculators/localization";
 
 describe("calculator language separation", () => {
@@ -51,6 +52,13 @@ describe("calculator language separation", () => {
       ].filter(([, value]) => !/[가-힣]/.test(value)).map(([field]) => `${calculator.slug}: ${field}`);
     });
     expect(missing).toEqual([]);
+  });
+
+  it("supplies distinct Korean use situations for every registered calculator", () => {
+    const missing = calculators.filter((calculator) => !getKoScenarioCopy(calculator.slug)).map((calculator) => calculator.slug);
+    expect(missing).toEqual([]);
+    const situations = calculators.map((calculator) => getKoScenarioCopy(calculator.slug)!.situation);
+    expect(new Set(situations).size).toBe(calculators.length);
   });
 
   it("keeps SEO copy separate for every registered calculator", () => {

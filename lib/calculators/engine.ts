@@ -1,6 +1,7 @@
 import { CalculatorDefinition } from "@/lib/calculators/data";
 import { localizeResultText } from "@/lib/calculators/localization";
 import { evaluateNumericExpression } from "@/lib/calculators/expression";
+import { currencyLocaleForCalculator, preserveUsdResultValue } from "@/lib/calculators/currencyPolicy";
 
 export type CalculatorResult = {
   primary: { label: string; value: string };
@@ -17,16 +18,16 @@ function getLocalizedText(value: string | { en?: string; ko?: string } | undefin
   return value[locale] ?? value.en ?? value.ko ?? "";
 }
 
-function finalizeResult(result: CalculatorResult, locale: "en" | "ko"): CalculatorResult {
+function finalizeResult(result: CalculatorResult, locale: "en" | "ko", definition: CalculatorDefinition): CalculatorResult {
   if (locale === "en") return result;
   return {
     primary: {
       label: localizeResultText(result.primary.label, locale),
-      value: localizeResultText(result.primary.value, locale),
+      value: preserveUsdResultValue(result.primary.value, definition) ? result.primary.value : localizeResultText(result.primary.value, locale),
     },
     secondary: result.secondary?.map((item) => ({
       label: localizeResultText(item.label, locale),
-      value: localizeResultText(item.value, locale),
+      value: preserveUsdResultValue(item.value, definition) ? item.value : localizeResultText(item.value, locale),
     })),
     note: result.note ? localizeResultText(result.note, locale) : undefined,
   };
@@ -1171,5 +1172,5 @@ function computeCalculatorRaw(definition: CalculatorDefinition, values: Values, 
 
 
 export function computeCalculator(definition: CalculatorDefinition, values: Values, locale: "en" | "ko" = "en"): CalculatorResult {
-  return finalizeResult(computeCalculatorRaw(definition, values, locale), locale);
+  return finalizeResult(computeCalculatorRaw(definition, values, currencyLocaleForCalculator(definition, locale)), locale, definition);
 }

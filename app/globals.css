@@ -102,3 +102,19 @@ button {
   .mobile-reading-details > summary { list-style: none; }
   .mobile-reading-details > summary::-webkit-details-marker { display: none; }
 }
+
+/* Primary blue actions must remain legible in both languages and on mobile.
+   Target interactive elements only; pale informational panels are unaffected. */
+:where(a, button, [role="button"]):is(
+  [class~="bg-blue-500"],
+  [class~="bg-blue-600"],
+  [class~="bg-blue-700"],
+  [class~="bg-blue-800"],
+  [class~="bg-indigo-500"],
+  [class~="bg-indigo-600"],
+  [class~="bg-indigo-700"],
+  [class~="bg-sky-600"],
+  [class~="bg-sky-700"]
+) {
+  color: #fff !important;
+}

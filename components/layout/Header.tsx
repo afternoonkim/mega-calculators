@@ -45,8 +45,8 @@ export default function Header({ locale }: { locale: Locale }) {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
-        <div className="flex items-center gap-4 py-4">
-          <Link href={withLocale(locale, "/")} className="shrink-0 text-xl font-black tracking-tight text-slate-950">
+        <div className="flex items-center gap-3 py-2.5 md:gap-4 md:py-4">
+          <Link href={withLocale(locale, "/")} className="shrink-0 text-base font-black tracking-tight text-slate-950 md:text-xl">
             Mega Calculators
           </Link>
 
@@ -70,7 +70,7 @@ export default function Header({ locale }: { locale: Locale }) {
             aria-label={open ? (locale === "ko" ? "메뉴 닫기" : "Close menu") : (locale === "ko" ? "메뉴 열기" : "Open menu")}
             aria-expanded={open}
             onClick={() => setOpen((current) => !current)}
-            className="ml-auto inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 text-slate-900 transition hover:bg-slate-50 lg:hidden"
+            className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-900 transition hover:bg-slate-50 lg:hidden"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>

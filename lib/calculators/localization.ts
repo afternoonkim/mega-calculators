@@ -1113,6 +1113,23 @@ export function localizeResultText(text: string, locale: Locale) {
     [/per mile/gi, '마일당'],
     [/per kilometer/gi, '킬로미터당'],
     [/calories\/day/gi, 'kcal/일'],
+    [/(-?[\d.,]+)\s*weeks?/gi, '$1주'],
+    [/(-?[\d.,]+)\s*millimeters?/gi, '$1밀리미터'],
+    [/(-?[\d.,]+)\s*centimeters?/gi, '$1센티미터'],
+    [/(-?[\d.,]+)\s*kilometers?/gi, '$1킬로미터'],
+    [/(-?[\d.,]+)\s*meters?/gi, '$1미터'],
+    [/(-?[\d.,]+)\s*miles?/gi, '$1마일'],
+    [/(-?[\d.,]+)\s*feet/gi, '$1피트'],
+    [/(-?[\d.,]+)\s*inches?/gi, '$1인치'],
+    [/(-?[\d.,]+)\s*kilograms?/gi, '$1킬로그램'],
+    [/(-?[\d.,]+)\s*grams?/gi, '$1그램'],
+    [/(-?[\d.,]+)\s*pounds?/gi, '$1파운드'],
+    [/(-?[\d.,]+)\s*liters?/gi, '$1리터'],
+    [/(-?[\d.,]+)\s*calories/gi, '$1칼로리'],
+    [/\bper day\b/gi, '하루당'],
+    [/\bper week\b/gi, '주당'],
+    [/\bper month\b/gi, '월당'],
+    [/\bper year\b/gi, '연간'],
   ];
   for (const [pattern, replacement] of replacements) out = out.replace(pattern, replacement);
 

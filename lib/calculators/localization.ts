@@ -1002,7 +1002,37 @@ function buildKoIntro(definition: CalculatorDefinition, localizedName: string) {
   return `${localizedName}는 ${joined}을 기준으로 결과를 계산해주는 온라인 계산기입니다. 빈칸에 값을 넣고 바로 결과를 확인할 수 있도록 간단하게 구성했습니다.`;
 }
 
+const koFormulaEditorial: Record<string, string> = {
+  "compound-interest-calculator": "초기금액의 복리 성장분에 매월 적립금의 미래가치를 더합니다. 적용 수익률과 적립 시점에 따라 값이 달라집니다.",
+  "loan-calculator": "원금을 월 이율과 총 상환 횟수로 나누어 원리금균등 상환액을 추정합니다. 이율이 0이면 원금을 납입 횟수로 나누어 계산합니다.",
+  "mortgage-calculator": "주택가격에서 계약금을 제외한 대출원금을 기준으로 월 원리금과 총이자를 추정합니다. 세금·보험·관리비는 별도 확인이 필요합니다.",
+  "investment-calculator": "투자 원금과 기간, 가정한 수익률을 이용해 예상 미래금액을 구합니다. 수익률을 확정적인 이익으로 해석해서는 안 됩니다.",
+  "dividend-yield-calculator": "주당 연간 배당금을 주가로 나눈 뒤 100을 곱해 배당수익률을 계산합니다. 배당금이나 주가가 변하면 결과도 달라집니다.",
+  "stock-average-calculator": "각 매수 건의 가격에 수량을 곱한 총매수금액을 전체 수량으로 나누어 평균 매수가를 계산합니다.",
+  "roi-calculator": "순이익을 최초 투입비용으로 나누고 100을 곱해 투자수익률을 구합니다. 비용 범위를 일관되게 적용해야 비교할 수 있습니다.",
+  "bmi-calculator": "체중(kg)을 키(m)의 제곱으로 나누어 BMI를 구합니다. 성인 BMI는 체지방 분포를 직접 측정하는 값이 아닙니다.",
+  "bmr-calculator": "입력된 성별·나이·키·체중을 사용하는 추정식으로 기초대사량을 계산합니다. 실제 에너지 소비량과는 차이가 날 수 있습니다.",
+  "body-surface-area-calculator": "키와 체중을 신체표면적 산정식에 대입해 추정값을 구합니다. 의료 용량 결정에는 전문가의 확인이 필요합니다.",
+  "percentage-calculator": "부분값을 전체값으로 나누어 100을 곱해 비율을 계산합니다. 전체값이 0인 경우는 계산할 수 없습니다.",
+  "percent-change-calculator": "(새 값−기존 값)을 기존 값으로 나누고 100을 곱해 증감률을 구합니다. 기존 값이 0이면 별도 해석이 필요합니다.",
+  "average-calculator": "입력한 수들의 합계를 유효한 값의 개수로 나누어 산술평균을 계산합니다. 누락값 처리 기준을 확인하세요.",
+  "weighted-average-calculator": "각 값과 가중치를 곱한 결과의 합을 전체 가중치 합으로 나눕니다. 가중치 합이 0이면 계산할 수 없습니다.",
+  "standard-deviation-calculator": "각 값과 평균의 차이를 제곱하여 합산하고 기준 개수로 나눈 뒤 제곱근을 구합니다. 모집단과 표본 기준은 구분해야 합니다.",
+  "circle-area-calculator": "원의 넓이는 반지름의 제곱에 원주율 π를 곱합니다. 지름을 입력했다면 반지름으로 바꾸는 과정이 필요합니다.",
+  "rectangle-area-calculator": "가로와 세로를 곱해 직사각형 넓이를 계산합니다. 길이 단위를 동일하게 맞춰야 합니다.",
+  "triangle-area-calculator": "밑변과 높이를 곱하고 2로 나누어 삼각형 넓이를 계산합니다. 높이는 밑변에 수직인 길이입니다.",
+  "distance-formula-calculator": "두 점의 가로좌표 차이와 세로좌표 차이를 각각 제곱해 더한 뒤 제곱근을 구합니다.",
+  "pythagorean-theorem-calculator": "직각삼각형에서 빗변의 제곱은 다른 두 변 제곱의 합과 같습니다. 직각 조건을 확인해야 합니다.",
+  "simple-interest-calculator": "단리는 원금×연이율×기간으로 이자를 계산하며 발생 이자를 원금에 다시 더해 복리 계산하지 않습니다.",
+  "break-even-calculator": "고정비를 단위당 판매가격과 변동비의 차이로 나누어 손익분기 판매수량을 추정합니다. 단위당 이익이 0 이하이면 의미 있는 분기점이 없습니다.",
+  "unit-price-calculator": "상품 가격을 용량이나 수량으로 나누어 단위당 가격을 구합니다. 같은 단위로 환산한 뒤 비교해야 합니다.",
+  "discount-calculator": "정가에 할인율을 곱해 할인액을 구하고, 이를 정가에서 빼서 할인가를 계산합니다.",
+  "rule-of-72-calculator": "72를 연 수익률(%)로 나누어 원금이 두 배가 되는 기간을 대략 추정합니다. 정확한 복리 계산과는 차이가 있습니다.",
+};
+
 function buildKoFormulaText(definition: CalculatorDefinition, localizedName: string) {
+  const dedicated = koFormulaEditorial[definition.slug];
+  if (dedicated) return dedicated;
   if (isConverter(definition)) {
     return `${localizedName}는 입력한 수치에 표준 단위 환산 비율을 적용해 결과를 계산합니다. 즉, 기준 단위로 한 번 변환한 뒤 원하는 단위로 다시 바꾸는 방식이라 입력값만 정확하면 결과를 빠르게 비교할 수 있습니다.`;
   }
